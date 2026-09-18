@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-cream text-ink font-sans antialiased;
+  }
+
+  ::selection {
+    background-color: #dDEBE0;
+    color: #132d1e;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-[-0.01em];
+  }
+
+  /* Fokus keyboard yang konsisten & aksesibel */
+  :focus-visible {
+    outline: 2px solid #2c6742;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-content px-5 sm:px-6 lg:px-8;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border text-sm font-semibold
+           transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-md {
+    @apply h-11 px-5;
+  }
+
+  .btn-sm {
+    @apply h-9 px-3.5 text-[13px];
+  }
+
+  .btn-primary {
+    @apply border-brand-700 bg-brand-700 text-white hover:bg-brand-800 hover:border-brand-800;
+  }
+
+  .btn-outline {
+    @apply border-line-strong bg-white text-ink hover:bg-brand-50 hover:border-brand-300;
+  }
+
+  .btn-ghost {
+    @apply border-transparent bg-transparent text-ink-soft hover:bg-brand-50 hover:text-brand-800;
+  }
+
+  .btn-danger {
+    @apply border-red-200 bg-white text-red-700 hover:bg-red-50;
+  }
+
+  .card {
+    @apply rounded-card border border-line bg-white shadow-card;
+  }
+
+  .field-label {
+    @apply mb-1.5 block text-[13px] font-semibold text-ink-soft;
+  }
+
+  .field {
+    @apply block w-full rounded-lg border border-line-strong bg-white px-3.5 py-2.5 text-sm text-ink
+           placeholder:text-ink-muted/70 focus:border-brand-500 focus:outline-none focus:ring-2
+           focus:ring-brand-500/20;
+  }
+
+  .field-sm {
+    @apply block w-full rounded-lg border border-line-strong bg-white px-2.5 py-1.5 text-[13px] text-ink
+           focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold;
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-bold uppercase tracking-[0.16em] text-brand-600;
+  }
+
+  .table-wrap {
+    @apply -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0;
+  }
+
+  .data-table {
+    @apply w-full min-w-[640px] border-collapse text-sm;
+  }
+
+  .data-table th {
+    @apply border-b border-line px-3 py-2.5 text-left text-[12px] font-bold uppercase tracking-wide text-ink-muted;
+  }
+
+  .data-table td {
+    @apply border-b border-line px-3 py-3 align-middle text-ink-soft;
+  }
+
+  .data-table tbody tr:hover {
+    @apply bg-cream/70;
+  }
+}
+
+/* Pola garis tipis untuk placeholder foto — tanpa gradient */
+.pattern-dots {
+  background-image: radial-gradient(#cbd3c9 1px, transparent 1px);
+  background-size: 14px 14px;
+}
