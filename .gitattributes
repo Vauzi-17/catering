@@ -1,0 +1,24 @@
+# Menyeragamkan akhir baris.
+#
+# Windows memakai CRLF, sedangkan Linux dan macOS memakai LF. Tanpa berkas ini
+# Git akan memperingatkan setiap kali menyimpan, dan riwayat perubahan bisa
+# terlihat seolah seluruh isi berkas berubah padahal hanya akhir barisnya.
+#
+# Aturannya: di dalam repositori semua berkas teks disimpan sebagai LF. Ini
+# juga yang dipakai server tempat aplikasi nanti dijalankan.
+* text=auto eol=lf
+
+# Berkas yang wajib LF karena dibaca langsung oleh server
+*.sh      text eol=lf
+.htaccess text eol=lf
+
+# Berkas biner — jangan diutak-atik Git
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.woff  binary
+*.woff2 binary
