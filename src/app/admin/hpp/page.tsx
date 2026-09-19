@@ -216,9 +216,11 @@ export default function HalamanHpp() {
           nada={hasil.marginPersen >= target ? "baik" : "perhatian"}
         />
         <KartuStat
-          label={`Usulan harga (margin ${persen(target, 0)})`}
+          label="Usulan harga"
           nilai={rupiah(rekomendasi.hargaBulat)}
-          catatan={`Margin tercapai ${persen(rekomendasi.marginTercapai)}`}
+          catatan={`Untuk target margin ${persen(target, 0)} · tercapai ${persen(
+            rekomendasi.marginTercapai,
+          )}`}
           nada="baik"
         />
       </div>
@@ -272,7 +274,7 @@ export default function HalamanHpp() {
 
           <dl className="mt-5 space-y-2.5 border-t border-line pt-4 text-sm">
             <div className="flex justify-between">
-              <dt className="text-ink-muted">Total biaya bahan</dt>
+              <dt className="text-ink-muted">Biaya bahan</dt>
               <dd className="font-semibold">{rupiah(hasil.biayaBahan)}</dd>
             </div>
             <div className="flex justify-between">
@@ -331,8 +333,8 @@ export default function HalamanHpp() {
             </section>
           ) : (
             <PanelAnalisis
-              judul="Catatan"
-              deskripsi={`Dari resep ${menu.nama}, harga bahan terbaru, dan target margin ${persen(
+              judul="AI Insight"
+              deskripsi={`Dibaca dari resep ${menu.nama}, harga bahan terbaru, dan target margin ${persen(
                 target,
                 0,
               )}.`}

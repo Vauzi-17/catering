@@ -72,7 +72,7 @@ export function LencanaSumber({ sumber }: { sumber: "gemini" | "lokal" }) {
 }
 
 export function PanelAnalisis({
-  judul = "Hasil analisis",
+  judul = "AI Insight",
   deskripsi,
   catatan,
   sumber,
@@ -93,12 +93,14 @@ export function PanelAnalisis({
         <div className="flex-1">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-display text-lg leading-snug">{judul}</h2>
-            {sumber && <LencanaSumber sumber={sumber} />}
+            {/* Sumbernya belum pasti selama masih memuat — jangan tampilkan
+                lencana lebih dulu supaya tidak terbaca keliru. */}
+            {sumber && !memuat && <LencanaSumber sumber={sumber} />}
           </div>
           <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
             {memuat
-              ? "Menyusun catatan…"
-              : (deskripsi ?? "Disusun dari data yang tercatat di sistem.")}
+              ? "Menyusun penjelasan…"
+              : (deskripsi ?? "Penjelasan atas angka yang dihitung sistem.")}
           </p>
         </div>
       </div>
@@ -119,6 +121,12 @@ export function PanelAnalisis({
           );
         })}
       </ul>
+
+      <p className="mt-4 border-t border-line pt-3 text-[12px] leading-relaxed text-ink-muted">
+        Seluruh angka pada halaman ini — pendapatan, HPP, margin, jumlah pesanan —
+        dihitung sistem dari data pesanan dan bahan baku. Bagian ini hanya
+        penjelasan atas angka tersebut.
+      </p>
     </section>
   );
 }

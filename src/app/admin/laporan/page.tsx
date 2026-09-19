@@ -188,8 +188,8 @@ export default function HalamanLaporan() {
         </section>
 
         <PanelAnalisis
-          judul="Catatan"
-          deskripsi="Dari tren pendapatan, margin menu, dan stok bahan."
+          judul="AI Insight"
+          deskripsi="Dibaca dari tren pendapatan, margin menu, dan stok bahan."
           catatan={catatan}
           sumber={catatanAi ? "gemini" : "lokal"}
           memuat={memuatAi}

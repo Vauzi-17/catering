@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { JudulHalaman } from "@/components/admin/AdminShell";
 import { GrafikBatang, KartuStat, PanelAnalisis } from "@/components/admin/Bagian";
 import {
@@ -17,7 +17,9 @@ import {
   kebutuhanBahan,
   laporanHarian,
   performaMenu,
+  type CatatanAnalisis,
 } from "@/lib/analisis";
+import { mintaInsightLaporan, susunKonteks } from "@/lib/ai-klien";
 import { persen, rupiah, tanggalHariIni, tanggalPendek } from "@/lib/format";
 import { useData } from "@/store/DataProvider";
 
@@ -39,10 +41,54 @@ export default function DasborAdmin() {
     [pesanan, menus, bahan],
   );
 
-  const catatan = useMemo(
+  const catatanLokal = useMemo(
     () => insightLaporan(laporan, performa, kebutuhan).slice(0, 3),
     [laporan, performa, kebutuhan],
   );
+
+  // Angka pada kartu dan grafik di atas dihitung sistem. Bagian ini hanya
+  // penjelasannya, ditulis Gemini bila tersedia — kalau tidak, dipakai
+  // penjelasan hasil perhitungan sendiri supaya dasbor tidak pernah kosong.
+  const [catatanAi, setCatatanAi] = useState<CatatanAnalisis[] | null>(null);
+  const [memuatAi, setMemuatAi] = useState(false);
+
+  useEffect(() => {
+    if (pesanan.length === 0) return;
+    let dibatalkan = false;
+
+    setMemuatAi(true);
+    setCatatanAi(null);
+
+    void mintaInsightLaporan(
+      susunKonteks({
+        pesanan,
+        menus,
+        bahan,
+        overheadPersen: pengaturan.overheadPersen,
+        targetMargin: pengaturan.targetMargin,
+        rentangHari: 7,
+      }),
+    )
+      .then((hasil) => {
+        if (!dibatalkan) setCatatanAi(hasil ? hasil.slice(0, 3) : null);
+      })
+      .finally(() => {
+        if (!dibatalkan) setMemuatAi(false);
+      });
+
+    return () => {
+      dibatalkan = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    pesanan.length,
+    menus.length,
+    bahan.length,
+    pengaturan.overheadPersen,
+    pengaturan.targetMargin,
+  ]);
+
+  const catatan = catatanAi ?? catatanLokal;
 
   const hariIni = tanggalHariIni();
   const barisHariIni = laporan.find((l) => l.tanggal === hariIni);
@@ -153,9 +199,11 @@ export default function DasborAdmin() {
         </section>
 
         <PanelAnalisis
-          judul="Catatan"
-          deskripsi="Ringkasan dari data pesanan dan stok bahan."
+          judul="AI Insight"
+          deskripsi="Ringkasan kondisi usaha hari ini."
           catatan={catatan}
+          sumber={catatanAi ? "gemini" : "lokal"}
+          memuat={memuatAi}
         />
       </div>
 

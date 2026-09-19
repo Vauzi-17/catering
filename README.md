@@ -9,6 +9,7 @@ prasmanan, tumpeng, dan snack box.
 | --- | --- |
 | [`docs/SETUP-BACKEND.md`](docs/SETUP-BACKEND.md) | Cara menyiapkan Supabase dan Gemini, langkah demi langkah |
 | [`docs/KEBUTUHAN-FOTO.md`](docs/KEBUTUHAN-FOTO.md) | Daftar foto yang perlu disiapkan klien + panduan memotret |
+| [`docs/DATA-YANG-HARUS-DIGANTI.md`](docs/DATA-YANG-HARUS-DIGANTI.md) | Data contoh yang wajib diganti sebelum serah terima |
 
 ---
 
@@ -196,6 +197,7 @@ Tiga tempat pemakaian:
 
 | Halaman | Route | Bila Gemini mati |
 | --- | --- | --- |
+| Dashboard | `POST /api/ai/insight` (`jenis: "laporan"`) | Catatan dari `insightLaporan()` |
 | Laporan | `POST /api/ai/insight` (`jenis: "laporan"`) | Catatan dari `insightLaporan()` |
 | Hitung HPP | `POST /api/ai/insight` (`jenis: "hpp"`) | Catatan dari `analisisHpp()` |
 | AI Assistant | `POST /api/ai/asisten` | Jawaban dari `jawabPertanyaan()` |

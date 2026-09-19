@@ -129,7 +129,7 @@ export default function HalamanBahanAdmin() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Bahan</th>
+                  <th>Nama bahan</th>
                   <th>Kategori</th>
                   <th className="text-right">Harga satuan</th>
                   <th className="text-right">Stok</th>

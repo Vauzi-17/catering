@@ -400,7 +400,8 @@ function FormulirMenu({
                 placeholder="/images/menu/nama-file.jpg"
               />
               <p className="mt-1.5 text-[12px] text-ink-muted">
-                Kosongkan bila foto belum ada. Kotak abu-abu akan ditampilkan sementara.
+                Boleh path berkas lokal, boleh juga URL dari Supabase Storage.
+                Kosongkan bila foto belum ada — kotak abu-abu tampil sementara.
               </p>
             </div>
 
