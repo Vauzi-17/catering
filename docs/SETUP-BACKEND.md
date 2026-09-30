@@ -23,17 +23,17 @@ aplikasi. Jadi tidak ada yang rusak bila dikerjakan bertahap.
 
 ### A2. Jalankan berkas SQL
 
-Buka **SQL Editor → New query**, lalu jalankan tiga berkas ini **berurutan**.
+Buka **SQL Editor → New query**, lalu jalankan berkas-berkas ini **berurutan**.
 Tempel isinya, klik **Run**, tunggu sampai muncul "Success".
 
 | Urutan | Berkas | Isinya |
 | --- | --- | --- |
 | 1 | `supabase/01-schema.sql` | Tabel, indeks, trigger, fungsi bantu |
-| 2 | `supabase/02-rls.sql` | Aturan keamanan baris tahap pengembangan |
-| 3 | `supabase/03-seed.sql` | 5 kategori, 26 bahan baku, 14 menu beserta resepnya |
+| 2 | `supabase/03-seed.sql` | 5 kategori, 26 bahan baku, 14 menu beserta resepnya |
+| 3 | `supabase/06-akun-pembayaran.sql` | Akun pelanggan, pembayaran, keamanan baris produksi — lihat [`SETUP-PEMBAYARAN.md`](SETUP-PEMBAYARAN.md) |
 | 4 (opsional) | `supabase/05-contoh-pesanan.sql` | 23 pesanan contoh, supaya Dasbor dan Laporan ada isinya |
 
-Berkas ketiga aman dijalankan berulang kali — datanya diperbarui, bukan
+Semua berkas aman dijalankan berulang kali — datanya diperbarui, bukan
 digandakan. Jadi bila sebuah berkas gagal di tengah jalan, cukup perbaiki
 penyebabnya lalu jalankan ulang dari awal; tidak perlu mengosongkan tabel.
 
@@ -41,9 +41,9 @@ Di bagian paling bawah `03-seed.sql` ada perintah pemeriksa. Jalankan bagian itu
 untuk memastikan hasilnya: **5 kategori, 26 bahan baku, 14 menu, 109 baris
 resep.**
 
-> `supabase/04-rls-produksi.sql` **belum dijalankan sekarang.** Berkas itu untuk
-> nanti, setelah login admin dipindah ke Supabase Auth. Penjelasannya ada di
-> bagian D.
+> `02-rls.sql` dan `04-rls-produksi.sql` adalah aturan versi lama dan **tidak
+> dipakai lagi** — `06-akun-pembayaran.sql` menggantikan keduanya. Menjalankan
+> `02` sesudah `06` membuka kembali izin tulis untuk pengunjung anonim.
 
 ### A3. Mengisi Dasbor dan Laporan
 
@@ -74,15 +74,16 @@ Rincian dan riwayat statusnya ikut terhapus otomatis.
 
 **Cara sungguhan — pesan lewat website sendiri**
 
-1. Buka `/pesan`, pilih menu, isi formulir, kirim.
-2. Buka **Panel Admin → Pesanan**, klik **Kelola** pada pesanan itu, lalu
-   **Konfirmasi pesanan**.
+1. Daftar dan masuk sebagai pelanggan, pilih menu, isi data acara, lalu bayar
+   lewat simulator sandbox Midtrans (lihat `SETUP-PEMBAYARAN.md` bagian 2.3).
+2. Pesanan otomatis berstatus **Dibayar** dan langsung terhitung di laporan.
 
 Dua hal yang sering membingungkan di sini:
 
-- **Pesanan hanya masuk laporan setelah dikonfirmasi.** Status *Menunggu
-  Konfirmasi* belum diakui sebagai pendapatan — itu disengaja, karena pesanan
-  bisa saja batal. Tetapi tetap ikut dihitung pada estimasi kebutuhan bahan.
+- **Pesanan hanya masuk laporan setelah dibayar.** Status *Menunggu
+  Pembayaran* belum diakui sebagai pendapatan — itu disengaja, karena tagihan
+  bisa kedaluwarsa. Pesanan lama berstatus *Menunggu Konfirmasi* diperlakukan
+  sama.
 - **Laporan dikelompokkan menurut tanggal acara, bukan tanggal pesan.** Formulir
   hanya menerima acara paling cepat besok (H-1), jadi pesanan yang Anda buat
   sekarang akan muncul di kolom tanggal acaranya — bukan hari ini. Karena grafik
@@ -112,8 +113,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi....
 Kedua nilai itu memang boleh terbaca dari peramban. Yang menjaga data adalah
 aturan RLS di Supabase, bukan kerahasiaan kuncinya.
 
-**Jangan** memakai `service_role key` di aplikasi ini. Kunci itu melewati semua
-aturan keamanan dan tidak boleh sampai ke peramban.
+`service_role key` **tidak** diisi di sini — kunci itu melewati semua aturan
+keamanan dan hanya dipakai di server lewat `SUPABASE_SERVICE_ROLE_KEY` (tanpa
+awalan `NEXT_PUBLIC_`). Lihat `SETUP-PEMBAYARAN.md` bagian 1.6.
 
 ### A5. Pastikan berhasil
 
@@ -232,48 +234,15 @@ Ubah alamat pada:
 
 ---
 
-## Bagian D — Mengamankan sebelum dipublikasikan
+## Bagian D — Akun, pembayaran, dan keamanan produksi
 
-> Selama login admin masih memakai `admin` / `asri2025`, aturan pada
-> `02-rls.sql` terpaksa mengizinkan penulisan data oleh pengunjung anonim.
-> Artinya siapa pun yang mengetahui URL Supabase dan anon key Anda bisa
-> mengubah data menu, bahan baku, dan pesanan.
->
-> Aman selama dikerjakan di komputer sendiri. **Wajib diperbaiki sebelum
-> alamat website diberikan ke pelanggan.**
+Login admin, akun pelanggan, dan pembayaran Midtrans sekarang memakai Supabase
+Auth. Langkahnya — termasuk menjalankan `supabase/06-akun-pembayaran.sql` yang
+menggantikan `02-rls.sql` dan `04-rls-produksi.sql` — ada di
+[`SETUP-PEMBAYARAN.md`](SETUP-PEMBAYARAN.md).
 
-Langkahnya:
-
-1. **Authentication → Users → Add user.** Buat akun untuk Ibu Asri dengan email
-   dan kata sandi. Salin UUID yang muncul.
-2. **SQL Editor**, jalankan:
-
-   ```sql
-   insert into public.users (id, nama)
-   values ('<uuid-yang-tadi-disalin>', 'Asri Wulandari');
-   ```
-
-3. Ubah fungsi `login` pada `src/store/DataProvider.tsx` menjadi:
-
-   ```ts
-   const login = useCallback(async (email: string, sandi: string) => {
-     const { error } = await wajibSupabase().auth.signInWithPassword({
-       email,
-       password: sandi,
-     });
-     if (!error) setMasuk(true);
-     return !error;
-   }, []);
-   ```
-
-   Ubah juga `createClient` pada `src/lib/supabase.ts` menjadi
-   `auth: { persistSession: true }` supaya sesi bertahan setelah halaman
-   dimuat ulang.
-
-4. Jalankan `supabase/04-rls-produksi.sql` di SQL Editor.
-
-Setelah itu anon key hanya bisa: membaca katalog menu, membuat pesanan, dan
-melacak satu pesanan lewat kodenya. Selebihnya wajib login.
+**Wajib dikerjakan sebelum alamat website diberikan ke pelanggan.** Selama
+hanya `02-rls.sql` yang berjalan, pengunjung anonim masih bisa menulis data.
 
 ---
 
@@ -282,14 +251,14 @@ melacak satu pesanan lewat kodenya. Selebihnya wajib login.
 | Gejala | Penyebab biasanya |
 | --- | --- |
 | Sidebar masih "Mode data contoh" | `.env.local` belum ada, atau server belum dijalankan ulang setelah diisi |
-| "permission denied for table ..." | `02-rls.sql` belum dijalankan |
+| "permission denied for table ..." | `06-akun-pembayaran.sql` belum dijalankan, atau akun belum terdaftar sebagai admin |
 | Menu kosong padahal Supabase terhubung | `03-seed.sql` belum dijalankan |
-| Dasbor dan Laporan nol semua | Tabel pesanan masih kosong, atau semua pesanan masih berstatus Menunggu Konfirmasi. Lihat bagian A3 |
-| Pesanan sudah dibuat tapi laporan tetap nol | Belum dikonfirmasi, atau tanggal acaranya di luar rentang laporan. Lihat bagian A3 |
+| Dasbor dan Laporan nol semua | Tabel pesanan masih kosong, atau semua pesanan masih Menunggu Pembayaran. Lihat bagian A3 |
+| Pesanan sudah dibuat tapi laporan tetap nol | Belum dibayar, atau tanggal acaranya di luar rentang laporan. Lihat bagian A3 |
 | `relation "peta_bahan" does not exist` | Anda memakai salinan lama `03-seed.sql`. Versi itu memakai tabel sementara yang tidak bertahan di connection pooler Supabase. Ambil berkas terbaru lalu jalankan ulang — isinya sudah tidak memakai tabel sementara |
 | Lencana selalu "Hitungan aplikasi" | Lihat pesan di terminal — sudah diterjemahkan ke penyebab yang spesifik |
 | `Model ... sedang penuh permintaan di sisi Google` | Normal dan sementara. Aplikasi sudah jatuh ke hitungan sendiri. Bila sering, ganti `GEMINI_MODEL` |
 | `GEMINI_API_KEY tidak diterima Google` | Kunci salah ketik atau sudah dicabut. Ambil kunci baru di AI Studio |
 | `Kuota atau laju permintaan Gemini terlampaui` | Lebih dari 15 permintaan per menit, atau jatah harian habis. Tunggu sebentar |
-| Pesanan gagal dikirim | Policy insert pada tabel `orders` belum ada — jalankan ulang `02-rls.sql` |
+| Pesanan gagal dikirim | Lihat tabel masalah di `SETUP-PEMBAYARAN.md` bagian 6 |
 | `npm run build` gagal saat mengambil font | Komputer sedang tanpa internet; `next/font` mengunduh font saat build |

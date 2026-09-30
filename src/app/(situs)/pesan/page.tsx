@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { FormPesanan } from "@/components/FormPesanan";
 
 export const metadata: Metadata = {
-  title: "Pesan Online",
-  description:
-    "Keranjang dan formulir pemesanan Asri Catering. Atur jumlah porsi, isi tanggal dan alamat acara, lalu terima kode pesanan untuk memantau statusnya.",
+  title: "Checkout",
+  description: "Isi jadwal dan lokasi acara, lalu bayar pesanan Asri Catering secara online.",
+  robots: { index: false },
 };
 
 export default function HalamanPesan() {

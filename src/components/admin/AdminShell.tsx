@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import { Receipt } from "lucide-react";
 import { LogoMark } from "@/components/Logo";
 import {
   IconAlert,
@@ -22,6 +23,7 @@ import { useData } from "@/store/DataProvider";
 const menuAdmin = [
   { label: "Dashboard", href: "/admin", ikon: IconGrid },
   { label: "Pesanan", href: "/admin/pesanan", ikon: IconClipboard },
+  { label: "Transaksi", href: "/admin/transaksi", ikon: Receipt },
   { label: "Menu", href: "/admin/menu", ikon: IconBox },
   { label: "Bahan Baku", href: "/admin/bahan", ikon: IconLeaf },
   { label: "Hitung HPP", href: "/admin/hpp", ikon: IconCalculator },

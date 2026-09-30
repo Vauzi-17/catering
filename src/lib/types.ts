@@ -50,10 +50,38 @@ export interface Menu {
 }
 
 export type StatusPesanan =
+  | "Menunggu Pembayaran"
   | "Menunggu Konfirmasi"
+  | "Dibayar"
   | "Diproses"
+  | "Dikirim"
   | "Selesai"
   | "Dibatalkan";
+
+/** null = pesanan lama/manual yang tidak lewat pembayaran online. */
+export type StatusBayar = "Menunggu" | "Lunas" | "Kedaluwarsa" | "Gagal" | "Dikembalikan";
+
+export interface Pembayaran {
+  id: string;
+  midtransOrderId: string;
+  transactionId: string | null;
+  statusTransaksi: string;
+  jenisPembayaran: string;
+  keterangan: string;
+  jumlah: number;
+  waktuTransaksi: string | null;
+  dibuatPada: string;
+}
+
+export interface Profil {
+  id: string;
+  nama: string;
+  telepon: string;
+  alamat: string;
+  patokan: string;
+  lat: number | null;
+  lng: number | null;
+}
 
 export interface ItemPesanan {
   menuId: string;
@@ -77,6 +105,15 @@ export interface Pesanan {
   status: StatusPesanan;
   dibuatPada: string; // ISO date
   riwayat: { status: StatusPesanan; waktu: string }[];
+  // Kolom pembayaran online; kosong pada pesanan lama dan mode contoh.
+  patokan?: string;
+  lat?: number | null;
+  lng?: number | null;
+  statusBayar?: StatusBayar | null;
+  metodeBayar?: string;
+  batasBayar?: string | null;
+  dibayarPada?: string | null;
+  pembayaran?: Pembayaran[];
 }
 
 export interface HasilHpp {

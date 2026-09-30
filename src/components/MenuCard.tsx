@@ -9,12 +9,13 @@ import type { Menu } from "@/lib/types";
 import { useData } from "@/store/DataProvider";
 
 export function MenuCard({ menu }: { menu: Menu }) {
-  const { tambahKeranjang } = useData();
+  const { tambahKeranjang, bukaKeranjang } = useData();
   const [ditambahkan, setDitambahkan] = useState(false);
   const satuan = satuanMenu(menu);
 
   function tambah() {
     tambahKeranjang(menu.id, menu.minimalPesan);
+    bukaKeranjang();
     setDitambahkan(true);
     window.setTimeout(() => setDitambahkan(false), 1800);
   }

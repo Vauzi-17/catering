@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/store/AuthProvider";
 import { DataProvider } from "@/store/DataProvider";
 
 const sans = Plus_Jakarta_Sans({
@@ -55,7 +56,9 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${sans.variable} ${display.variable}`}>
       <body>
-        <DataProvider>{children}</DataProvider>
+        <AuthProvider>
+          <DataProvider>{children}</DataProvider>
+        </AuthProvider>
       </body>
     </html>
   );

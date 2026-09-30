@@ -1,3 +1,4 @@
+import { STATUS_PERLU_PROSES } from "@/lib/status";
 import {
   hitungHpp,
   kebutuhanBahan,
@@ -82,8 +83,8 @@ export function susunKonteks({
         biaya: k.kurang * k.hargaSatuan,
       })),
     pesananAktif: {
-      menunggu: pesanan.filter((x) => x.status === "Menunggu Konfirmasi").length,
-      diproses: pesanan.filter((x) => x.status === "Diproses").length,
+      menunggu: pesanan.filter((x) => STATUS_PERLU_PROSES.includes(x.status)).length,
+      diproses: pesanan.filter((x) => x.status === "Diproses" || x.status === "Dikirim").length,
     },
   };
 }

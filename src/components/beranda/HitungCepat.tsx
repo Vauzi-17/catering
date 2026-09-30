@@ -1,19 +1,14 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Minus, Plus, ShieldCheck, Truck } from "lucide-react";
-import { profil } from "@/data/profil";
 import { rupiah, satuanMenu } from "@/lib/format";
 import { useData } from "@/store/DataProvider";
 
-// Sesuai ketentuan pada FAQ: antar gratis dalam kota mulai 25 porsi.
-const MIN_GRATIS_ANTAR = 25;
 const MAKS_PORSI = 1000;
 
 export function HitungCepat() {
-  const router = useRouter();
-  const { menus, tambahKeranjang } = useData();
+  const { menus, tambahKeranjang, bukaKeranjang } = useData();
   const tersedia = useMemo(() => menus.filter((m) => m.tersedia), [menus]);
 
   const [menuId, setMenuId] = useState("");
@@ -32,11 +27,10 @@ export function HitungCepat() {
 
   const jumlah = Math.min(Math.max(qty, minimal), MAKS_PORSI);
   const subtotal = menu.hargaJual * jumlah;
-  const gratisAntar = jumlah >= MIN_GRATIS_ANTAR;
 
   function lanjut() {
     tambahKeranjang(menu!.id, jumlah);
-    router.push("/pesan");
+    bukaKeranjang();
   }
 
   return (
@@ -130,17 +124,13 @@ export function HitungCepat() {
         </div>
         <div className="flex justify-between gap-4">
           <dt className="inline-flex items-center gap-1.5 text-ink-soft">
-            Antar dalam kota
+            Ongkir
             <Truck size={15} strokeWidth={1.8} className="text-ink-muted" />
           </dt>
           <dd>
-            {gratisAntar ? (
-              <span className="rounded-md bg-zamrud-50 px-2 py-0.5 text-[12px] font-bold text-zamrud-700">
-                GRATIS
-              </span>
-            ) : (
-              <span className="text-[13px] text-ink-muted">Sesuai jarak</span>
-            )}
+            <span className="rounded-md bg-zamrud-50 px-2 py-0.5 text-[12px] font-bold text-zamrud-700">
+              GRATIS
+            </span>
           </dd>
         </div>
       </dl>
@@ -152,11 +142,7 @@ export function HitungCepat() {
         <p className="mt-1 font-display text-[30px] font-semibold leading-none tabular-nums text-zamrud-800">
           {rupiah(subtotal)}
         </p>
-        {!gratisAntar && (
-          <p className="mt-2 text-[12px] text-ink-muted">
-            Tambah {MIN_GRATIS_ANTAR - jumlah} {satuan} lagi untuk antar gratis.
-          </p>
-        )}
+        <p className="mt-2 text-[12px] text-ink-muted">Ongkir gratis dalam area layanan.</p>
       </div>
 
       <button
@@ -170,7 +156,7 @@ export function HitungCepat() {
 
       <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[12px] text-ink-muted">
         <ShieldCheck size={14} className="shrink-0 text-zamrud-600" />
-        Harga akhir dikonfirmasi admin lewat WhatsApp {profil.telepon}
+        Bayar online saat checkout: QRIS, virtual account, e-wallet
       </p>
     </div>
   );

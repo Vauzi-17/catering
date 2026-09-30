@@ -8,7 +8,7 @@ const asal = process.env.NEXT_PUBLIC_SITE_URL ?? "https://asricatering.id";
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const halaman = ["", "/menu", "/tentang", "/pesan", "/lacak"].map((p) => ({
+  const halaman = ["", "/menu", "/tentang"].map((p) => ({
     url: `${asal}${p}/`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,

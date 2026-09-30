@@ -11,8 +11,8 @@ const jelajahi = [
   { label: "Beranda", href: "/" },
   { label: "Menu & Harga", href: "/menu" },
   { label: "Tentang Kami", href: "/tentang" },
-  { label: "Pesan Online", href: "/pesan" },
-  { label: "Status Pesanan", href: "/lacak" },
+  { label: "Pesanan Saya", href: "/pesanan" },
+  { label: "Akun Saya", href: "/akun" },
 ];
 
 export function SiteFooter() {

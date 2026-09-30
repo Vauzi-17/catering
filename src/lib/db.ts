@@ -5,7 +5,9 @@ import type {
   KategoriMenu,
   Menu,
   Pesanan,
+  Pembayaran,
   Satuan,
+  StatusBayar,
   StatusPesanan,
 } from "@/lib/types";
 
@@ -106,11 +108,48 @@ interface BarisPesanan {
   total: number | string;
   status: string;
   dibuat_pada: string;
+  patokan?: string | null;
+  lat?: number | string | null;
+  lng?: number | string | null;
+  status_bayar?: string | null;
+  metode_bayar?: string | null;
+  batas_bayar?: string | null;
+  dibayar_pada?: string | null;
+  payments?: BarisPembayaran[] | null;
   order_details:
     | { menu_id: string | null; nama_menu: string; qty: number; harga: number | string }[]
     | null;
   order_status_history: { status: string; waktu: string }[] | null;
 }
+
+interface BarisPembayaran {
+  id: string;
+  midtrans_order_id: string;
+  transaction_id: string | null;
+  status_transaksi: string;
+  jenis_pembayaran: string;
+  keterangan: string;
+  jumlah: number | string;
+  waktu_transaksi: string | null;
+  dibuat_pada: string;
+}
+
+function kePembayaran(b: BarisPembayaran): Pembayaran {
+  return {
+    id: b.id,
+    midtransOrderId: b.midtrans_order_id,
+    transactionId: b.transaction_id,
+    statusTransaksi: b.status_transaksi,
+    jenisPembayaran: b.jenis_pembayaran,
+    keterangan: b.keterangan,
+    jumlah: angka(b.jumlah),
+    waktuTransaksi: b.waktu_transaksi,
+    dibuatPada: b.dibuat_pada,
+  };
+}
+
+const angkaAtauNull = (v: number | string | null | undefined) =>
+  v === null || v === undefined ? null : Number(v);
 
 function kePesanan(baris: BarisPesanan): Pesanan {
   return {
@@ -135,11 +174,24 @@ function kePesanan(baris: BarisPesanan): Pesanan {
     riwayat: (baris.order_status_history ?? [])
       .map((h) => ({ status: h.status as StatusPesanan, waktu: h.waktu }))
       .sort((a, b) => (a.waktu < b.waktu ? -1 : 1)),
+    patokan: baris.patokan ?? "",
+    lat: angkaAtauNull(baris.lat),
+    lng: angkaAtauNull(baris.lng),
+    statusBayar: (baris.status_bayar ?? null) as StatusBayar | null,
+    metodeBayar: baris.metode_bayar ?? "",
+    batasBayar: baris.batas_bayar ?? null,
+    dibayarPada: baris.dibayar_pada ?? null,
+    pembayaran: (baris.payments ?? [])
+      .map(kePembayaran)
+      .sort((a, b) => (a.dibuatPada < b.dibuatPada ? 1 : -1)),
   };
 }
 
 const KOLOM_PESANAN =
-  "id, kode, nama, telepon, alamat, tanggal_acara, waktu_antar, metode, catatan, total, status, dibuat_pada, order_details(menu_id, nama_menu, qty, harga), order_status_history(status, waktu)";
+  "id, kode, nama, telepon, alamat, tanggal_acara, waktu_antar, metode, catatan, total, status, dibuat_pada, patokan, lat, lng, status_bayar, metode_bayar, batas_bayar, dibayar_pada, order_details(menu_id, nama_menu, qty, harga), order_status_history(status, waktu)";
+
+const KOLOM_PEMBAYARAN =
+  "id, midtrans_order_id, transaction_id, status_transaksi, jenis_pembayaran, keterangan, jumlah, waktu_transaksi, dibuat_pada";
 
 // ------------------------------------------------------------------ baca
 
@@ -181,14 +233,65 @@ export async function ambilPesanan(): Promise<Pesanan[]> {
   return (data as unknown as BarisPesanan[]).map(kePesanan);
 }
 
-export async function cariPesananKode(kode: string): Promise<Pesanan | null> {
+/** Pesanan milik akun yang sedang login (dibatasi RLS), terbaru di atas. */
+export async function ambilPesananSaya(): Promise<Pesanan[]> {
   const { data, error } = await wajibSupabase()
     .from("orders")
     .select(KOLOM_PESANAN)
-    .ilike("kode", kode.trim())
+    .order("dibuat_pada", { ascending: false })
+    .limit(100);
+  if (error) throw error;
+  return (data as unknown as BarisPesanan[]).map(kePesanan);
+}
+
+/** Satu pesanan lengkap dengan histori pembayarannya. */
+export async function ambilPesananDenganKode(kode: string): Promise<Pesanan | null> {
+  const { data, error } = await wajibSupabase()
+    .from("orders")
+    .select(`${KOLOM_PESANAN}, payments(${KOLOM_PEMBAYARAN})`)
+    .eq("kode", kode)
     .maybeSingle();
   if (error) throw error;
   return data ? kePesanan(data as unknown as BarisPesanan) : null;
+}
+
+export interface TransaksiAdmin extends Pembayaran {
+  kodePesanan: string;
+  namaPemesan: string;
+}
+
+/** Histori transaksi untuk panel admin, terbaru di atas. */
+export async function ambilTransaksi(): Promise<TransaksiAdmin[]> {
+  const { data, error } = await wajibSupabase()
+    .from("payments")
+    .select(`${KOLOM_PEMBAYARAN}, orders(kode, nama)`)
+    .order("dibuat_pada", { ascending: false })
+    .limit(500);
+  if (error) throw error;
+  return (data as unknown as (BarisPembayaran & { orders: { kode: string; nama: string } | null })[]).map(
+    (b) => ({
+      ...kePembayaran(b),
+      kodePesanan: b.orders?.kode ?? "",
+      namaPemesan: b.orders?.nama ?? "",
+    }),
+  );
+}
+
+export interface InfoPengantaran {
+  lat: number;
+  lng: number;
+  radiusKm: number;
+}
+
+/** Titik dapur dan radius layanan, boleh dibaca siapa saja. */
+export async function ambilInfoPengantaran(): Promise<InfoPengantaran | null> {
+  const { data, error } = await wajibSupabase().rpc("info_pengantaran");
+  if (error) throw error;
+  const baris = (Array.isArray(data) ? data[0] : data) as
+    | { dapur_lat: number | string; dapur_lng: number | string; radius_km: number | string }
+    | undefined;
+  if (!baris) return null;
+  return { lat: Number(baris.dapur_lat), lng: Number(baris.dapur_lng), radiusKm: Number(baris.radius_km) };
 }
 
 export async function ambilPengaturan(): Promise<{
@@ -310,55 +413,6 @@ export async function simpanBahanDb(bahan: Bahan): Promise<Bahan> {
 export async function hapusBahanDb(id: string): Promise<void> {
   const { error } = await wajibSupabase().from("ingredients").delete().eq("id", id);
   if (error) throw error;
-}
-
-export async function buatPesananDb(
-  data: Omit<Pesanan, "id" | "kode" | "status" | "dibuatPada" | "riwayat" | "total">,
-): Promise<Pesanan> {
-  const db = wajibSupabase();
-  const total = data.items.reduce((a, it) => a + it.harga * it.qty, 0);
-
-  // Kode pesanan dibentuk oleh trigger di basis data supaya tidak bentrok
-  // ketika dua pelanggan memesan pada saat bersamaan.
-  const { data: pesananBaru, error } = await db
-    .from("orders")
-    .insert({
-      kode: "",
-      nama: data.nama,
-      telepon: data.telepon,
-      alamat: data.alamat,
-      tanggal_acara: data.tanggalAcara,
-      waktu_antar: data.waktuAntar,
-      metode: data.metode,
-      catatan: data.catatan,
-      total,
-    })
-    .select("id, kode, dibuat_pada")
-    .single();
-  if (error) throw error;
-
-  const { error: galatRincian } = await db.from("order_details").insert(
-    data.items.map((it) => ({
-      order_id: pesananBaru.id,
-      menu_id: apakahUuid(it.menuId) ? it.menuId : null,
-      nama_menu: it.nama,
-      qty: it.qty,
-      harga: it.harga,
-    })),
-  );
-  if (galatRincian) throw galatRincian;
-
-  return {
-    ...data,
-    id: pesananBaru.id as string,
-    kode: pesananBaru.kode as string,
-    total,
-    status: "Menunggu Konfirmasi",
-    dibuatPada: pesananBaru.dibuat_pada as string,
-    riwayat: [
-      { status: "Menunggu Konfirmasi", waktu: pesananBaru.dibuat_pada as string },
-    ],
-  };
 }
 
 export async function ubahStatusPesananDb(

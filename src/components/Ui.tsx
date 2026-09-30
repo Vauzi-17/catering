@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
+import { WARNA_STATUS } from "@/lib/status";
 import type { StatusPesanan } from "@/lib/types";
 
 export function SectionHeading({
@@ -32,15 +33,8 @@ export function SectionHeading({
   );
 }
 
-const gayaStatus: Record<StatusPesanan, string> = {
-  "Menunggu Konfirmasi": "border-amber-200 bg-amber-50 text-amber-800",
-  Diproses: "border-sky-200 bg-sky-50 text-sky-800",
-  Selesai: "border-brand-700 bg-brand-700 text-white",
-  Dibatalkan: "border-red-200 bg-red-50 text-red-700",
-};
-
 export function StatusBadge({ status }: { status: StatusPesanan }) {
-  return <span className={`chip ${gayaStatus[status]}`}>{status}</span>;
+  return <span className={`chip border-transparent ${WARNA_STATUS[status]}`}>{status}</span>;
 }
 
 export function Kosong({

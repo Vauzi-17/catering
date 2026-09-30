@@ -13,7 +13,7 @@ import type { Menu } from "@/lib/types";
 import { useData } from "@/store/DataProvider";
 
 export function DetailMenu({ menuAwalan }: { menuAwalan: Menu }) {
-  const { menus, tambahKeranjang } = useData();
+  const { menus, tambahKeranjang, bukaKeranjang } = useData();
   const router = useRouter();
 
   const menu = menus.find((m) => m.slug === menuAwalan.slug) ?? menuAwalan;
@@ -31,6 +31,7 @@ export function DetailMenu({ menuAwalan }: { menuAwalan: Menu }) {
 
   function tambah() {
     tambahKeranjang(menu.id, qty);
+    bukaKeranjang();
     setPesan(`${qty} ${satuan} masuk ke keranjang.`);
     window.setTimeout(() => setPesan(""), 2500);
   }

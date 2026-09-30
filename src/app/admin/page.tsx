@@ -21,6 +21,7 @@ import {
 } from "@/lib/analisis";
 import { mintaInsightLaporan, susunKonteks } from "@/lib/ai-klien";
 import { persen, rupiah, tanggalHariIni, tanggalPendek } from "@/lib/format";
+import { STATUS_BERJALAN, STATUS_PERLU_PROSES } from "@/lib/status";
 import { useData } from "@/store/DataProvider";
 
 export default function DasborAdmin() {
@@ -93,10 +94,8 @@ export default function DasborAdmin() {
   const hariIni = tanggalHariIni();
   const barisHariIni = laporan.find((l) => l.tanggal === hariIni);
 
-  const pesananAktif = pesanan.filter(
-    (p) => p.status === "Menunggu Konfirmasi" || p.status === "Diproses",
-  );
-  const perluKonfirmasi = pesanan.filter((p) => p.status === "Menunggu Konfirmasi");
+  const pesananAktif = pesanan.filter((p) => STATUS_BERJALAN.includes(p.status));
+  const perluKonfirmasi = pesanan.filter((p) => STATUS_PERLU_PROSES.includes(p.status));
 
   const tujuhHari = useMemo(() => {
     const hasil: { label: string; nilai: number; keterangan: string }[] = [];
@@ -158,7 +157,7 @@ export default function DasborAdmin() {
         <KartuStat
           label="Pesanan aktif"
           nilai={String(pesananAktif.length)}
-          catatan={`${perluKonfirmasi.length} menunggu konfirmasi`}
+          catatan={`${perluKonfirmasi.length} perlu diproses`}
           ikon={<IconClipboard width={20} height={20} />}
           nada={perluKonfirmasi.length > 0 ? "perhatian" : "netral"}
         />
@@ -181,7 +180,7 @@ export default function DasborAdmin() {
             <div>
               <h2 className="font-display text-lg">Pendapatan tujuh hari terakhir</h2>
               <p className="mt-1 text-[13px] text-ink-muted">
-                Dihitung dari pesanan yang sudah dikonfirmasi.
+                Dihitung dari pesanan yang sudah dibayar atau dikonfirmasi.
               </p>
             </div>
             <p className="text-right">

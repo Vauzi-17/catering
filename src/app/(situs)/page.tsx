@@ -19,12 +19,13 @@ import { profil } from "@/data/profil";
 import { fotoMenu as foto } from "@/lib/foto";
 
 const pitaPromo = [
-  "Antar gratis dalam Kota Bandung, min. 25 porsi",
+  "Ongkir gratis dalam area layanan",
   "Bisa pesan H-1 untuk di bawah 100 porsi",
   "Porsi cicip gratis untuk pesanan 100+ porsi",
   "Dimasak pagi di hari pengantaran",
   "Isi paket bisa disesuaikan",
-  "Bayar transfer atau tunai",
+  "Bayar online: QRIS, virtual account, e-wallet",
+  "Status pesanan terpantau sampai diantar",
 ];
 
 const ikonLangkah = [ShoppingBag, ClipboardList, Ticket, Truck];
