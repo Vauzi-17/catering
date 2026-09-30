@@ -145,9 +145,12 @@ create table if not exists public.payments (
 );
 
 -- Notifikasi yang sama bisa dikirim ulang oleh Midtrans; cukup dicatat sekali.
-create unique index if not exists payments_transaksi_status_key
-  on public.payments (transaction_id, status_transaksi)
-  where transaction_id is not null;
+-- Index penuh (bukan bersyarat) supaya bisa dipakai upsert dari aplikasi;
+-- baris dengan transaction_id kosong tetap boleh lebih dari satu karena
+-- NULL selalu dianggap berbeda.
+drop index if exists public.payments_transaksi_status_key;
+create unique index payments_transaksi_status_key
+  on public.payments (transaction_id, status_transaksi);
 create index if not exists payments_order_idx on public.payments (order_id, dibuat_pada desc);
 
 -- ---------------------------------------------------------------------------
