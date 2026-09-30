@@ -3,8 +3,9 @@
 /**
  * Popup pembayaran Midtrans Snap.
  *
- * Skrip snap.js dimuat sekali saat dibutuhkan. Kunci sandbox Midtrans selalu
- * diawali "SB-", jadi alamat skrip sandbox/produksi dipilih dari client key.
+ * Skrip snap.js dimuat sekali saat dibutuhkan. Versi sandbox/produksi dipilih
+ * dari redirect_url yang dibuat server untuk transaksi itu, bukan dari awalan
+ * client key — akun sandbox baru tidak lagi memakai awalan "SB-".
  */
 interface SnapJs {
   pay: (
@@ -28,12 +29,12 @@ const CLIENT_KEY = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY ?? "";
 
 let memuat: Promise<SnapJs | null> | null = null;
 
-function muatSnap(): Promise<SnapJs | null> {
+function muatSnap(sandbox: boolean): Promise<SnapJs | null> {
   if (typeof window === "undefined" || !CLIENT_KEY) return Promise.resolve(null);
   if (window.snap) return Promise.resolve(window.snap);
   memuat ??= new Promise((selesai) => {
     const skrip = document.createElement("script");
-    skrip.src = CLIENT_KEY.startsWith("SB-")
+    skrip.src = sandbox
       ? "https://app.sandbox.midtrans.com/snap/snap.js"
       : "https://app.midtrans.com/snap/snap.js";
     skrip.setAttribute("data-client-key", CLIENT_KEY);
@@ -56,7 +57,8 @@ export type HasilSnap = "sukses" | "menunggu" | "ditutup" | "galat";
  * cadangan dan fungsi ini tidak pernah selesai.
  */
 export async function bayarDenganSnap(token: string, redirectUrl: string): Promise<HasilSnap> {
-  const snap = await muatSnap();
+  const sandbox = new URL(redirectUrl).hostname.includes("sandbox");
+  const snap = await muatSnap(sandbox);
   if (!snap) {
     window.location.href = redirectUrl;
     return new Promise(() => {});

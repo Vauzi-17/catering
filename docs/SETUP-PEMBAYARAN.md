@@ -128,8 +128,10 @@ Kunci ini melewati seluruh RLS. **Jangan pernah** memberinya awalan
    - **Server Key** → `MIDTRANS_SERVER_KEY` (rahasia, server saja)
    - **Client Key** → `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` (boleh terbaca peramban)
 
-   Kunci sandbox diawali `SB-`. Aplikasi memakai awalan itu untuk memilih
-   alamat API sandbox atau produksi secara otomatis.
+   Akun sandbox lama memakai kunci berawalan `SB-Mid-...`, akun sandbox baru
+   berawalan `Mid-...` seperti kunci produksi. Karena itu aplikasi **tidak**
+   menebak dari awalan: selama `MIDTRANS_IS_PRODUCTION` kosong atau `false`,
+   semua transaksi dikirim ke sandbox.
 
 ### 2.2 URL notifikasi (wajib)
 
@@ -166,10 +168,10 @@ Tidak ada uang sungguhan yang berpindah di sandbox.
   biaya, tetapi setiap transaksi yang berhasil dikenai biaya per metode
   (VA, QRIS, e-wallet berbeda-beda). Tarif terbaru ada di halaman harga
   Midtrans — **perlu diverifikasi sebelum menentukan harga jual.**
-- Ganti kedua kunci dengan kunci **Production** (tanpa awalan `SB-`), lalu isi
-  Notification URL yang sama di dashboard produksi.
-- Bila kunci produksi Anda kebetulan tidak dikenali, paksa dengan
-  `MIDTRANS_IS_PRODUCTION=true`.
+- Ganti kedua kunci dengan kunci **Production** (dashboard tanpa "sandbox" di
+  alamatnya), isi `MIDTRANS_IS_PRODUCTION=true`, lalu isi Notification URL
+  yang sama di dashboard produksi. Ketiganya harus diganti bersamaan, lalu
+  Redeploy.
 
 ---
 
@@ -186,7 +188,7 @@ Isi di **Vercel → Project → Settings → Environment Variables** (dan di
 | `MIDTRANS_SERVER_KEY` | ya | **server** | Midtrans → Access Keys |
 | `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` | ya | peramban | Midtrans → Access Keys |
 | `NEXT_PUBLIC_SITE_URL` | disarankan | keduanya | `https://catering-six-psi.vercel.app` |
-| `MIDTRANS_IS_PRODUCTION` | tidak | server | `true` / `false`, hanya bila deteksi otomatis keliru |
+| `MIDTRANS_IS_PRODUCTION` | tidak | server | Kosong/`false` = sandbox. `true` hanya untuk kunci produksi |
 | `GEMINI_API_KEY`, `GEMINI_MODEL` | tidak | server | Lihat `SETUP-BACKEND.md` bagian B |
 
 Variabel berawalan `NEXT_PUBLIC_` ditanam ke kode saat **build**. Setelah
@@ -269,6 +271,7 @@ cukup dengan mengganti alamat ubin di `src/components/akun/PetaLokasi.tsx`.
 | Gejala | Penyebab biasanya |
 | --- | --- |
 | "Server belum dikonfigurasi" atau "Pembayaran belum dikonfigurasi" (503) | `SUPABASE_SERVICE_ROLE_KEY` atau `MIDTRANS_SERVER_KEY` belum diisi di Vercel, atau belum redeploy |
+| Gagal membuka pembayaran, log Vercel menyebut 401 / unauthorized dari Midtrans | Kunci dan mode tidak cocok: kunci sandbox dengan `MIDTRANS_IS_PRODUCTION=true`, atau sebaliknya. Kunci juga harus dari akun Midtrans yang sama dengan Notification URL |
 | Popup pembayaran tidak muncul, halaman langsung pindah ke Midtrans | `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` kosong. Pembayaran tetap jalan lewat halaman Midtrans, tetapi isi kuncinya lalu redeploy |
 | Sudah bayar di simulator, status tetap Menunggu Pembayaran | Notification URL belum diisi atau tanpa garis miring akhir. Tekan **Sudah bayar? Cek status** untuk sinkron manual, lalu perbaiki URL-nya |
 | Tautan verifikasi membuka halaman utama, bukan `/masuk/` | Redirect URLs di Supabase belum ditambahkan (1.2) |
