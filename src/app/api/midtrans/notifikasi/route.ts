@@ -23,8 +23,9 @@ export async function POST(req: Request) {
     const hasil = await catatTransaksi(trx);
     return Response.json({ ok: true, ...hasil });
   } catch (e) {
-    // Pesanan uji dari tombol "Test notification" di dashboard Midtrans
-    // tidak ada di basis data; jawab 200 supaya tidak dikirim ulang terus.
+    // Pesanan uji dari tombol "Test notification", atau transaksi aplikasi lain
+    // yang memakai akun Midtrans yang sama, tidak ada di basis data; jawab 200
+    // supaya tidak dikirim ulang terus.
     if (e instanceof GalatApi && e.status === 404) {
       return Response.json({ ok: true, catatan: e.message });
     }

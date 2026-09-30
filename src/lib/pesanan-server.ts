@@ -123,7 +123,7 @@ type TransaksiLengkap = StatusMidtrans & {
  */
 export async function catatTransaksi(trx: TransaksiLengkap): Promise<{ kode: string; diubah: boolean }> {
   const asal = kodeDariOrderId(trx.order_id);
-  if (!asal) throw new GalatApi(400, "order_id tidak dikenal.");
+  if (!asal) throw new GalatApi(404, "order_id bukan milik Asri Catering.");
   const pesanan = await ambilPesananKode(asal.kode);
   const db = supabaseServer();
 
