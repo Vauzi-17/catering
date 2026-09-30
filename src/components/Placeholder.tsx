@@ -31,9 +31,15 @@ export function GambarPlaceholder({
 }
 
 /** Kotak abu-abu untuk peta lokasi, menunggu penyematan Google Maps. */
-export function PetaPlaceholder({ label }: { label: string }) {
+export function PetaPlaceholder({
+  label,
+  rasio = "aspect-[16/9]",
+}: {
+  label: string;
+  rasio?: string;
+}) {
   return (
-    <div className="flex aspect-[16/9] w-full flex-col items-center justify-center gap-2 border border-abu-kuat bg-abu">
+    <div className={`flex ${rasio} w-full flex-col items-center justify-center gap-2 border border-abu-kuat bg-abu`}>
       <IconMapArea className="text-abu-ikon" width={28} height={28} />
       <span className="px-4 text-center text-[12px] font-medium leading-snug text-abu-teks">
         {label}

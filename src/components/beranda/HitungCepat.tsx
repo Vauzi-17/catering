@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Minus, Plus, ShieldCheck, Truck } from "lucide-react";
 import { profil } from "@/data/profil";
-import { rupiah } from "@/lib/format";
+import { rupiah, satuanMenu } from "@/lib/format";
 import { useData } from "@/store/DataProvider";
 
 // Sesuai ketentuan pada FAQ: antar gratis dalam kota mulai 25 porsi.
@@ -21,7 +21,7 @@ export function HitungCepat() {
 
   const menu = tersedia.find((m) => m.id === menuId) ?? tersedia[0];
   const minimal = menu?.minimalPesan ?? 1;
-  const satuan = menu?.satuanJual.replace(/^per\s+/i, "") ?? "porsi";
+  const satuan = menu ? satuanMenu(menu) : "porsi";
 
   // Porsi mengikuti batas minimal paket yang sedang dipilih.
   useEffect(() => {

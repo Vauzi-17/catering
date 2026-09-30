@@ -1,54 +1,19 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  ChefHat,
-  ClipboardList,
-  Receipt,
-  Soup,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { DaftarKeunggulan } from "@/components/DaftarKeunggulan";
+import { DaftarTestimoni } from "@/components/DaftarTestimoni";
 import { HitungCepat } from "@/components/beranda/HitungCepat";
 import { MenuLaris } from "@/components/beranda/MenuLaris";
 import { KartuFavorit, RingkasMenu } from "@/components/beranda/SorotanHero";
 import { IconWhatsapp } from "@/components/Icons";
 import { GambarPlaceholder } from "@/components/Placeholder";
+import { SectionHeading } from "@/components/Ui";
 import { kategoriMenu } from "@/data/menu";
 import { profil } from "@/data/profil";
 
-// Urutan ikon mengikuti urutan profil.keunggulan.
-const ikonKeunggulan = [ChefHat, Receipt, Soup, ClipboardList];
-
-function inisial(nama: string) {
-  return nama
-    .replace(/^(Bapak|Ibu)\s+/i, "")
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((k) => k[0])
-    .join("")
-    .toUpperCase();
-}
-
-function JudulBagian({
-  judul,
-  deskripsi,
-  className = "",
-}: {
-  judul: string;
-  deskripsi?: string;
-  className?: string;
-}) {
-  return (
-    <div className={className}>
-      <h2 className="text-[32px] font-semibold leading-[1.1] sm:text-[40px]">{judul}</h2>
-      {deskripsi && (
-        <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-ink-soft">{deskripsi}</p>
-      )}
-    </div>
-  );
-}
-
 export default function Beranda() {
   return (
-    <div className="bg-kabut">
+    <>
       {/* Hero */}
       <section className="relative overflow-hidden rounded-b-[50%_56px] bg-gradient-to-br from-jingga-700 via-jingga-600 to-jingga-400 text-white sm:rounded-b-[50%_88px]">
         <div className="container-page grid items-center gap-12 pb-24 pt-12 sm:pb-28 lg:grid-cols-[1.15fr_1fr] lg:gap-10 lg:pb-32 lg:pt-16">
@@ -100,7 +65,7 @@ export default function Beranda() {
 
       {/* Menu paling laris */}
       <section className="container-page py-20 sm:py-24">
-        <JudulBagian
+        <SectionHeading
           judul="Paling Laris"
           deskripsi="Paket yang paling sering dipesan untuk rapat, syukuran, dan acara keluarga."
         />
@@ -132,36 +97,14 @@ export default function Beranda() {
       {/* Keunggulan */}
       <section className="border-y border-kabut-line bg-kabut-deep py-16 sm:py-20">
         <div className="container-page">
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {profil.keunggulan.map((k, i) => {
-              const Ikon = ikonKeunggulan[i % ikonKeunggulan.length];
-              return (
-                <li
-                  key={k.judul}
-                  className="flex gap-4 rounded-2xl border border-kabut-line bg-white p-5 sm:flex-col sm:gap-5 sm:p-6"
-                >
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-jingga-50 text-jingga-600">
-                    <Ikon size={22} strokeWidth={1.8} />
-                  </span>
-                  <span>
-                    <span className="block font-sans text-[17px] font-semibold text-ink">
-                      {k.judul}
-                    </span>
-                    <span className="mt-1.5 block text-[14px] leading-relaxed text-ink-muted">
-                      {k.isi}
-                    </span>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
+          <DaftarKeunggulan />
         </div>
       </section>
 
       {/* Cara pesan + estimasi */}
       <section className="container-page grid gap-12 py-20 sm:py-24 lg:grid-cols-[1fr_440px] lg:gap-16">
         <div>
-          <JudulBagian
+          <SectionHeading
             judul="Cara Pesan"
             deskripsi={`Pesan kurang dari 100 porsi bisa H-1. Setiap pesanan mendapat kode untuk memantau statusnya sampai diantar.`}
           />
@@ -198,28 +141,10 @@ export default function Beranda() {
       {/* Testimoni */}
       <section className="border-t border-kabut-line bg-white py-20 sm:py-24">
         <div className="container-page">
-          <JudulBagian judul="Kata Pelanggan" />
+          <SectionHeading judul="Kata Pelanggan" />
 
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {profil.testimoni.map((t) => (
-              <figure
-                key={t.nama}
-                className="flex flex-col rounded-2xl border border-kabut-line bg-kabut p-6"
-              >
-                <blockquote className="flex-1 text-[15px] leading-relaxed text-ink-soft">
-                  {t.isi}
-                </blockquote>
-                <figcaption className="mt-6 flex items-center gap-3 border-t border-kabut-line pt-5">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zamrud-50 text-[13px] font-bold text-zamrud-700">
-                    {inisial(t.nama)}
-                  </span>
-                  <span>
-                    <span className="block text-[14px] font-semibold text-ink">{t.nama}</span>
-                    <span className="block text-[12px] text-ink-muted">{t.peran}</span>
-                  </span>
-                </figcaption>
-              </figure>
-            ))}
+          <div className="mt-10">
+            <DaftarTestimoni />
           </div>
         </div>
       </section>
@@ -258,6 +183,6 @@ export default function Beranda() {
           </div>
         </div>
       </section>
-    </div>
+    </>
   );
 }

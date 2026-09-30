@@ -79,3 +79,8 @@ export function slugify(teks: string): string {
     .trim()
     .replace(/\s+/g, "-");
 }
+
+/** "per box" → "box", dipakai untuk teks seperti "Min. 10 box". */
+export function satuanMenu(menu: { satuanJual: string }): string {
+  return menu.satuanJual.replace(/^per\s+/i, "");
+}
