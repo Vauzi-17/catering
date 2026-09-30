@@ -20,7 +20,16 @@ export const supabaseAktif = Boolean(url && anonKey);
 
 export const supabase: SupabaseClient | null = supabaseAktif
   ? createClient(url as string, anonKey as string, {
-      auth: { persistSession: false },
+      auth: {
+        // Sesi login pelanggan & admin disimpan di browser dan diperbarui
+        // otomatis. Alur "implicit" membuat tautan verifikasi email dan reset
+        // kata sandi tetap berfungsi walau dibuka di perangkat lain.
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        flowType: "implicit",
+        storageKey: "asri.auth",
+      },
     })
   : null;
 

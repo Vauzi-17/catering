@@ -15,6 +15,7 @@ import { menuAwal } from "@/data/menu";
 import { buatPesananAwal } from "@/data/pesanan";
 import * as db from "@/lib/db";
 import { supabaseAktif } from "@/lib/supabase";
+import { useAuth } from "@/store/AuthProvider";
 import type { Bahan, Menu, Pesanan, StatusPesanan } from "@/lib/types";
 
 const KUNCI = {
@@ -59,10 +60,11 @@ interface KonteksData {
   pesanan: Pesanan[];
   keranjang: ItemKeranjang[];
   pengaturan: Pengaturan;
+  /** Admin sudah masuk: akun admin Supabase, atau login demo pada mode contoh. */
   masuk: boolean;
 
   /** Memuat daftar pesanan. Dipanggil panel admin saat pertama dibuka. */
-  muatPesanan: () => Promise<void>;
+  muatPesanan: (paksa?: boolean) => Promise<void>;
 
   simpanMenu: (menu: Menu) => Promise<void>;
   hapusMenu: (id: string) => Promise<void>;
@@ -74,13 +76,15 @@ interface KonteksData {
   hapusKeranjang: (menuId: string) => void;
   kosongkanKeranjang: () => void;
 
-  buatPesanan: (
-    data: Omit<Pesanan, "id" | "kode" | "status" | "dibuatPada" | "riwayat" | "total">,
-  ) => Promise<Pesanan>;
   ubahStatusPesanan: (id: string, status: StatusPesanan) => Promise<void>;
-  cariPesanan: (kode: string) => Promise<Pesanan | null>;
+
+  /** Laci keranjang di sisi kanan layar. */
+  laciKeranjang: boolean;
+  bukaKeranjang: () => void;
+  tutupKeranjang: () => void;
 
   simpanPengaturan: (p: Pengaturan) => Promise<void>;
+  /** Login demo panel admin, hanya untuk mode contoh tanpa Supabase. */
   login: (pengguna: string, sandi: string) => boolean;
   logout: () => void;
   resetData: () => void;
@@ -142,7 +146,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [pesanan, setPesanan] = useState<Pesanan[]>([]);
   const [keranjang, setKeranjang] = useState<ItemKeranjang[]>([]);
   const [pengaturan, setPengaturan] = useState<Pengaturan>(pengaturanAwal);
-  const [masuk, setMasuk] = useState(false);
+  const [masukDemo, setMasukDemo] = useState(false);
+  const [laciKeranjang, setLaciKeranjang] = useState(false);
+
+  const auth = useAuth();
+  const uid = auth.pengguna?.id ?? null;
+  const masuk = supabaseAktif ? auth.adalahAdmin : masukDemo;
 
   const pesananTermuat = useRef(false);
 
@@ -151,9 +160,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     let dibatalkan = false;
 
     async function muat() {
-      // Keranjang dan sesi selalu lokal, tidak ikut disimpan ke basis data.
+      // Keranjang dan sesi demo selalu lokal, tidak ikut disimpan ke basis data.
       setKeranjang(baca(KUNCI.keranjang, []));
-      setMasuk(baca(KUNCI.sesi, false));
+      setMasukDemo(baca(KUNCI.sesi, false));
 
       if (!supabaseAktif) {
         setMenus(baca(KUNCI.menu, menuAwal));
@@ -163,9 +172,26 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setPengaturan(baca(KUNCI.pengaturan, pengaturanAwal));
         pesananTermuat.current = true;
         setSiap(true);
-        return;
       }
+      // Mode Supabase: siap ditandai setelah menu dari basis data termuat.
+    }
 
+    void muat();
+    return () => {
+      dibatalkan = true;
+    };
+  }, []);
+
+  // Data Supabase dimuat ulang setiap kali pengguna berganti, karena yang
+  // boleh dibaca bergantung pada akunnya (bahan baku & menu nonaktif hanya
+  // untuk admin, pesanan hanya milik sendiri).
+  useEffect(() => {
+    if (!supabaseAktif || !auth.siap) return;
+    let dibatalkan = false;
+    pesananTermuat.current = false;
+    setPesanan([]);
+
+    void (async () => {
       try {
         const [daftarMenu, daftarBahan, setelan] = await Promise.all([
           db.ambilMenus(),
@@ -181,13 +207,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
       } finally {
         if (!dibatalkan) setSiap(true);
       }
-    }
+    })();
 
-    void muat();
     return () => {
       dibatalkan = true;
     };
-  }, []);
+  }, [uid, auth.siap]);
 
   // Penyimpanan lokal hanya dipakai pada mode contoh.
   useEffect(() => {
@@ -207,15 +232,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
     if (siap) tulis(KUNCI.keranjang, keranjang);
   }, [keranjang, siap]);
   useEffect(() => {
-    if (siap) tulis(KUNCI.sesi, masuk);
-  }, [masuk, siap]);
+    if (siap && !supabaseAktif) tulis(KUNCI.sesi, masukDemo);
+  }, [masukDemo, siap]);
 
   /**
    * Daftar pesanan tidak ikut dimuat di halaman pelanggan supaya data pemesan
    * tidak diambil tanpa perlu. Panel admin memanggil fungsi ini sekali.
    */
-  const muatPesanan = useCallback(async () => {
-    if (pesananTermuat.current || !supabaseAktif) return;
+  const muatPesanan = useCallback(async (paksa = false) => {
+    if ((pesananTermuat.current && !paksa) || !supabaseAktif) return;
     pesananTermuat.current = true;
     setSibuk(true);
     try {
@@ -321,46 +346,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   // ------------------------------------------------------------ pesanan
 
-  const buatPesanan: KonteksData["buatPesanan"] = useCallback(
-    async (data) => {
-      if (supabaseAktif) {
-        setSibuk(true);
-        setGalat(null);
-        try {
-          const baru = await db.buatPesananDb(data);
-          setPesanan((lama) => [baru, ...lama]);
-          return baru;
-        } catch (e) {
-          setGalat(pesanGalat(e));
-          throw e;
-        } finally {
-          setSibuk(false);
-        }
-      }
-
-      const sekarang = new Date();
-      const p = (n: number) => n.toString().padStart(2, "0");
-      const urut = Math.floor(Math.random() * 900 + 100);
-      const kode = `ASR-${sekarang.getFullYear().toString().slice(2)}${p(
-        sekarang.getMonth() + 1,
-      )}${p(sekarang.getDate())}-${urut}`;
-      const total = data.items.reduce((a, it) => a + it.harga * it.qty, 0);
-
-      const baru: Pesanan = {
-        ...data,
-        id: `ps-${sekarang.getTime()}`,
-        kode,
-        total,
-        status: "Menunggu Konfirmasi",
-        dibuatPada: sekarang.toISOString(),
-        riwayat: [{ status: "Menunggu Konfirmasi", waktu: sekarang.toISOString() }],
-      };
-      setPesanan((lama) => [baru, ...lama]);
-      return baru;
-    },
-    [],
-  );
-
   const ubahStatusPesanan = useCallback(
     async (id: string, status: StatusPesanan) => {
       if (supabaseAktif) await jalankan(() => db.ubahStatusPesananDb(id, status));
@@ -379,30 +364,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
     [jalankan],
   );
 
-  const cariPesanan = useCallback(
-    async (kode: string): Promise<Pesanan | null> => {
-      const bersih = kode.trim();
-      if (!bersih) return null;
-
-      const lokal = pesanan.find(
-        (p) => p.kode.toLowerCase() === bersih.toLowerCase(),
-      );
-      if (lokal) return lokal;
-      if (!supabaseAktif) return null;
-
-      setSibuk(true);
-      try {
-        return await db.cariPesananKode(bersih);
-      } catch (e) {
-        setGalat(pesanGalat(e));
-        return null;
-      } finally {
-        setSibuk(false);
-      }
-    },
-    [pesanan],
-  );
-
   // --------------------------------------------------------- pengaturan
 
   const simpanPengaturan = useCallback(
@@ -416,12 +377,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
   // Autentikasi demo tanpa backend. Diganti Supabase Auth pada tahap berikutnya
   // (lihat supabase/04-rls-produksi.sql).
   const login = useCallback((pengguna: string, sandi: string) => {
+    if (supabaseAktif) return false;
     const valid = pengguna.trim().toLowerCase() === "admin" && sandi === "asri2025";
-    if (valid) setMasuk(true);
+    if (valid) setMasukDemo(true);
     return valid;
   }, []);
 
-  const logout = useCallback(() => setMasuk(false), []);
+  const logout = useCallback(() => {
+    if (supabaseAktif) void auth.keluar();
+    else setMasukDemo(false);
+  }, [auth]);
+
+  const bukaKeranjang = useCallback(() => setLaciKeranjang(true), []);
+  const tutupKeranjang = useCallback(() => setLaciKeranjang(false), []);
 
   const resetData = useCallback(() => {
     if (supabaseAktif) return; // data sungguhan tidak boleh dihapus dari sini
@@ -456,9 +424,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       ubahQtyKeranjang,
       hapusKeranjang,
       kosongkanKeranjang,
-      buatPesanan,
       ubahStatusPesanan,
-      cariPesanan,
+      laciKeranjang,
+      bukaKeranjang,
+      tutupKeranjang,
       simpanPengaturan,
       login,
       logout,
@@ -484,9 +453,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       ubahQtyKeranjang,
       hapusKeranjang,
       kosongkanKeranjang,
-      buatPesanan,
       ubahStatusPesanan,
-      cariPesanan,
+      laciKeranjang,
+      bukaKeranjang,
+      tutupKeranjang,
       simpanPengaturan,
       login,
       logout,

@@ -93,19 +93,19 @@ export const profil = {
       isi: "Telusuri katalog menu dan pilih paket yang sesuai dengan acara serta jumlah tamu Anda.",
     },
     {
-      judul: "Isi formulir",
-      ringkas: "Isi data, tanggal, dan alamat.",
-      isi: "Lengkapi data pemesan, tanggal acara, alamat pengantaran, dan jumlah porsi pada halaman pemesanan.",
+      judul: "Isi jadwal & lokasi",
+      ringkas: "Masuk, pilih tanggal, tandai lokasi.",
+      isi: "Masuk ke akun Anda, pilih tanggal dan jam acara, lalu tandai lokasi pengantaran di peta.",
     },
     {
-      judul: "Terima kode",
-      ringkas: "Kode dipakai untuk cek status.",
-      isi: "Sistem memberikan kode pesanan yang bisa dipakai untuk mengecek status kapan saja pada halaman lacak pesanan.",
+      judul: "Bayar online",
+      ringkas: "QRIS, virtual account, atau e-wallet.",
+      isi: "Bayar lewat Midtrans dengan QRIS, virtual account bank, atau e-wallet. Pembayaran terkonfirmasi otomatis tanpa perlu kirim bukti transfer.",
     },
     {
-      judul: "Pesanan diantar",
-      ringkas: "Admin konfirmasi, lalu diantar.",
-      isi: "Admin menghubungi Anda untuk konfirmasi akhir, lalu pesanan diantar sesuai jadwal yang disepakati.",
+      judul: "Pantau & terima",
+      ringkas: "Lihat status sampai pesanan tiba.",
+      isi: "Pantau pesanan di halaman Pesanan Saya: dibayar, dimasak, dikirim, sampai selesai.",
     },
   ],
   faq: [
@@ -122,12 +122,12 @@ export const profil = {
     {
       tanya: "Apakah ada biaya antar?",
       jawab:
-        "Pengantaran di dalam Kota Bandung gratis untuk pesanan minimal 25 porsi. Di luar itu dikenakan ongkos antar sesuai jarak yang akan diinformasikan saat konfirmasi.",
+        "Tidak ada. Ongkir gratis untuk lokasi di dalam area layanan kami. Saat memesan, tandai lokasi di peta dan sistem langsung memberi tahu apakah lokasi tersebut terjangkau.",
     },
     {
       tanya: "Bagaimana cara pembayaran?",
       jawab:
-        "Pembayaran dilakukan dengan uang muka 50 persen saat pesanan dikonfirmasi, dan sisanya dilunasi paling lambat saat pesanan diantar. Transfer bank dan tunai keduanya diterima.",
+        "Pembayaran penuh dilakukan online saat checkout melalui Midtrans: QRIS, virtual account bank, atau e-wallet. Begitu pembayaran masuk, status pesanan berubah otomatis tanpa perlu mengirim bukti transfer.",
     },
     {
       tanya: "Apakah menu bisa disesuaikan?",

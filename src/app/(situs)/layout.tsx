@@ -1,3 +1,4 @@
+import { KeranjangLaci } from "@/components/KeranjangLaci";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 
@@ -9,6 +10,7 @@ export default function SitusLayout({
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooter />
+      <KeranjangLaci />
     </div>
   );
 }

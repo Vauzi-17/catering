@@ -1,8 +1,8 @@
 import { Check } from "lucide-react";
 
-const daftarLangkah = ["Keranjang", "Data Acara", "Selesai"];
+const daftarLangkah = ["Keranjang", "Data Acara", "Pembayaran", "Selesai"];
 
-/** Penanda posisi pada alur pesan: 0 keranjang, 1 data acara, 2 selesai. */
+/** Penanda posisi pada alur pesan: 0 keranjang, 1 data acara, 2 pembayaran, 3 selesai. */
 export function LangkahCheckout({ aktif }: { aktif: number }) {
   return (
     <div className="border-b border-kabut-line bg-white">
@@ -14,7 +14,7 @@ export function LangkahCheckout({ aktif }: { aktif: number }) {
             <li key={label} className="flex items-center gap-2 sm:gap-4">
               {i > 0 && (
                 <span
-                  className={`h-px w-6 sm:w-16 lg:w-24 ${i <= aktif ? "bg-zamrud-600" : "bg-kabut-line"}`}
+                  className={`h-px w-5 sm:w-12 lg:w-20 ${i <= aktif ? "bg-zamrud-600" : "bg-kabut-line"}`}
                   aria-hidden="true"
                 />
               )}
