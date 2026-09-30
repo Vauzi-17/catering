@@ -37,6 +37,34 @@ const config: Config = {
           ikon: "#A7ACA3",
           teks: "#878D84",
         },
+        // Palet desain baru halaman publik (beranda, header, footer)
+        jingga: {
+          50: "#FFF6EA",
+          100: "#FDE8CA",
+          200: "#FAD095",
+          300: "#F6B55A",
+          400: "#F29B1F",
+          500: "#E3850E",
+          600: "#C96C0A",
+          700: "#A6560C",
+          800: "#7F4210",
+          900: "#5E3110",
+        },
+        zamrud: {
+          50: "#EAF6F0",
+          100: "#D2EDDF",
+          200: "#A6DBC0",
+          500: "#12875B",
+          600: "#0D7650",
+          700: "#0B6344",
+          800: "#0A4F37",
+          900: "#083B2A",
+        },
+        kabut: {
+          DEFAULT: "#F5F7FB",
+          deep: "#EDF1F8",
+          line: "#E1E6EF",
+        },
         clay: {
           50: "#FBF3EC",
           100: "#F3E2D2",
@@ -54,6 +82,7 @@ const config: Config = {
       boxShadow: {
         card: "0 1px 2px rgba(19, 45, 30, 0.04)",
         pop: "0 8px 24px -12px rgba(19, 45, 30, 0.18)",
+        lembut: "0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 16px -8px rgba(15, 23, 42, 0.08)",
       },
       maxWidth: {
         content: "1180px",
