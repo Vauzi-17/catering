@@ -1,7 +1,7 @@
 # Asri Catering — Website Profil, Pemesanan & Panel Admin
 
-Website untuk usaha katering **Asri Catering** (milik Ibu Asri): nasi rames,
-prasmanan, tumpeng, dan snack box.
+Website untuk usaha katering **Asri Catering** (milik Ibu Asri): nasi kotak,
+bento, prasmanan, tumpeng, dan snack box.
 
 **Next.js 15 (App Router) · TypeScript · Tailwind CSS · Supabase · Gemini API**
 

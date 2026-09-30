@@ -106,7 +106,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       <aside className="hidden w-[264px] shrink-0 flex-col justify-between bg-brand-900 p-5 lg:sticky lg:top-0 lg:flex lg:h-screen">
         <div>
           <Link href="/admin" className="flex items-center gap-2.5">
-            <LogoMark className="h-9 w-9 bg-brand-700" />
+            <LogoMark className="h-9 w-9" />
             <span className="flex flex-col leading-none">
               <span className="font-display text-[17px] font-semibold text-white">
                 Asri Catering
@@ -153,7 +153,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-40 border-b border-brand-800 bg-brand-900 px-5 py-3 lg:hidden">
           <div className="flex items-center justify-between">
             <Link href="/admin" className="flex items-center gap-2.5">
-              <LogoMark className="h-8 w-8 bg-brand-700" />
+              <LogoMark className="h-8 w-8" />
               <span className="font-display text-[16px] font-semibold text-white">
                 Panel Admin
               </span>

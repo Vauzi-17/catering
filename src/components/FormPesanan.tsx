@@ -3,19 +3,32 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
-  IconAlert,
-  IconArrowRight,
-  IconCheck,
-  IconMinus,
-  IconPlus,
-  IconTrash,
-} from "@/components/Icons";
+  ArrowLeft,
+  ArrowRight,
+  CircleAlert,
+  Headset,
+  Landmark,
+  MapPin,
+  Minus,
+  Plus,
+  ShieldCheck,
+  ShoppingBag,
+  Store,
+  Trash2,
+  Wallet,
+} from "lucide-react";
+import { IconWhatsapp } from "@/components/Icons";
 import { FotoMenu } from "@/components/Placeholder";
-import { Kosong } from "@/components/Ui";
+import { LangkahCheckout } from "@/components/pesan/LangkahCheckout";
+import { PesananBerhasil } from "@/components/pesan/PesananBerhasil";
+import { SaranPaket } from "@/components/pesan/SaranPaket";
+import { RingkasanPesanan, type BarisKeranjang } from "@/components/pesan/RingkasanPesanan";
 import { profil } from "@/data/profil";
-import { rupiah, tanggalPanjang, tanggalPlus } from "@/lib/format";
+import { rupiah, satuanMenu, tanggalPlus } from "@/lib/format";
 import type { Pesanan } from "@/lib/types";
 import { useData } from "@/store/DataProvider";
+
+type Metode = "Antar ke Alamat" | "Ambil di Tempat";
 
 interface Formulir {
   nama: string;
@@ -23,7 +36,7 @@ interface Formulir {
   alamat: string;
   tanggalAcara: string;
   waktuAntar: string;
-  metode: "Antar ke Alamat" | "Ambil di Tempat";
+  metode: Metode;
   catatan: string;
 }
 
@@ -32,10 +45,18 @@ const formAwal: Formulir = {
   telepon: "",
   alamat: "",
   tanggalAcara: "",
-  waktuAntar: "11:00",
+  waktuAntar: "11:30",
   metode: "Antar ke Alamat",
   catatan: "",
 };
+
+const pilihanJam = [
+  { label: "Pagi", jam: "09:30" },
+  { label: "Siang", jam: "11:30" },
+  { label: "Sore", jam: "16:30" },
+];
+
+type Langkah = "keranjang" | "data";
 
 export function FormPesanan() {
   const {
@@ -50,24 +71,24 @@ export function FormPesanan() {
     sibuk,
   } = useData();
 
+  const [langkah, setLangkah] = useState<Langkah>("keranjang");
   const [form, setForm] = useState<Formulir>(formAwal);
+  const [jamLain, setJamLain] = useState(false);
   const [galat, setGalat] = useState<Record<string, string>>({});
-  const [pilihanTambah, setPilihanTambah] = useState("");
   const [berhasil, setBerhasil] = useState<Pesanan | null>(null);
 
-  const baris = useMemo(
+  const baris = useMemo<BarisKeranjang[]>(
     () =>
       keranjang
         .map((k) => {
           const menu = menus.find((m) => m.id === k.menuId);
           return menu ? { menu, qty: k.qty } : null;
         })
-        .filter((v): v is { menu: (typeof menus)[number]; qty: number } => v !== null),
+        .filter((v): v is BarisKeranjang => v !== null),
     [keranjang, menus],
   );
 
-  const total = baris.reduce((a, b) => a + b.menu.hargaJual * b.qty, 0);
-  const totalPorsi = baris.reduce((a, b) => a + b.qty, 0);
+  const diantar = form.metode === "Antar ke Alamat";
 
   function ubahField<K extends keyof Formulir>(kunci: K, nilai: Formulir[K]) {
     setForm((f) => ({ ...f, [kunci]: nilai }));
@@ -77,36 +98,63 @@ export function FormPesanan() {
     });
   }
 
-  function validasi() {
+  function gulirKeGalat() {
+    window.setTimeout(() => {
+      document
+        .querySelector<HTMLElement>("[data-galat='true']")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 0);
+  }
+
+  function validasiKeranjang() {
+    const g: Record<string, string> = {};
+    if (baris.length === 0) g.menu = "Pilih minimal satu menu terlebih dahulu.";
+    const kurang = baris.find(({ menu, qty }) => qty < menu.minimalPesan);
+    if (kurang)
+      g.menu = `${kurang.menu.nama} minimal ${kurang.menu.minimalPesan} ${satuanMenu(kurang.menu)}.`;
+    setGalat(g);
+    return Object.keys(g).length === 0;
+  }
+
+  function validasiData() {
     const g: Record<string, string> = {};
     if (form.nama.trim().length < 3) g.nama = "Nama pemesan minimal 3 huruf.";
     if (!/^[0-9+\-\s()]{9,}$/.test(form.telepon.trim()))
-      g.telepon = "Masukkan nomor telepon yang bisa dihubungi.";
-    if (form.metode === "Antar ke Alamat" && form.alamat.trim().length < 10)
+      g.telepon = "Masukkan nomor WhatsApp yang bisa dihubungi.";
+    if (diantar && form.alamat.trim().length < 10)
       g.alamat = "Tuliskan alamat lengkap beserta patokan.";
     if (!form.tanggalAcara) g.tanggalAcara = "Pilih tanggal acara.";
     else if (form.tanggalAcara < tanggalPlus(1))
       g.tanggalAcara = "Pesanan paling cepat untuk besok (H-1).";
     if (!form.waktuAntar) g.waktuAntar = "Pilih jam pengantaran.";
-    if (baris.length === 0) g.menu = "Pilih minimal satu menu terlebih dahulu.";
-
-    baris.forEach(({ menu, qty }) => {
-      if (qty < menu.minimalPesan)
-        g.menu = `${menu.nama} minimal ${menu.minimalPesan} ${menu.satuanJual.replace(
-          "per ",
-          "",
-        )}.`;
-    });
-
     setGalat(g);
     return Object.keys(g).length === 0;
   }
 
+  function lanjutKeData() {
+    if (!validasiKeranjang()) {
+      gulirKeGalat();
+      return;
+    }
+    setLangkah("data");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function kembaliKeKeranjang() {
+    setGalat({});
+    setLangkah("keranjang");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   async function kirim(e: React.FormEvent) {
     e.preventDefault();
-    if (!validasi()) {
-      const pertama = document.querySelector<HTMLElement>("[data-galat='true']");
-      pertama?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (!validasiKeranjang()) {
+      setLangkah("keranjang");
+      gulirKeGalat();
+      return;
+    }
+    if (!validasiData()) {
+      gulirKeGalat();
       return;
     }
 
@@ -115,10 +163,7 @@ export function FormPesanan() {
       pesananBaru = await buatPesanan({
         nama: form.nama.trim(),
         telepon: form.telepon.trim(),
-        alamat:
-          form.metode === "Ambil di Tempat"
-            ? "Diambil di dapur Asri Catering"
-            : form.alamat.trim(),
+        alamat: diantar ? form.alamat.trim() : "Diambil di dapur Asri Catering",
         tanggalAcara: form.tanggalAcara,
         waktuAntar: form.waktuAntar,
         metode: form.metode,
@@ -140,453 +185,517 @@ export function FormPesanan() {
 
     kosongkanKeranjang();
     setForm(formAwal);
+    setJamLain(false);
+    setLangkah("keranjang");
     setBerhasil(pesananBaru);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   if (berhasil) {
     return (
-      <div className="container-page py-12 sm:py-16">
-        <div className="mx-auto max-w-2xl">
-          <div className="card p-7 sm:p-9">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-brand-200 bg-brand-50 text-brand-700">
-              <IconCheck width={24} height={24} />
-            </span>
-            <h1 className="mt-5 font-display text-[28px] leading-tight sm:text-[32px]">
-              Pesanan Anda sudah kami terima
-            </h1>
-            <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">
-              Simpan kode di bawah ini. Admin akan menghubungi {berhasil.telepon}
-              untuk konfirmasi.
-            </p>
-
-            <div className="mt-6 rounded-card border border-brand-200 bg-brand-50 p-5 text-center">
-              <p className="text-[12px] font-semibold uppercase tracking-wider text-brand-700">
-                Kode pesanan
-              </p>
-              <p className="mt-1.5 font-display text-[30px] font-semibold tracking-wide text-brand-800">
-                {berhasil.kode}
-              </p>
-            </div>
-
-            <dl className="mt-6 divide-y divide-line border-y border-line">
-              <div className="flex justify-between gap-4 py-3 text-sm">
-                <dt className="text-ink-muted">Nama pemesan</dt>
-                <dd className="text-right font-semibold">{berhasil.nama}</dd>
-              </div>
-              <div className="flex justify-between gap-4 py-3 text-sm">
-                <dt className="text-ink-muted">Tanggal acara</dt>
-                <dd className="text-right font-semibold">
-                  {tanggalPanjang(berhasil.tanggalAcara)}, {berhasil.waktuAntar}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-4 py-3 text-sm">
-                <dt className="text-ink-muted">Metode</dt>
-                <dd className="text-right font-semibold">{berhasil.metode}</dd>
-              </div>
-              {berhasil.items.map((it) => (
-                <div key={it.menuId} className="flex justify-between gap-4 py-3 text-sm">
-                  <dt className="text-ink-muted">
-                    {it.nama} × {it.qty}
-                  </dt>
-                  <dd className="text-right font-semibold">{rupiah(it.harga * it.qty)}</dd>
-                </div>
-              ))}
-              <div className="flex justify-between gap-4 py-3">
-                <dt className="font-semibold">Total</dt>
-                <dd className="font-display text-xl font-semibold text-brand-800">
-                  {rupiah(berhasil.total)}
-                </dd>
-              </div>
-            </dl>
-
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link href={`/lacak?kode=${berhasil.kode}`} className="btn btn-primary btn-md">
-                Lacak pesanan ini
-                <IconArrowRight width={18} height={18} />
-              </Link>
-              <button
-                type="button"
-                onClick={() => setBerhasil(null)}
-                className="btn btn-outline btn-md"
-              >
-                Buat pesanan lain
-              </button>
-            </div>
-
-            <p className="mt-6 text-[13px] leading-relaxed text-ink-muted">
-              Butuh perubahan mendadak? Hubungi {profil.telepon} paling lambat H-1
-              sebelum tanggal acara.
-            </p>
-          </div>
-        </div>
-      </div>
+      <>
+        <LangkahCheckout aktif={2} />
+        <PesananBerhasil pesanan={berhasil} menus={menus} />
+      </>
     );
   }
 
+  // Paket yang belum ada di keranjang; yang populer dan berfoto didahulukan.
+  const menuTambahan = menus
+    .filter((m) => m.tersedia && !keranjang.some((k) => k.menuId === m.id))
+    .sort((a, b) => Number(b.populer) - Number(a.populer) || Number(!!b.foto) - Number(!!a.foto))
+    .slice(0, 8);
+
   return (
-    <form onSubmit={kirim} noValidate className="container-page py-10 sm:py-14">
-      <div className="grid gap-8 lg:grid-cols-12 lg:gap-10">
-        {/* Kolom kiri: menu dipilih + data pemesan */}
-        <div className="space-y-6 lg:col-span-7">
-          <section className="card p-5 sm:p-6" data-galat={Boolean(galat.menu)}>
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="font-display text-xl">1. Menu yang dipesan</h2>
-              {baris.length > 0 && (
+    <>
+      <LangkahCheckout aktif={langkah === "keranjang" ? 0 : 1} />
+
+      <form onSubmit={kirim} noValidate className="container-page py-10 sm:py-12">
+        <div className="grid gap-8 lg:grid-cols-12 lg:gap-10">
+          <div className="min-w-0 lg:col-span-7 xl:col-span-8">
+            {langkah === "keranjang" ? (
+              <>
+                <h1 className="text-[32px] font-semibold leading-tight sm:text-[40px]">
+                  Rincian Pesanan
+                </h1>
+                <p className="mt-2 text-[15px] text-ink-soft">
+                  Atur jumlah porsi tiap paket. Semua masakan diolah pagi di hari pengantaran.
+                </p>
+
+                <div className="mt-7 space-y-4" data-galat={Boolean(galat.menu)}>
+                  {!siap ? (
+                    <p className="kartu p-6 text-sm text-ink-muted">Memuat keranjang…</p>
+                  ) : baris.length === 0 ? (
+                    <div className="kartu flex flex-col items-center px-6 py-14 text-center">
+                      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-kabut text-ink-muted">
+                        <ShoppingBag size={22} strokeWidth={1.8} />
+                      </span>
+                      <h2 className="mt-4 font-sans text-[17px] font-semibold">
+                        Keranjang masih kosong
+                      </h2>
+                      <p className="mt-2 max-w-sm text-sm text-ink-muted">
+                        Pilih paket dari katalog, atau langsung tambahkan salah satu paket di bawah.
+                      </p>
+                      <Link href="/menu" className="tombol tombol-md tombol-jingga mt-6">
+                        Lihat Menu
+                        <ArrowRight size={17} />
+                      </Link>
+                    </div>
+                  ) : (
+                    baris.map(({ menu, qty }) => (
+                      <ItemKeranjang
+                        key={menu.id}
+                        baris={{ menu, qty }}
+                        onUbah={(n) => ubahQtyKeranjang(menu.id, n)}
+                        onHapus={() => hapusKeranjang(menu.id)}
+                      />
+                    ))
+                  )}
+
+                  {galat.menu && (
+                    <p className="flex items-center gap-2 text-[13px] font-semibold text-red-700">
+                      <CircleAlert size={16} />
+                      {galat.menu}
+                    </p>
+                  )}
+                </div>
+
+                {menuTambahan.length > 0 && (
+                  <SaranPaket
+                    judul={baris.length === 0 ? "Mulai dari paket favorit" : "Tambah paket lain"}
+                    daftar={menuTambahan}
+                    onTambah={(menu) => {
+                      tambahKeranjang(menu.id, menu.minimalPesan);
+                      setGalat((g) => {
+                        const { menu: _, ...sisa } = g;
+                        return sisa;
+                      });
+                    }}
+                  />
+                )}
+              </>
+            ) : (
+              <div className="space-y-5">
                 <button
                   type="button"
-                  onClick={kosongkanKeranjang}
-                  className="text-[13px] font-semibold text-ink-muted hover:text-red-700"
+                  onClick={kembaliKeKeranjang}
+                  className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-ink-muted hover:text-zamrud-700"
                 >
-                  Kosongkan
+                  <ArrowLeft size={15} />
+                  Kembali ke keranjang
                 </button>
-              )}
-            </div>
 
-            {!siap ? (
-              <p className="mt-5 text-sm text-ink-muted">Memuat daftar pesanan…</p>
-            ) : baris.length === 0 ? (
-              <div className="mt-5">
-                <Kosong
-                  judul="Belum ada menu dipilih"
-                  deskripsi="Pilih menu dari katalog, atau tambahkan langsung lewat kotak pilihan di bawah."
-                  aksi={
-                    <Link href="/menu" className="btn btn-outline btn-md">
-                      Buka katalog menu
-                    </Link>
-                  }
-                />
-              </div>
-            ) : (
-              <ul className="mt-5 divide-y divide-line border-y border-line">
-                {baris.map(({ menu, qty }) => (
-                  <li key={menu.id} className="flex flex-wrap items-center gap-4 py-4">
-                    <div className="w-16 shrink-0 overflow-hidden rounded-lg border border-line">
-                      <FotoMenu src={menu.foto} nama={menu.nama} rasio="aspect-square" mini />
-                    </div>
+                <h1 className="sr-only">Data acara</h1>
 
-                    <div className="min-w-[140px] flex-1">
-                      <p className="text-[15px] font-semibold leading-snug">{menu.nama}</p>
-                      <p className="mt-0.5 text-[13px] text-ink-muted">
-                        {rupiah(menu.hargaJual)} {menu.satuanJual} · min.{" "}
-                        {menu.minimalPesan}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => ubahQtyKeranjang(menu.id, qty - 5)}
-                        className="btn btn-outline h-9 w-9 p-0"
-                        aria-label={`Kurangi jumlah ${menu.nama}`}
-                      >
-                        <IconMinus width={16} height={16} />
-                      </button>
+                <Bagian
+                  nomor="01"
+                  judul="Data Pemesan"
+                  deskripsi="Untuk konfirmasi pesanan dan koordinasi di lokasi."
+                >
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="sm:col-span-2" data-galat={Boolean(galat.nama)}>
+                      <label className="isian-label" htmlFor="nama">
+                        Nama pemesan / instansi
+                      </label>
                       <input
-                        type="number"
-                        min={0}
-                        value={qty}
-                        onChange={(e) =>
-                          ubahQtyKeranjang(menu.id, Number(e.target.value) || 0)
-                        }
-                        className="field-sm h-9 w-16 text-center"
-                        aria-label={`Jumlah ${menu.nama}`}
+                        id="nama"
+                        className="isian"
+                        value={form.nama}
+                        onChange={(e) => ubahField("nama", e.target.value)}
+                        placeholder="Contoh: Ibu Rina / PT Sinar Mandiri"
+                        autoComplete="name"
                       />
-                      <button
-                        type="button"
-                        onClick={() => ubahQtyKeranjang(menu.id, qty + 5)}
-                        className="btn btn-outline h-9 w-9 p-0"
-                        aria-label={`Tambah jumlah ${menu.nama}`}
+                      {galat.nama && <PesanGalat>{galat.nama}</PesanGalat>}
+                    </div>
+
+                    <div data-galat={Boolean(galat.telepon)}>
+                      <label className="isian-label" htmlFor="telepon">
+                        Nomor WhatsApp
+                      </label>
+                      <input
+                        id="telepon"
+                        inputMode="tel"
+                        className="isian"
+                        value={form.telepon}
+                        onChange={(e) => ubahField("telepon", e.target.value)}
+                        placeholder="0812-3456-7890"
+                        autoComplete="tel"
+                      />
+                      {galat.telepon && <PesanGalat>{galat.telepon}</PesanGalat>}
+                    </div>
+
+                    <div data-galat={Boolean(galat.tanggalAcara)}>
+                      <label className="isian-label" htmlFor="tanggal">
+                        Tanggal acara
+                      </label>
+                      <input
+                        id="tanggal"
+                        type="date"
+                        min={tanggalPlus(1)}
+                        className="isian"
+                        value={form.tanggalAcara}
+                        onChange={(e) => ubahField("tanggalAcara", e.target.value)}
+                      />
+                      {galat.tanggalAcara && <PesanGalat>{galat.tanggalAcara}</PesanGalat>}
+                    </div>
+                  </div>
+
+                  <fieldset className="mt-5" data-galat={Boolean(galat.waktuAntar)}>
+                    <legend className="isian-label">Jam pengantaran</legend>
+                    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                      {pilihanJam.map((p) => {
+                        const dipilih = !jamLain && form.waktuAntar === p.jam;
+                        return (
+                          <label
+                            key={p.jam}
+                            className={`flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5 text-[14px] transition-colors ${
+                              dipilih
+                                ? "border-zamrud-500 bg-zamrud-50 text-zamrud-800"
+                                : "border-kabut-line bg-kabut text-ink-soft hover:border-zamrud-200"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="jam"
+                              checked={dipilih}
+                              onChange={() => {
+                                setJamLain(false);
+                                ubahField("waktuAntar", p.jam);
+                              }}
+                              className="h-4 w-4 accent-zamrud-700"
+                            />
+                            <span>
+                              {p.label}{" "}
+                              <span className="tabular-nums text-ink-muted">
+                                {p.jam.replace(":", ".")}
+                              </span>
+                            </span>
+                          </label>
+                        );
+                      })}
+                      <label
+                        className={`flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5 text-[14px] transition-colors ${
+                          jamLain
+                            ? "border-zamrud-500 bg-zamrud-50 text-zamrud-800"
+                            : "border-kabut-line bg-kabut text-ink-soft hover:border-zamrud-200"
+                        }`}
                       >
-                        <IconPlus width={16} height={16} />
-                      </button>
+                        <input
+                          type="radio"
+                          name="jam"
+                          checked={jamLain}
+                          onChange={() => setJamLain(true)}
+                          className="h-4 w-4 accent-zamrud-700"
+                        />
+                        Jam lain
+                      </label>
                     </div>
+                    {jamLain && (
+                      <input
+                        type="time"
+                        aria-label="Jam pengantaran lain"
+                        className="isian mt-2.5 sm:w-48"
+                        value={form.waktuAntar}
+                        onChange={(e) => ubahField("waktuAntar", e.target.value)}
+                      />
+                    )}
+                    {galat.waktuAntar && <PesanGalat>{galat.waktuAntar}</PesanGalat>}
+                  </fieldset>
+                </Bagian>
 
-                    <div className="w-24 text-right">
-                      <p className="text-sm font-semibold">
-                        {rupiah(menu.hargaJual * qty)}
-                      </p>
-                      {qty < menu.minimalPesan && (
-                        <p className="mt-0.5 text-[11px] font-semibold text-red-700">
-                          min. {menu.minimalPesan}
-                        </p>
-                      )}
+                <Bagian
+                  nomor="02"
+                  judul="Pengantaran"
+                  deskripsi="Diantar ke lokasi acara, atau diambil sendiri di dapur kami."
+                >
+                  <fieldset>
+                    <legend className="sr-only">Metode penyerahan</legend>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {(
+                        [
+                          {
+                            nilai: "Antar ke Alamat",
+                            ikon: MapPin,
+                            isi: `Gratis dalam Kota Bandung untuk minimal 25 porsi.`,
+                          },
+                          {
+                            nilai: "Ambil di Tempat",
+                            ikon: Store,
+                            isi: `Diambil sendiri di ${profil.alamatSingkat}.`,
+                          },
+                        ] as const
+                      ).map(({ nilai, ikon: Ikon, isi }) => {
+                        const dipilih = form.metode === nilai;
+                        return (
+                          <label
+                            key={nilai}
+                            className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors ${
+                              dipilih
+                                ? "border-zamrud-500 bg-zamrud-50"
+                                : "border-kabut-line bg-kabut hover:border-zamrud-200"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="metode"
+                              checked={dipilih}
+                              onChange={() => ubahField("metode", nilai)}
+                              className="mt-1 h-4 w-4 accent-zamrud-700"
+                            />
+                            <span>
+                              <span className="flex items-center gap-2 text-[15px] font-semibold text-ink">
+                                <Ikon size={16} strokeWidth={1.8} className="text-zamrud-700" />
+                                {nilai}
+                              </span>
+                              <span className="mt-1 block text-[13px] leading-relaxed text-ink-muted">
+                                {isi}
+                              </span>
+                            </span>
+                          </label>
+                        );
+                      })}
                     </div>
+                  </fieldset>
 
-                    <button
-                      type="button"
-                      onClick={() => hapusKeranjang(menu.id)}
-                      className="btn btn-ghost h-9 w-9 p-0 text-ink-muted hover:text-red-700"
-                      aria-label={`Hapus ${menu.nama}`}
-                    >
-                      <IconTrash width={17} height={17} />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+                  {diantar && (
+                    <div className="mt-5" data-galat={Boolean(galat.alamat)}>
+                      <label className="isian-label" htmlFor="alamat">
+                        Alamat lengkap lokasi acara
+                      </label>
+                      <textarea
+                        id="alamat"
+                        rows={3}
+                        className="isian resize-y"
+                        value={form.alamat}
+                        onChange={(e) => ubahField("alamat", e.target.value)}
+                        placeholder="Nama gedung, jalan, nomor, lantai atau ruang, dan patokan terdekat"
+                      />
+                      {galat.alamat && <PesanGalat>{galat.alamat}</PesanGalat>}
+                    </div>
+                  )}
 
-            <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
-              <select
-                value={pilihanTambah}
-                onChange={(e) => setPilihanTambah(e.target.value)}
-                className="field sm:flex-1"
-                aria-label="Pilih menu untuk ditambahkan"
-              >
-                <option value="">Tambah menu lain…</option>
-                {menus
-                  .filter((m) => m.tersedia && !keranjang.some((k) => k.menuId === m.id))
-                  .map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.nama} — {rupiah(m.hargaJual)} {m.satuanJual}
-                    </option>
-                  ))}
-              </select>
-              <button
-                type="button"
-                className="btn btn-outline btn-md"
-                disabled={!pilihanTambah}
-                onClick={() => {
-                  const menu = menus.find((m) => m.id === pilihanTambah);
-                  if (!menu) return;
-                  tambahKeranjang(menu.id, menu.minimalPesan);
-                  setPilihanTambah("");
-                  setGalat((g) => {
-                    const { menu: _, ...sisa } = g;
-                    return sisa;
-                  });
-                }}
-              >
-                <IconPlus width={17} height={17} />
-                Tambahkan
-              </button>
-            </div>
-
-            {galat.menu && (
-              <p className="mt-3 flex items-center gap-2 text-[13px] font-semibold text-red-700">
-                <IconAlert width={16} height={16} />
-                {galat.menu}
-              </p>
-            )}
-          </section>
-
-          <section className="card p-5 sm:p-6">
-            <h2 className="font-display text-xl">2. Data pemesan</h2>
-
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <div data-galat={Boolean(galat.nama)}>
-                <label className="field-label" htmlFor="nama">
-                  Nama pemesan / instansi *
-                </label>
-                <input
-                  id="nama"
-                  className="field"
-                  value={form.nama}
-                  onChange={(e) => ubahField("nama", e.target.value)}
-                  placeholder="Contoh: Ibu Rina / PT Sinar Mandiri"
-                />
-                {galat.nama && <PesanGalat>{galat.nama}</PesanGalat>}
-              </div>
-
-              <div data-galat={Boolean(galat.telepon)}>
-                <label className="field-label" htmlFor="telepon">
-                  Nomor telepon / WhatsApp *
-                </label>
-                <input
-                  id="telepon"
-                  inputMode="tel"
-                  className="field"
-                  value={form.telepon}
-                  onChange={(e) => ubahField("telepon", e.target.value)}
-                  placeholder="0812-3456-7890"
-                />
-                {galat.telepon && <PesanGalat>{galat.telepon}</PesanGalat>}
-              </div>
-
-              <div data-galat={Boolean(galat.tanggalAcara)}>
-                <label className="field-label" htmlFor="tanggal">
-                  Tanggal acara *
-                </label>
-                <input
-                  id="tanggal"
-                  type="date"
-                  min={tanggalPlus(1)}
-                  className="field"
-                  value={form.tanggalAcara}
-                  onChange={(e) => ubahField("tanggalAcara", e.target.value)}
-                />
-                {galat.tanggalAcara && <PesanGalat>{galat.tanggalAcara}</PesanGalat>}
-              </div>
-
-              <div data-galat={Boolean(galat.waktuAntar)}>
-                <label className="field-label" htmlFor="waktu">
-                  Jam pengantaran *
-                </label>
-                <input
-                  id="waktu"
-                  type="time"
-                  className="field"
-                  value={form.waktuAntar}
-                  onChange={(e) => ubahField("waktuAntar", e.target.value)}
-                />
-                {galat.waktuAntar && <PesanGalat>{galat.waktuAntar}</PesanGalat>}
-              </div>
-            </div>
-
-            <fieldset className="mt-5">
-              <legend className="field-label">Metode penyerahan</legend>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {(["Antar ke Alamat", "Ambil di Tempat"] as const).map((m) => (
-                  <label
-                    key={m}
-                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3.5 text-sm transition-colors ${
-                      form.metode === m
-                        ? "border-brand-500 bg-brand-50"
-                        : "border-line-strong bg-white hover:border-brand-300"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="metode"
-                      value={m}
-                      checked={form.metode === m}
-                      onChange={() => ubahField("metode", m)}
-                      className="mt-0.5 h-4 w-4 accent-brand-700"
+                  <div className="mt-5">
+                    <label className="isian-label" htmlFor="catatan">
+                      Catatan <span className="font-normal text-ink-muted">(opsional)</span>
+                    </label>
+                    <textarea
+                      id="catatan"
+                      rows={3}
+                      className="isian resize-y"
+                      value={form.catatan}
+                      onChange={(e) => ubahField("catatan", e.target.value)}
+                      placeholder="Contoh: sambal dipisah, 3 porsi tanpa daging, masuk lewat pintu samping"
                     />
-                    <span>
-                      <span className="block font-semibold text-ink">{m}</span>
-                      <span className="mt-0.5 block text-[13px] text-ink-muted">
-                        {m === "Antar ke Alamat"
-                          ? "Gratis dalam Kota Bandung, minimal 25 porsi."
-                          : "Diambil sendiri di dapur kami sesuai jam yang dipilih."}
-                      </span>
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
+                  </div>
+                </Bagian>
 
-            {form.metode === "Antar ke Alamat" && (
-              <div className="mt-5" data-galat={Boolean(galat.alamat)}>
-                <label className="field-label" htmlFor="alamat">
-                  Alamat pengantaran *
-                </label>
-                <textarea
-                  id="alamat"
-                  rows={3}
-                  className="field resize-y"
-                  value={form.alamat}
-                  onChange={(e) => ubahField("alamat", e.target.value)}
-                  placeholder="Nama gedung, jalan, nomor, kelurahan, dan patokan terdekat"
-                />
-                {galat.alamat && <PesanGalat>{galat.alamat}</PesanGalat>}
-              </div>
-            )}
-
-            <div className="mt-5">
-              <label className="field-label" htmlFor="catatan">
-                Catatan tambahan
-              </label>
-              <textarea
-                id="catatan"
-                rows={3}
-                className="field resize-y"
-                value={form.catatan}
-                onChange={(e) => ubahField("catatan", e.target.value)}
-                placeholder="Contoh: sambal dipisah, 3 porsi tanpa daging, tolong sertakan sendok ekstra"
-              />
-            </div>
-          </section>
-        </div>
-
-        {/* Kolom kanan: ringkasan */}
-        <div className="lg:col-span-5">
-          <div className="lg:sticky lg:top-28">
-            <div className="card p-5 sm:p-6">
-              <h2 className="font-display text-xl">3. Ringkasan pesanan</h2>
-
-              {baris.length === 0 ? (
-                <p className="mt-4 text-sm text-ink-muted">
-                  Ringkasan akan muncul setelah Anda memilih menu.
-                </p>
-              ) : (
-                <ul className="mt-4 space-y-2.5 border-b border-line pb-4 text-sm">
-                  {baris.map(({ menu, qty }) => (
-                    <li key={menu.id} className="flex justify-between gap-4">
-                      <span className="text-ink-muted">
-                        {menu.nama} <span className="text-ink-muted/80">× {qty}</span>
-                      </span>
-                      <span className="shrink-0 font-semibold">
-                        {rupiah(menu.hargaJual * qty)}
+                <Bagian
+                  nomor="03"
+                  judul="Pembayaran"
+                  deskripsi="Tidak ada pembayaran di halaman ini. Admin mengirimkan rincian setelah pesanan dikonfirmasi."
+                >
+                  <ul className="grid gap-3 sm:grid-cols-2">
+                    <li className="flex gap-3 rounded-xl border border-kabut-line bg-kabut p-4">
+                      <Wallet size={18} strokeWidth={1.8} className="mt-0.5 shrink-0 text-zamrud-700" />
+                      <span className="text-[13px] leading-relaxed text-ink-muted">
+                        <span className="block text-[15px] font-semibold text-ink">Uang muka 50%</span>
+                        Dibayar saat pesanan dikonfirmasi, sisanya paling lambat saat diantar.
                       </span>
                     </li>
-                  ))}
-                </ul>
-              )}
+                    <li className="flex gap-3 rounded-xl border border-kabut-line bg-kabut p-4">
+                      <Landmark size={18} strokeWidth={1.8} className="mt-0.5 shrink-0 text-zamrud-700" />
+                      <span className="text-[13px] leading-relaxed text-ink-muted">
+                        <span className="block text-[15px] font-semibold text-ink">Transfer atau tunai</span>
+                        Keduanya diterima. Detailnya disampaikan admin saat konfirmasi.
+                      </span>
+                    </li>
+                  </ul>
+                </Bagian>
+              </div>
+            )}
+          </div>
 
-              <dl className="mt-4 space-y-2.5 text-sm">
-                <div className="flex justify-between">
-                  <dt className="text-ink-muted">Jumlah porsi</dt>
-                  <dd className="font-semibold">{totalPorsi}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-ink-muted">Ongkos antar dalam kota</dt>
-                  <dd className="font-semibold">Gratis</dd>
-                </div>
-                <div className="flex items-end justify-between border-t border-line pt-3">
-                  <dt className="font-semibold">Total perkiraan</dt>
-                  <dd className="font-display text-2xl font-semibold text-brand-800">
-                    {rupiah(total)}
-                  </dd>
-                </div>
-              </dl>
-
-              <button
-                type="submit"
-                className="btn btn-primary btn-md mt-6 w-full"
-                disabled={sibuk}
+          {/* Kolom kanan: ringkasan */}
+          <div className="min-w-0 lg:col-span-5 xl:col-span-4">
+            <div className="space-y-4 lg:sticky lg:top-24">
+              <RingkasanPesanan
+                baris={baris}
+                diantar={diantar}
+                tampilkanItem={langkah === "data"}
               >
-                {sibuk ? "Mengirim…" : "Kirim Pesanan"}
-                {!sibuk && <IconArrowRight width={18} height={18} />}
-              </button>
+                {langkah === "keranjang" ? (
+                  <button
+                    key="lanjut"
+                    type="button"
+                    onClick={lanjutKeData}
+                    disabled={!siap || baris.length === 0}
+                    className="tombol tombol-blok tombol-jingga mt-5"
+                  >
+                    Lanjut ke Data Acara
+                    <ArrowRight size={18} />
+                  </button>
+                ) : (
+                  <button
+                    key="kirim"
+                    type="submit"
+                    disabled={sibuk}
+                    className="tombol tombol-blok tombol-jingga mt-5"
+                  >
+                    {sibuk ? "Mengirim…" : "Kirim Pesanan"}
+                    {!sibuk && <ArrowRight size={18} />}
+                  </button>
+                )}
 
-              {galat.kirim && (
-                <p className="mt-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-[13px] font-semibold text-red-700">
-                  <IconAlert className="mt-0.5 shrink-0" width={15} height={15} />
-                  {galat.kirim}
+                {galat.kirim && (
+                  <p className="mt-3 flex items-start gap-2 rounded-lg bg-red-50 px-3.5 py-2.5 text-[13px] font-semibold text-red-700">
+                    <CircleAlert size={15} className="mt-0.5 shrink-0" />
+                    {galat.kirim}
+                  </p>
+                )}
+
+                <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[12px] text-ink-muted">
+                  <ShieldCheck size={14} className="shrink-0 text-zamrud-600" />
+                  Belum ada pembayaran di tahap ini
                 </p>
-              )}
+              </RingkasanPesanan>
 
-              <p className="mt-4 text-[13px] leading-relaxed text-ink-muted">
-                Belum ada pembayaran di tahap ini. Admin akan menghubungi Anda untuk
-                konfirmasi.
-              </p>
-            </div>
-
-            <div className="card mt-5 p-5">
-              <h3 className="text-sm font-bold">Perlu diketahui</h3>
-              <ul className="mt-3 space-y-2.5 text-[13px] leading-relaxed text-ink-muted">
-                <li className="flex gap-2">
-                  <IconCheck className="mt-0.5 shrink-0 text-brand-600" width={15} height={15} />
-                  Pesanan di atas 100 porsi sebaiknya dibuat tiga hari sebelum acara.
-                </li>
-                <li className="flex gap-2">
-                  <IconCheck className="mt-0.5 shrink-0 text-brand-600" width={15} height={15} />
-                  Jumlah porsi masih bisa diubah paling lambat H-1.
-                </li>
-              </ul>
+              <a
+                href={`https://wa.me/${profil.teleponRaw}?text=${encodeURIComponent(
+                  "Halo Asri Catering, saya ingin bertanya soal pesanan untuk instansi.",
+                )}`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-3 rounded-2xl border border-kabut-line bg-kabut-deep p-4 transition-colors hover:border-zamrud-200"
+              >
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-zamrud-700">
+                  <Headset size={19} strokeWidth={1.8} />
+                </span>
+                <span className="flex-1 text-[13px] leading-snug text-ink-soft">
+                  <span className="block font-semibold text-ink">Pesanan instansi atau lebih dari 100 porsi?</span>
+                  Tanyakan dulu lewat WhatsApp.
+                </span>
+                <IconWhatsapp width={18} height={18} className="shrink-0 text-zamrud-700" />
+              </a>
             </div>
           </div>
         </div>
+      </form>
+    </>
+  );
+}
+
+function ItemKeranjang({
+  baris: { menu, qty },
+  onUbah,
+  onHapus,
+}: {
+  baris: BarisKeranjang;
+  onUbah: (qty: number) => void;
+  onHapus: () => void;
+}) {
+  const satuan = satuanMenu(menu);
+  const kurang = qty < menu.minimalPesan;
+
+  return (
+    <div className="kartu flex gap-4 p-4 sm:p-5">
+      <div className="w-20 shrink-0 overflow-hidden rounded-xl sm:w-24">
+        <FotoMenu src={menu.foto} nama={menu.nama} rasio="aspect-square" mini />
       </div>
-    </form>
+
+      <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <p className="text-[12px] font-medium text-jingga-700">{menu.kategori}</p>
+          <h3 className="mt-0.5 text-[19px] font-semibold leading-snug sm:text-[21px]">
+            {menu.nama}
+          </h3>
+          <p className="mt-1 text-[13px] text-ink-muted">
+            {rupiah(menu.hargaJual)} / {satuan} · min. {menu.minimalPesan}
+          </p>
+        </div>
+
+        <div className="flex flex-col items-start gap-2.5 sm:items-end">
+          <p className="whitespace-nowrap text-[18px] font-bold tabular-nums text-zamrud-800">
+            {rupiah(menu.hargaJual * qty)}
+          </p>
+          <div className="flex items-center gap-2">
+            <div className="inline-flex h-9 items-center rounded-lg border border-kabut-line bg-kabut">
+              <button
+                type="button"
+                onClick={() => onUbah(qty - 5)}
+                className="flex h-full w-9 items-center justify-center text-ink-soft hover:text-ink"
+                aria-label={`Kurangi jumlah ${menu.nama}`}
+              >
+                <Minus size={15} />
+              </button>
+              <input
+                type="number"
+                inputMode="numeric"
+                min={0}
+                value={qty}
+                onChange={(e) => onUbah(Number(e.target.value) || 0)}
+                className="h-full w-12 border-x border-kabut-line bg-white text-center text-[14px] font-semibold tabular-nums focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                aria-label={`Jumlah ${menu.nama}`}
+              />
+              <button
+                type="button"
+                onClick={() => onUbah(qty + 5)}
+                className="flex h-full w-9 items-center justify-center text-ink-soft hover:text-ink"
+                aria-label={`Tambah jumlah ${menu.nama}`}
+              >
+                <Plus size={15} />
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={onHapus}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-red-50 hover:text-red-700"
+              aria-label={`Hapus ${menu.nama}`}
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+          {kurang && (
+            <p className="text-[12px] font-semibold text-red-700 sm:text-right">
+              Minimal {menu.minimalPesan} {satuan}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Bagian({
+  nomor,
+  judul,
+  deskripsi,
+  children,
+}: {
+  nomor: string;
+  judul: string;
+  deskripsi: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="kartu p-5 sm:p-7">
+      <div className="flex gap-3.5">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zamrud-50 text-[12px] font-bold tabular-nums text-zamrud-700">
+          {nomor}
+        </span>
+        <div>
+          <h2 className="font-sans text-[19px] font-semibold text-ink">{judul}</h2>
+          <p className="mt-0.5 text-[13px] text-ink-muted">{deskripsi}</p>
+        </div>
+      </div>
+      <div className="mt-6">{children}</div>
+    </section>
   );
 }
 
 function PesanGalat({ children }: { children: React.ReactNode }) {
   return (
     <p className="mt-1.5 flex items-center gap-1.5 text-[12.5px] font-semibold text-red-700">
-      <IconAlert width={14} height={14} />
+      <CircleAlert size={14} />
       {children}
     </p>
   );

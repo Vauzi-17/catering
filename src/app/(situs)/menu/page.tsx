@@ -1,21 +1,23 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { HeroHalaman } from "@/components/HeroHalaman";
 import { KatalogMenu } from "@/components/KatalogMenu";
-import { PageHeader } from "@/components/Ui";
+import { fotoDekorasi } from "@/lib/foto";
 
 export const metadata: Metadata = {
   title: "Menu & Harga",
   description:
-    "Katalog lengkap menu Asri Catering: nasi box, prasmanan, tumpeng, snack box, dan lauk satuan beserta isi paket dan harga per porsi.",
+    "Katalog lengkap menu Asri Catering: nasi kotak, bento, prasmanan, tumpeng, snack box, dan lauk satuan beserta isi paket dan harga per porsi.",
 };
 
 export default function HalamanMenu() {
   return (
     <>
-      <PageHeader
-        eyebrow="Katalog"
-        judul="Menu & harga Asri Catering"
-        deskripsi="Harga sudah termasuk kemasan dan peralatan makan."
+      <HeroHalaman
+        remah={[{ label: "Beranda", href: "/" }, { label: "Menu" }]}
+        judul="Menu & Harga"
+        deskripsi="Harga sudah termasuk kemasan dan alat makan."
+        foto={fotoDekorasi}
       />
       <Suspense
         fallback={

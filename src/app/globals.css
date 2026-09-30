@@ -116,10 +116,80 @@
   .data-table tbody tr:hover {
     @apply bg-cream/70;
   }
+
+  /* ---- Komponen halaman publik (desain baru) ---- */
+  .kartu {
+    @apply rounded-2xl border border-kabut-line bg-white shadow-lembut;
+  }
+
+  .tombol {
+    @apply inline-flex items-center justify-center gap-2 rounded-full font-semibold
+           transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .tombol-sm {
+    @apply h-9 px-4 text-[13px];
+  }
+
+  .tombol-md {
+    @apply h-11 px-6 text-[14px];
+  }
+
+  .tombol-lg {
+    @apply h-12 px-7 text-[15px];
+  }
+
+  /* Tombol utama selebar kartu, dipakai di ringkasan pesanan */
+  .tombol-blok {
+    @apply h-12 w-full rounded-xl text-[15px];
+  }
+
+  .tombol-jingga {
+    @apply bg-jingga-600 text-white hover:bg-jingga-700;
+  }
+
+  .tombol-zamrud {
+    @apply bg-zamrud-700 text-white hover:bg-zamrud-800;
+  }
+
+  .tombol-garis {
+    @apply border border-kabut-line bg-white text-ink-soft hover:border-zamrud-200 hover:text-zamrud-700;
+  }
+
+  .isian-label {
+    @apply mb-1.5 block text-[13px] font-semibold text-ink-soft;
+  }
+
+  .isian {
+    @apply block w-full rounded-lg border border-kabut-line bg-kabut px-3.5 py-2.5 text-sm text-ink
+           placeholder:text-ink-muted/70 focus:border-zamrud-500 focus:bg-white focus:outline-none
+           focus:ring-2 focus:ring-zamrud-500/20;
+  }
 }
 
 /* Pola garis tipis untuk placeholder foto — tanpa gradient */
 .pattern-dots {
   background-image: radial-gradient(#cbd3c9 1px, transparent 1px);
   background-size: 14px 14px;
+}
+
+/* Pita teks berjalan di beranda. Isi digandakan dua kali, lalu digeser
+   setengah lebar supaya sambungannya tidak terlihat. */
+@keyframes geser-pita {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.pita-jalan {
+  animation: geser-pita 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pita-jalan {
+    animation: none;
+  }
 }

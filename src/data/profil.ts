@@ -1,10 +1,10 @@
 export const profil = {
   nama: "Asri Catering",
-  tagline: "Masakan rames rumahan untuk acara Anda",
+  tagline: "Katering nasi kotak & bento untuk setiap acara",
   pemilik: "Ibu Asri Wulandari",
   berdiri: 2016,
   deskripsiSingkat:
-    "Asri Catering melayani nasi rames, prasmanan, tumpeng, dan snack box untuk acara kantor, sekolah, pengajian, dan keluarga. Semua masakan diolah pada hari pengantaran di dapur sendiri.",
+    "Asri Catering melayani nasi kotak, bento, prasmanan, tumpeng, dan snack box untuk acara kantor, sekolah, pengajian, dan keluarga. Semua masakan diolah pada hari pengantaran di dapur sendiri.",
   sejarah: [
     {
       tahun: "2016",
@@ -73,7 +73,7 @@ export const profil = {
     {
       nama: "Rina Kusumawati",
       peran: "Staf Umum, Dinas Pendidikan",
-      isi: "Sudah tiga tahun kami pesan nasi box untuk rapat bulanan. Datang selalu tepat waktu dan rasanya konsisten. Nasi rames komplitnya paling disukai peserta.",
+      isi: "Sudah tiga tahun kami pesan nasi box untuk rapat bulanan. Datang selalu tepat waktu dan rasanya konsisten. Paket nasi kotak acara kantornya paling disukai peserta.",
     },
     {
       nama: "Bapak Hendra",

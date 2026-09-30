@@ -1,10 +1,11 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { HeroHalaman } from "@/components/HeroHalaman";
 import { LacakPesanan } from "@/components/LacakPesanan";
-import { PageHeader } from "@/components/Ui";
+import { fotoDekorasi } from "@/lib/foto";
 
 export const metadata: Metadata = {
-  title: "Lacak Pesanan",
+  title: "Status Pesanan",
   description:
     "Cek status pesanan Asri Catering menggunakan kode pesanan, mulai dari konfirmasi sampai pesanan selesai diantar.",
 };
@@ -12,10 +13,11 @@ export const metadata: Metadata = {
 export default function HalamanLacak() {
   return (
     <>
-      <PageHeader
-        eyebrow="Status pesanan"
-        judul="Lacak pesanan Anda"
-        deskripsi="Masukkan kode pesanan Anda untuk melihat status terbarunya."
+      <HeroHalaman
+        remah={[{ label: "Beranda", href: "/" }, { label: "Status Pesanan" }]}
+        judul="Status Pesanan"
+        deskripsi="Masukkan kode pesanan untuk melihat status terbarunya."
+        foto={fotoDekorasi.slice(0, 3)}
       />
       <Suspense
         fallback={

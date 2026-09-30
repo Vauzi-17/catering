@@ -18,14 +18,15 @@ const display = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL("https://asricatering.id"),
   title: {
-    default: "Asri Catering — Nasi Rames, Prasmanan & Tumpeng di Bandung",
+    default: "Asri Catering — Katering Nasi Kotak, Bento & Prasmanan di Bandung",
     template: "%s · Asri Catering",
   },
   description:
-    "Asri Catering melayani nasi rames, nasi box, prasmanan, tumpeng, dan snack box untuk acara kantor, sekolah, dan keluarga di Bandung. Harga jelas, pesan online, pesanan tercatat rapi.",
+    "Asri Catering melayani nasi kotak, bento, prasmanan, tumpeng, dan snack box untuk acara kantor, sekolah, dan keluarga di Bandung. Harga jelas, pesan online, pesanan tercatat rapi.",
   keywords: [
     "catering bandung",
-    "nasi rames",
+    "nasi kotak bandung",
+    "bento catering",
     "nasi box bandung",
     "catering prasmanan",
     "tumpeng bandung",
@@ -35,9 +36,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "id_ID",
     siteName: "Asri Catering",
-    title: "Asri Catering — Masakan rames rumahan untuk acara Anda",
+    title: "Asri Catering — Katering nasi kotak & bento untuk setiap acara",
     description:
-      "Nasi rames, prasmanan, tumpeng, dan snack box untuk acara di Bandung. Pesan online, harga tercantum jelas.",
+      "Nasi kotak, bento, prasmanan, tumpeng, dan snack box untuk acara di Bandung. Pesan online, harga tercantum jelas.",
   },
   robots: { index: true, follow: true },
 };
