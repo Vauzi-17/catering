@@ -146,7 +146,7 @@ export function HitungCepat() {
       </dl>
 
       <div className="mt-5 rounded-xl bg-kabut px-4 py-4">
-        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-ink-muted">
+        <p className="text-[13px] font-medium text-ink-muted">
           Perkiraan total
         </p>
         <p className="mt-1 font-display text-[30px] font-semibold leading-none tabular-nums text-zamrud-800">

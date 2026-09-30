@@ -1,10 +1,8 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  BadgeCheck,
   ChefHat,
   ClipboardList,
-  Quote,
   Receipt,
   Soup,
 } from "lucide-react";
@@ -30,20 +28,17 @@ function inisial(nama: string) {
 }
 
 function JudulBagian({
-  eyebrow,
   judul,
   deskripsi,
   className = "",
 }: {
-  eyebrow: string;
   judul: string;
   deskripsi?: string;
   className?: string;
 }) {
   return (
     <div className={className}>
-      <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-jingga-700">{eyebrow}</p>
-      <h2 className="mt-2 text-[32px] font-semibold leading-[1.1] sm:text-[40px]">{judul}</h2>
+      <h2 className="text-[32px] font-semibold leading-[1.1] sm:text-[40px]">{judul}</h2>
       {deskripsi && (
         <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-ink-soft">{deskripsi}</p>
       )}
@@ -58,18 +53,13 @@ export default function Beranda() {
       <section className="relative overflow-hidden rounded-b-[50%_56px] bg-gradient-to-br from-jingga-700 via-jingga-600 to-jingga-400 text-white sm:rounded-b-[50%_88px]">
         <div className="container-page grid items-center gap-12 pb-24 pt-12 sm:pb-28 lg:grid-cols-[1.15fr_1fr] lg:gap-10 lg:pb-32 lg:pt-16">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em]">
-              <span className="h-1.5 w-1.5 rounded-full bg-white" />
-              Katering Bandung sejak {profil.berdiri}
-            </p>
-
-            <h1 className="mt-5 text-[40px] font-medium leading-[1.05] sm:text-[56px] lg:text-[64px]">
+            <h1 className="text-[40px] font-medium leading-[1.05] sm:text-[56px] lg:text-[64px]">
               Pilih Hidangan untuk Acara Anda
             </h1>
 
             <p className="mt-5 max-w-[34rem] text-[16px] leading-relaxed text-white/85 sm:text-[17px]">
-              Nasi kotak, bento, prasmanan, dan tumpeng dari dapur Ibu Asri. Dimasak pagi
-              di hari pengantaran, dikemas rapi, dan tiba sebelum acara dimulai.
+              Nasi kotak, bento, prasmanan, dan tumpeng dari dapur Ibu Asri di Bandung sejak{" "}
+              {profil.berdiri}. Dimasak pagi di hari pengantaran dan tiba sebelum acara dimulai.
             </p>
 
             <div className="mt-7">
@@ -110,17 +100,10 @@ export default function Beranda() {
 
       {/* Menu paling laris */}
       <section className="container-page py-20 sm:py-24">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <JudulBagian
-            eyebrow="Menu pilihan"
-            judul="Paling Laris"
-            deskripsi="Paket yang paling sering dipesan ulang untuk rapat, syukuran, dan acara keluarga."
-          />
-          <p className="inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-zamrud-100 bg-zamrud-50 px-3.5 py-1.5 text-[12px] font-semibold text-zamrud-800 sm:self-auto">
-            <BadgeCheck size={16} strokeWidth={1.8} className="text-zamrud-600" />
-            Dimasak di hari pengantaran
-          </p>
-        </div>
+        <JudulBagian
+          judul="Paling Laris"
+          deskripsi="Paket yang paling sering dipesan untuk rapat, syukuran, dan acara keluarga."
+        />
 
         <nav aria-label="Kategori menu" className="mt-8 flex flex-wrap gap-2">
           {kategoriMenu.map((k) => (
@@ -179,8 +162,7 @@ export default function Beranda() {
       <section className="container-page grid gap-12 py-20 sm:py-24 lg:grid-cols-[1fr_440px] lg:gap-16">
         <div>
           <JudulBagian
-            eyebrow="Cara pesan"
-            judul="Dari keranjang sampai meja acara"
+            judul="Cara Pesan"
             deskripsi={`Pesan kurang dari 100 porsi bisa H-1. Setiap pesanan mendapat kode untuk memantau statusnya sampai diantar.`}
           />
 
@@ -216,7 +198,7 @@ export default function Beranda() {
       {/* Testimoni */}
       <section className="border-t border-kabut-line bg-white py-20 sm:py-24">
         <div className="container-page">
-          <JudulBagian eyebrow="Kata pelanggan" judul="Dipesan ulang, bukan sekali coba" />
+          <JudulBagian judul="Kata Pelanggan" />
 
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {profil.testimoni.map((t) => (
@@ -224,8 +206,7 @@ export default function Beranda() {
                 key={t.nama}
                 className="flex flex-col rounded-2xl border border-kabut-line bg-kabut p-6"
               >
-                <Quote size={22} className="text-jingga-400" strokeWidth={1.8} aria-hidden="true" />
-                <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-ink-soft">
+                <blockquote className="flex-1 text-[15px] leading-relaxed text-ink-soft">
                   {t.isi}
                 </blockquote>
                 <figcaption className="mt-6 flex items-center gap-3 border-t border-kabut-line pt-5">

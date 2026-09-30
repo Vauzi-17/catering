@@ -30,7 +30,7 @@ function KartuMenuLaris({ menu }: { menu: Menu }) {
   }
 
   return (
-    <article className="group flex flex-col rounded-2xl border border-kabut-line bg-white p-3 shadow-lembut transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-jingga-200">
+    <article className="group flex flex-col rounded-2xl border border-kabut-line bg-white p-3 shadow-lembut transition-colors hover:border-jingga-200">
       <Link
         href={`/menu/${menu.slug}`}
         className="relative block overflow-hidden rounded-xl"
