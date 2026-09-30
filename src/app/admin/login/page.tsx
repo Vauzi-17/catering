@@ -37,7 +37,7 @@ export default function HalamanLogin() {
       {/* Panel kiri */}
       <div className="hidden flex-col justify-between bg-brand-900 p-10 text-white lg:flex">
         <Link href="/" className="flex items-center gap-2.5">
-          <LogoMark className="h-9 w-9 bg-brand-700" />
+          <LogoMark className="h-9 w-9" />
           <span className="font-display text-lg font-semibold">Asri Catering</span>
         </Link>
 

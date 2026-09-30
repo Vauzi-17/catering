@@ -56,7 +56,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-kabut-line bg-white/95 backdrop-blur-sm">
       <div className="container-page flex h-16 items-center justify-between gap-4 lg:h-[72px]">
         <Link href="/" aria-label="Asri Catering — beranda">
-          <Logo warna="zamrud" />
+          <Logo />
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Navigasi utama">

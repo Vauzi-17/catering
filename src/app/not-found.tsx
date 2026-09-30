@@ -6,7 +6,7 @@ export default function TidakDitemukan() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-kabut px-5">
       <div className="w-full max-w-lg text-center">
-        <LogoMark warna="zamrud" className="mx-auto h-12 w-12" />
+        <LogoMark className="mx-auto h-14 w-14" />
         <p className="mt-6 text-[14px] font-semibold text-jingga-700">Halaman tidak ditemukan</p>
         <h1 className="mt-2 text-[34px] font-semibold leading-tight sm:text-[42px]">
           Halaman yang Anda cari tidak ada

@@ -24,7 +24,7 @@ export function SiteFooter() {
       <div className="container-page grid gap-10 py-14 md:grid-cols-12">
         <div className="md:col-span-4">
           <div className="flex items-center gap-2.5">
-            <LogoMark warna="zamrud" className="h-8 w-8" />
+            <LogoMark className="h-9 w-9" />
             <span className="font-display text-[22px] font-semibold">Asri Catering</span>
           </div>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink-soft">
