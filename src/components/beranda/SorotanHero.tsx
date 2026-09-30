@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Award, ImageIcon } from "lucide-react";
+import { Award } from "lucide-react";
 import { pilihMenuLaris } from "@/components/beranda/MenuLaris";
 import { rupiah } from "@/lib/format";
 import { useData } from "@/store/DataProvider";
@@ -28,34 +28,5 @@ export function KartuFavorit() {
         </span>
       </span>
     </Link>
-  );
-}
-
-/** Tumpukan tiga foto kecil + jumlah menu yang tersedia. */
-export function RingkasMenu() {
-  const { menus } = useData();
-  const tersedia = menus.filter((m) => m.tersedia);
-
-  return (
-    <div className="flex items-center gap-4">
-      <div className="flex -space-x-3" aria-hidden="true">
-        {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-jingga-100 bg-abu"
-          >
-            <ImageIcon size={15} className="text-abu-ikon" />
-          </span>
-        ))}
-      </div>
-      <div>
-        <p className="text-[15px] font-semibold text-white">
-          {tersedia.length} pilihan menu
-        </p>
-        <p className="text-[12px] font-medium text-white/75">
-          Nasi kotak, prasmanan, tumpeng &amp; snack box
-        </p>
-      </div>
-    </div>
   );
 }

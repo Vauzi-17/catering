@@ -27,7 +27,7 @@ export function MenuCard({ menu }: { menu: Menu }) {
         tabIndex={-1}
         aria-hidden="true"
       >
-        <FotoMenu src={menu.foto} nama={menu.nama} rasio="aspect-square" className="rounded-xl" />
+        <FotoMenu src={menu.foto} nama={menu.nama} rasio="aspect-[4/3]" className="rounded-xl" />
         <span className="absolute right-2.5 top-2.5 rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-ink-soft shadow-sm">
           {menu.tersedia ? `Min. ${menu.minimalPesan} ${satuan}` : "Sedang kosong"}
         </span>

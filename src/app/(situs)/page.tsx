@@ -4,7 +4,7 @@ import { DaftarKeunggulan } from "@/components/DaftarKeunggulan";
 import { DaftarTestimoni } from "@/components/DaftarTestimoni";
 import { HitungCepat } from "@/components/beranda/HitungCepat";
 import { MenuLaris } from "@/components/beranda/MenuLaris";
-import { KartuFavorit, RingkasMenu } from "@/components/beranda/SorotanHero";
+import { KartuFavorit } from "@/components/beranda/SorotanHero";
 import { IconWhatsapp } from "@/components/Icons";
 import { GambarPlaceholder } from "@/components/Placeholder";
 import { SectionHeading } from "@/components/Ui";
@@ -27,16 +27,28 @@ export default function Beranda() {
               {profil.berdiri}. Dimasak pagi di hari pengantaran dan tiba sebelum acara dimulai.
             </p>
 
-            <div className="mt-7">
-              <RingkasMenu />
-            </div>
+            <dl className="mt-8 flex max-w-md divide-x divide-white/25">
+              {[profil.statistik[0], profil.statistik[1], profil.statistik[3]].map((s) => (
+                <div key={s.label} className="flex-1 px-4 first:pl-0 last:pr-0 sm:px-6">
+                  <dt className="sr-only">{s.label}</dt>
+                  <dd>
+                    <span className="block text-[26px] font-bold leading-none tabular-nums sm:text-[30px]">
+                      {s.angka}
+                    </span>
+                    <span className="mt-1.5 block text-[12px] font-medium text-white/80 sm:text-[13px]">
+                      {s.label}
+                    </span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/menu"
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white px-7 text-[15px] font-semibold text-jingga-800 transition-colors hover:bg-jingga-50"
               >
-                Pesan Sekarang
+                Lihat Menu
                 <ArrowRight size={18} />
               </Link>
               <Link
@@ -95,7 +107,7 @@ export default function Beranda() {
       </section>
 
       {/* Keunggulan */}
-      <section className="border-y border-kabut-line bg-kabut-deep py-16 sm:py-20">
+      <section className="border-y border-kabut-line bg-white py-14 sm:py-16">
         <div className="container-page">
           <DaftarKeunggulan />
         </div>
