@@ -172,3 +172,24 @@
   background-image: radial-gradient(#cbd3c9 1px, transparent 1px);
   background-size: 14px 14px;
 }
+
+/* Pita teks berjalan di beranda. Isi digandakan dua kali, lalu digeser
+   setengah lebar supaya sambungannya tidak terlihat. */
+@keyframes geser-pita {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.pita-jalan {
+  animation: geser-pita 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pita-jalan {
+    animation: none;
+  }
+}
