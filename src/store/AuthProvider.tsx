@@ -182,7 +182,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [sesi],
   );
 
-  const muatUlangProfil = useCallback(() => muatProfil(sesi?.user.id ?? null), [muatProfil, sesi]);
+  // Membaca sesi terbaru (bukan dari state) supaya bisa dipanggil tepat
+  // setelah masuk, sebelum state sesi sempat diperbarui.
+  const muatUlangProfil = useCallback(async () => {
+    if (!supabase) return;
+    const { data } = await supabase.auth.getSession();
+    await muatProfil(data.session?.user.id ?? null);
+  }, [muatProfil]);
 
   const token = useCallback(async () => {
     if (!supabase) return null;

@@ -1,5 +1,6 @@
 import type { Bahan, HasilHpp, Menu, Pesanan } from "@/lib/types";
 import { persen, rupiah } from "@/lib/format";
+import { STATUS_PENDAPATAN } from "@/lib/status";
 
 /**
  * Mesin analisis Asri Catering.
@@ -168,7 +169,7 @@ export interface BarisLaporan {
   margin: number;
 }
 
-const STATUS_DIHITUNG = ["Diproses", "Selesai"];
+const STATUS_DIHITUNG: string[] = STATUS_PENDAPATAN;
 
 export function laporanHarian(
   pesanan: Pesanan[],
@@ -239,7 +240,8 @@ export function kebutuhanBahan(
   const peta = new Map<string, number>();
 
   pesanan
-    .filter((p) => p.status === "Menunggu Konfirmasi" || p.status === "Diproses")
+    // Bahan untuk pesanan yang masih akan dimasak.
+    .filter((p) => ["Menunggu Konfirmasi", "Dibayar", "Diproses"].includes(p.status))
     .forEach((p) => {
       p.items.forEach((it) => {
         const menu = menus.find((m) => m.id === it.menuId);

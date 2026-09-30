@@ -1,3 +1,4 @@
+import { STATUS_PERLU_PROSES } from "@/lib/status";
 import {
   hitungHpp,
   kebutuhanBahan,
@@ -149,10 +150,10 @@ export function jawabPertanyaan(
 
   // Pesanan belum dikonfirmasi
   if (mengandung(t, ["pesanan", "konfirmasi", "masuk"])) {
-    const menunggu = pesanan.filter((p) => p.status === "Menunggu Konfirmasi");
-    const diproses = pesanan.filter((p) => p.status === "Diproses");
+    const menunggu = pesanan.filter((p) => STATUS_PERLU_PROSES.includes(p.status));
+    const diproses = pesanan.filter((p) => p.status === "Diproses" || p.status === "Dikirim");
     return {
-      isi: `Ada ${menunggu.length} pesanan menunggu konfirmasi dan ${diproses.length} pesanan sedang diproses.`,
+      isi: `Ada ${menunggu.length} pesanan perlu diproses dan ${diproses.length} pesanan sedang dimasak atau diantar.`,
       rincian: menunggu.slice(0, 5).map((p) => ({
         label: `${p.kode} · ${p.nama}`,
         nilai: `${tanggalPendek(p.tanggalAcara)} · ${rupiah(p.total)}`,

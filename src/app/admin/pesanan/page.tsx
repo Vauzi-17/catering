@@ -4,17 +4,33 @@ import { useMemo, useState } from "react";
 import { JudulHalaman } from "@/components/admin/AdminShell";
 import { KartuStat } from "@/components/admin/Bagian";
 import { IconClose, IconSearch } from "@/components/Icons";
+import { LencanaBayar } from "@/components/pesanan/Lencana";
 import { Kosong, StatusBadge } from "@/components/Ui";
 import { rupiah, tanggalPanjang, tanggalPendek, waktuRelatif } from "@/lib/format";
 import type { Pesanan, StatusPesanan } from "@/lib/types";
+import { panggilApi } from "@/lib/snap";
+import { STATUS_PERLU_PROSES } from "@/lib/status";
+import { useAuth } from "@/store/AuthProvider";
 import { useData } from "@/store/DataProvider";
 
 const semuaStatus: StatusPesanan[] = [
-  "Menunggu Konfirmasi",
+  "Menunggu Pembayaran",
+  "Dibayar",
   "Diproses",
+  "Dikirim",
   "Selesai",
   "Dibatalkan",
+  "Menunggu Konfirmasi",
 ];
+
+// Tombol lanjut per status. Pesanan online tidak dikonfirmasi manual:
+// statusnya menjadi "Dibayar" otomatis dari Midtrans.
+const langkahBerikut: Partial<Record<StatusPesanan, { label: string; status: StatusPesanan }>> = {
+  "Menunggu Konfirmasi": { label: "Konfirmasi & proses", status: "Diproses" },
+  Dibayar: { label: "Mulai masak", status: "Diproses" },
+  Diproses: { label: "Tandai dikirim / siap diambil", status: "Dikirim" },
+  Dikirim: { label: "Tandai selesai", status: "Selesai" },
+};
 
 export default function HalamanPesananAdmin() {
   const { pesanan, ubahStatusPesanan } = useData();
@@ -40,38 +56,39 @@ export default function HalamanPesananAdmin() {
   const terpilih = pesanan.find((p) => p.id === dipilih) ?? null;
 
   const hitung = (s: StatusPesanan) => pesanan.filter((p) => p.status === s).length;
-  const nilaiAktif = pesanan
-    .filter((p) => p.status === "Menunggu Konfirmasi" || p.status === "Diproses")
+  const perluDiproses = pesanan.filter((p) => STATUS_PERLU_PROSES.includes(p.status)).length;
+  const nilaiLunas = pesanan
+    .filter((p) => p.statusBayar === "Lunas" && p.status !== "Selesai" && p.status !== "Dibatalkan")
     .reduce((a, p) => a + p.total, 0);
 
   return (
     <>
       <JudulHalaman
         judul="Pesanan"
-        deskripsi="Konfirmasi pesanan baru dan perbarui statusnya."
+        deskripsi="Pesanan online otomatis berstatus Dibayar setelah pembayaran masuk. Lanjutkan ke masak, kirim, dan selesai."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KartuStat
-          label="Menunggu konfirmasi"
-          nilai={String(hitung("Menunggu Konfirmasi"))}
-          catatan="Perlu ditindaklanjuti hari ini"
-          nada={hitung("Menunggu Konfirmasi") > 0 ? "perhatian" : "baik"}
+          label="Perlu diproses"
+          nilai={String(perluDiproses)}
+          catatan="Sudah dibayar, belum dimasak"
+          nada={perluDiproses > 0 ? "perhatian" : "baik"}
         />
         <KartuStat
-          label="Sedang diproses"
-          nilai={String(hitung("Diproses"))}
-          catatan="Dikerjakan di dapur"
+          label="Dimasak / dikirim"
+          nilai={`${hitung("Diproses")} / ${hitung("Dikirim")}`}
+          catatan="Di dapur / dalam perjalanan"
         />
         <KartuStat
-          label="Selesai"
-          nilai={String(hitung("Selesai"))}
-          catatan="Sudah diterima pelanggan"
+          label="Menunggu pembayaran"
+          nilai={String(hitung("Menunggu Pembayaran"))}
+          catatan="Belum dibayar pelanggan"
         />
         <KartuStat
-          label="Nilai pesanan berjalan"
-          nilai={rupiah(nilaiAktif, true)}
-          catatan="Menunggu konfirmasi + diproses"
+          label="Lunas, belum selesai"
+          nilai={rupiah(nilaiLunas, true)}
+          catatan="Uang sudah masuk lewat Midtrans"
           nada="baik"
         />
       </div>
@@ -94,7 +111,7 @@ export default function HalamanPesananAdmin() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {(["Semua", ...semuaStatus] as const).map((s) => (
+            {(["Semua", ...semuaStatus.filter((x) => x !== "Menunggu Konfirmasi" || hitung(x) > 0)] as const).map((s) => (
               <button
                 key={s}
                 type="button"
@@ -168,7 +185,10 @@ export default function HalamanPesananAdmin() {
                     </td>
                     <td className="text-right font-semibold text-ink">{rupiah(p.total)}</td>
                     <td>
-                      <StatusBadge status={p.status} />
+                      <span className="flex flex-col items-start gap-1">
+                        <StatusBadge status={p.status} />
+                        <LencanaBayar status={p.statusBayar} />
+                      </span>
                     </td>
                     <td className="text-right">
                       <button
@@ -207,11 +227,23 @@ function DialogPesanan({
   tutup: () => void;
   ubahStatus: (s: StatusPesanan) => void;
 }) {
-  const aksi: { label: string; status: StatusPesanan; gaya: string }[] = [
-    { label: "Konfirmasi pesanan", status: "Diproses", gaya: "btn-primary" },
-    { label: "Tandai selesai", status: "Selesai", gaya: "btn-outline" },
-    { label: "Batalkan pesanan", status: "Dibatalkan", gaya: "btn-danger" },
-  ];
+  const auth = useAuth();
+  const [cek, setCek] = useState("");
+  const berikut = langkahBerikut[pesanan.status];
+  const bisaBatal = pesanan.status !== "Selesai" && pesanan.status !== "Dibatalkan";
+
+  async function cekPembayaran() {
+    setCek("Memeriksa…");
+    try {
+      const { ok, data } = await panggilApi<{ diubah?: boolean }>(
+        `/api/pesanan/${pesanan.kode}/sinkron/`,
+        await auth.token(),
+      );
+      setCek(ok ? (data.diubah ? "Status diperbarui. Muat ulang daftar." : "Belum ada perubahan dari Midtrans.") : data.galat ?? "Gagal memeriksa.");
+    } catch {
+      setCek("Gagal memeriksa.");
+    }
+  }
 
   return (
     <div
@@ -252,6 +284,13 @@ function DialogPesanan({
               { l: "Jam", v: pesanan.waktuAntar },
               { l: "Metode", v: pesanan.metode },
               { l: "Dibuat", v: waktuRelatif(pesanan.dibuatPada) },
+              {
+                l: "Pembayaran",
+                v: pesanan.statusBayar
+                  ? `${pesanan.statusBayar === "Menunggu" ? "Belum dibayar" : pesanan.statusBayar}${pesanan.metodeBayar ? ` · ${pesanan.metodeBayar}` : ""}`
+                  : "Manual",
+              },
+              ...(pesanan.dibayarPada ? [{ l: "Dibayar", v: waktuRelatif(pesanan.dibayarPada) }] : []),
             ].map((d) => (
               <div key={d.l}>
                 <dt className="text-[12px] font-semibold uppercase tracking-wide text-ink-muted">
@@ -264,7 +303,20 @@ function DialogPesanan({
               <dt className="text-[12px] font-semibold uppercase tracking-wide text-ink-muted">
                 Alamat
               </dt>
-              <dd className="mt-1 text-sm text-ink-soft">{pesanan.alamat}</dd>
+              <dd className="mt-1 text-sm text-ink-soft">
+                {pesanan.alamat}
+                {pesanan.patokan && <span className="block text-ink-muted">Patokan: {pesanan.patokan}</span>}
+                {pesanan.lat != null && pesanan.lng != null && (
+                  <a
+                    href={`https://www.google.com/maps?q=${pesanan.lat},${pesanan.lng}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1 inline-block font-semibold text-brand-700 hover:underline"
+                  >
+                    Buka lokasi di Google Maps
+                  </a>
+                )}
+              </dd>
             </div>
             {pesanan.catatan && (
               <div className="sm:col-span-2">
@@ -312,21 +364,42 @@ function DialogPesanan({
         </div>
 
         <div className="sticky bottom-0 flex flex-wrap gap-2 border-t border-line bg-white px-5 py-4 sm:px-6">
-          {aksi
-            .filter((a) => a.status !== pesanan.status)
-            .map((a) => (
-              <button
-                key={a.status}
-                type="button"
-                onClick={() => {
-                  ubahStatus(a.status);
-                  if (a.status === "Dibatalkan" || a.status === "Selesai") tutup();
-                }}
-                className={`btn btn-sm ${a.gaya}`}
-              >
-                {a.label}
-              </button>
-            ))}
+          {berikut && (
+            <button
+              type="button"
+              onClick={() => {
+                ubahStatus(berikut.status);
+                if (berikut.status === "Selesai") tutup();
+              }}
+              className="btn btn-sm btn-primary"
+            >
+              {berikut.label}
+            </button>
+          )}
+          {pesanan.status === "Menunggu Pembayaran" && (
+            <button type="button" onClick={() => void cekPembayaran()} className="btn btn-sm btn-outline">
+              Cek status pembayaran
+            </button>
+          )}
+          {bisaBatal && (
+            <button
+              type="button"
+              onClick={() => {
+                const pesanKonfirmasi =
+                  pesanan.statusBayar === "Lunas"
+                    ? "Pesanan ini sudah dibayar. Membatalkan di sini TIDAK mengembalikan dana; lakukan refund dari dashboard Midtrans. Tetap batalkan?"
+                    : "Batalkan pesanan ini?";
+                if (window.confirm(pesanKonfirmasi)) {
+                  ubahStatus("Dibatalkan");
+                  tutup();
+                }
+              }}
+              className="btn btn-sm btn-danger"
+            >
+              Batalkan pesanan
+            </button>
+          )}
+          {cek && <span className="self-center text-[13px] text-ink-muted">{cek}</span>}
         </div>
       </div>
     </div>

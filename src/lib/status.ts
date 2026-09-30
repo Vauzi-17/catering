@@ -59,3 +59,12 @@ export const LABEL_TRANSAKSI: Record<string, string> = {
   refund: "Dikembalikan",
   partial_refund: "Dikembalikan sebagian",
 };
+
+/** Menunggu tindakan admin: pesanan manual lama dan pesanan yang baru dibayar. */
+export const STATUS_PERLU_PROSES: StatusPesanan[] = ["Menunggu Konfirmasi", "Dibayar"];
+
+/** Pesanan yang sedang berjalan (belum selesai, belum batal, sudah dibayar/dikonfirmasi). */
+export const STATUS_BERJALAN: StatusPesanan[] = ["Menunggu Konfirmasi", "Dibayar", "Diproses", "Dikirim"];
+
+/** Pesanan yang dihitung sebagai pendapatan di laporan. */
+export const STATUS_PENDAPATAN: StatusPesanan[] = ["Dibayar", "Diproses", "Dikirim", "Selesai"];

@@ -163,7 +163,7 @@ export function FormPesanan() {
     setBarisBeku(baris);
     try {
       const { ok, data } = await panggilApi<{ kode?: string; token?: string; redirectUrl?: string }>(
-        "/api/pesanan",
+        "/api/pesanan/",
         await auth.token(),
         {
           items: baris.map((b) => ({ menuId: b.menu.id, qty: b.qty })),
@@ -210,7 +210,7 @@ export function FormPesanan() {
 
       await bayarDenganSnap(data.token, data.redirectUrl);
       // Apa pun hasil popup, status sebenarnya dibaca ulang di halaman pesanan.
-      await panggilApi(`/api/pesanan/${data.kode}/sinkron`, await auth.token()).catch(() => null);
+      await panggilApi(`/api/pesanan/${data.kode}/sinkron/`, await auth.token()).catch(() => null);
       router.push(`${tujuan}?baru=1`);
     } catch {
       setGalatKirim("Tidak dapat terhubung ke server. Periksa koneksi lalu coba lagi.");

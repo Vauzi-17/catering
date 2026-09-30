@@ -89,7 +89,7 @@ export function DetailPesananSaya({ kode }: { kode: string }) {
     setPesan(null);
     try {
       const { ok, data } = await panggilApi<{ token?: string; redirectUrl?: string }>(
-        `/api/pesanan/${kode}/bayar`,
+        `/api/pesanan/${kode}/bayar/`,
         await auth.token(),
       );
       if (!ok || !data.token || !data.redirectUrl) {
@@ -108,7 +108,7 @@ export function DetailPesananSaya({ kode }: { kode: string }) {
   async function cek(diam = false) {
     if (!diam) setSibuk("cek");
     try {
-      await panggilApi(`/api/pesanan/${kode}/sinkron`, await auth.token());
+      await panggilApi(`/api/pesanan/${kode}/sinkron/`, await auth.token());
       await muat();
       if (!diam) setPesan({ jenis: "info", teks: "Status pembayaran sudah diperbarui." });
     } catch {
