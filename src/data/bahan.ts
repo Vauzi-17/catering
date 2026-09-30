@@ -29,4 +29,7 @@ export const bahanAwal: Bahan[] = [
   { id: "bh-26", nama: "Daun Pisang", satuan: "ikat", hargaSatuan: 6000, kategori: "Kemasan", stok: 12, stokMinimum: 5 },
   { id: "bh-27", nama: "Kunyit", satuan: "kg", hargaSatuan: 20000, kategori: "Bumbu", stok: 3, stokMinimum: 1 },
   { id: "bh-28", nama: "Kotak Bento Sekat", satuan: "pcs", hargaSatuan: 3200, kategori: "Kemasan", stok: 300, stokMinimum: 120 },
+  { id: "bh-29", nama: "Udang", satuan: "kg", hargaSatuan: 90000, kategori: "Protein", stok: 5, stokMinimum: 2 },
+  { id: "bh-30", nama: "Pisang", satuan: "pcs", hargaSatuan: 1500, kategori: "Sayuran", stok: 80, stokMinimum: 30 },
+  { id: "bh-31", nama: "Air Mineral Gelas", satuan: "pcs", hargaSatuan: 700, kategori: "Bahan Pokok", stok: 240, stokMinimum: 96 },
 ];

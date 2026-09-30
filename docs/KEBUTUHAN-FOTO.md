@@ -170,13 +170,17 @@ boleh dilengkapi bertahap. Tidak ada yang rusak kalau baru sebagian yang ada.
 
 ## 8. Daftar periksa
 
+`[~]` berarti sudah ada foto sementara dari tahap desain. Foto ini beresolusi
+rendah sehingga tampak buram di layar besar, dan **wajib diganti dengan foto
+milik Asri Catering sendiri** sebelum website dipakai pelanggan.
+
 Menu:
 
-- [ ] paket-nasi-kuning-bento-royal
-- [ ] paket-nasi-kotak-acara-kantor
-- [ ] paket-nasi-kotak-rendang-vip
+- [~] paket-nasi-kuning-bento-royal — foto sementara 352 px, ganti dengan foto asli ≥ 1200 px
+- [~] paket-nasi-kotak-acara-kantor — foto sementara 246 px, ganti dengan foto asli ≥ 1200 px
+- [~] paket-nasi-kotak-rendang-vip — foto sementara 246 px, ganti dengan foto asli ≥ 1200 px
 - [ ] paket-bento-ayam-kremes
-- [ ] paket-nasi-kotak-nila-bakar
+- [~] paket-nasi-kotak-nila-bakar — foto sementara 246 px, ganti dengan foto asli ≥ 1200 px
 - [ ] prasmanan-paket-silver
 - [ ] prasmanan-paket-gold
 - [ ] tumpeng-mini

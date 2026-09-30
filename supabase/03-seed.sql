@@ -58,7 +58,10 @@ insert into public.ingredients (nama, satuan, harga_satuan, kategori, stok, stok
   ('Dus Snack Box', 'pcs', 1500, 'Kemasan', 350, 150),
   ('Daun Pisang', 'ikat', 6000, 'Kemasan', 12, 5),
   ('Kunyit', 'kg', 20000, 'Bumbu', 3, 1),
-  ('Kotak Bento Sekat', 'pcs', 3200, 'Kemasan', 300, 120)
+  ('Kotak Bento Sekat', 'pcs', 3200, 'Kemasan', 300, 120),
+  ('Udang', 'kg', 90000, 'Protein', 5, 2),
+  ('Pisang', 'pcs', 1500, 'Sayuran', 80, 30),
+  ('Air Mineral Gelas', 'pcs', 700, 'Bahan Pokok', 240, 96)
 on conflict (nama) do update set
   satuan       = excluded.satuan,
   harga_satuan = excluded.harga_satuan,
@@ -78,7 +81,7 @@ select
   c.id, 'paket-nasi-kuning-bento-royal', 'Paket Nasi Kuning Bento Royal',
   'Nasi kuning gurih, ayam bakar madu, mi goreng, sambal goreng kentang, dan telur dadar iris dalam kotak bento bersekat.',
   'Menu andalan untuk syukuran, ulang tahun kantor, dan jamuan tamu. Nasi kuning dimasak dengan santan dan kunyit segar, disajikan bersama ayam bakar olesan madu kecap, mi goreng jawa, sambal goreng kentang, telur dadar iris, sambal, dan kerupuk. Dikemas dalam kotak bento bersekat supaya lauk tidak saling bercampur selama pengantaran.',
-  38000, 'per box', '',
+  38000, 'per box', '/images/menu/paket-nasi-kuning-bento-royal.webp',
   array['Nasi kuning santan', 'Ayam bakar madu kecap', 'Mi goreng jawa', 'Sambal goreng kentang', 'Telur dadar iris', 'Sambal & kerupuk']::text[],
   true, true, 10, 3200, 3000
 from public.categories c
@@ -127,7 +130,7 @@ select
   c.id, 'paket-nasi-kotak-acara-kantor', 'Paket Nasi Kotak Acara Kantor',
   'Nasi pulen, ayam goreng lengkuas, tahu tempe bacem, oseng buncis wortel, sambal, dan lalapan.',
   'Paket yang paling sering dipesan untuk rapat, pelatihan, dan acara kantor. Nasi putih pandan wangi disajikan bersama ayam goreng lengkuas, tahu tempe bacem, oseng buncis wortel, lalapan, sambal, dan kerupuk. Porsi dan rasa dijaga sama dari box pertama sampai box terakhir.',
-  26000, 'per box', '',
+  26000, 'per box', '/images/menu/paket-nasi-kotak-acara-kantor.webp',
   array['Nasi putih pandan wangi', 'Ayam goreng lengkuas', 'Tahu tempe bacem', 'Oseng buncis wortel', 'Lalapan & sambal', 'Kerupuk']::text[],
   true, true, 20, 1800, 2000
 from public.categories c
@@ -173,10 +176,10 @@ insert into public.menus (
   biaya_kemasan, biaya_tenaga_kerja)
 select
   c.id, 'paket-nasi-kotak-rendang-vip', 'Paket Nasi Kotak Rendang VIP',
-  'Rendang sapi yang dimasak empat jam, sayur nangka santan, telur balado, dan sambal ijo.',
-  'Paket premium untuk jamuan resmi, pernikahan, dan tamu penting. Rendang sapi dimasak perlahan kurang lebih empat jam sampai bumbu meresap dan daging empuk, disajikan bersama nasi putih, sayur nangka santan, telur balado, sambal ijo, dan kerupuk dalam kotak bento bersekat.',
-  52000, 'per box', '',
-  array['Nasi putih pandan wangi', 'Rendang sapi', 'Sayur nangka santan', 'Telur balado', 'Sambal ijo', 'Kerupuk']::text[],
+  'Rendang sapi yang dimasak empat jam, udang balado, tumis sayur, pisang, dan air mineral.',
+  'Paket premium untuk jamuan resmi, pernikahan, dan tamu penting. Rendang sapi dimasak perlahan kurang lebih empat jam sampai bumbu meresap dan daging empuk, disajikan bersama nasi putih, udang balado, tumis sayur, buah pisang, dan air mineral gelas. Satu kotak sudah lengkap tanpa perlu tambahan minuman.',
+  58000, 'per box', '/images/menu/paket-nasi-kotak-rendang-vip.webp',
+  array['Nasi putih pandan wangi', 'Rendang sapi', 'Udang balado', 'Tumis sayur', 'Buah pisang', 'Air mineral gelas']::text[],
   true, true, 10, 3200, 3500
 from public.categories c
 where c.nama = 'Nasi Box'
@@ -201,10 +204,12 @@ from public.menus m
 cross join (values
   ('Beras Pandan Wangi', 0.1500),
   ('Daging Sapi', 0.1000),
-  ('Santan Kara', 0.4000),
+  ('Santan Kara', 0.3000),
   ('Kelapa Parut', 0.0300),
-  ('Nangka Muda', 0.0500),
-  ('Telur Ayam', 1.0000),
+  ('Udang', 0.0400),
+  ('Buncis', 0.0400),
+  ('Pisang', 1.0000),
+  ('Air Mineral Gelas', 1.0000),
   ('Cabai Merah', 0.0250),
   ('Bawang Merah', 0.0150),
   ('Bawang Putih', 0.0100),
@@ -212,6 +217,51 @@ cross join (values
 ) as v(nama_bahan, jumlah)
 join public.ingredients i on i.nama = v.nama_bahan
 where m.slug = 'paket-nasi-kotak-rendang-vip'
+on conflict (menu_id, ingredient_id) do update set jumlah = excluded.jumlah;
+
+-- Paket Nasi Kotak Nila Bakar Rica
+insert into public.menus (
+  category_id, slug, nama, deskripsi, deskripsi_panjang, harga_jual,
+  satuan_jual, foto, isi, populer, tersedia, minimal_pesan,
+  biaya_kemasan, biaya_tenaga_kerja)
+select
+  c.id, 'paket-nasi-kotak-nila-bakar', 'Paket Nasi Kotak Nila Bakar Rica',
+  'Ikan nila bakar bumbu rica, tempe goreng, lalapan selada dan timun, serta sambal matah.',
+  'Ikan nila segar ukuran sedang dibakar dengan bumbu rica hingga harum, disajikan bersama nasi putih, tempe goreng, lalapan selada dan timun, serta sambal matah. Pilihan untuk tamu yang menghindari daging merah.',
+  32000, 'per box', '/images/menu/paket-nasi-kotak-nila-bakar.webp',
+  array['Nasi putih pandan wangi', 'Nila bakar bumbu rica', 'Tempe goreng', 'Lalapan selada & timun', 'Sambal matah']::text[],
+  true, true, 10, 1800, 2500
+from public.categories c
+where c.nama = 'Nasi Box'
+on conflict (slug) do update set
+  category_id        = excluded.category_id,
+  nama               = excluded.nama,
+  deskripsi          = excluded.deskripsi,
+  deskripsi_panjang  = excluded.deskripsi_panjang,
+  harga_jual         = excluded.harga_jual,
+  satuan_jual        = excluded.satuan_jual,
+  isi                = excluded.isi,
+  populer            = excluded.populer,
+  tersedia           = excluded.tersedia,
+  minimal_pesan      = excluded.minimal_pesan,
+  biaya_kemasan      = excluded.biaya_kemasan,
+  biaya_tenaga_kerja = excluded.biaya_tenaga_kerja,
+  diubah_pada        = now();
+
+insert into public.recipes (menu_id, ingredient_id, jumlah)
+select m.id, i.id, v.jumlah
+from public.menus m
+cross join (values
+  ('Beras Pandan Wangi', 0.1500),
+  ('Ikan Nila', 0.1800),
+  ('Tempe', 0.2500),
+  ('Cabai Merah', 0.0250),
+  ('Bawang Merah', 0.0150),
+  ('Bumbu Dapur Racik', 0.3000),
+  ('Minyak Goreng', 0.0200)
+) as v(nama_bahan, jumlah)
+join public.ingredients i on i.nama = v.nama_bahan
+where m.slug = 'paket-nasi-kotak-nila-bakar'
 on conflict (menu_id, ingredient_id) do update set jumlah = excluded.jumlah;
 
 -- Paket Bento Ayam Kremes Spesial
@@ -225,7 +275,7 @@ select
   'Pilihan praktis untuk acara sekolah, seminar, dan pertemuan komunitas. Ayam diungkep bumbu kuning lalu digoreng dengan kremesan renyah, disajikan bersama nasi putih, tahu goreng, lalapan selada, dan sambal terasi yang dikemas terpisah supaya kremesan tetap renyah.',
   32000, 'per box', '',
   array['Nasi putih pandan wangi', 'Ayam kremes bumbu kuning', 'Tahu goreng', 'Lalapan selada', 'Sambal terasi terpisah']::text[],
-  true, true, 15, 3200, 2500
+  false, true, 15, 3200, 2500
 from public.categories c
 where c.nama = 'Nasi Box'
 on conflict (slug) do update set
@@ -259,52 +309,6 @@ cross join (values
 ) as v(nama_bahan, jumlah)
 join public.ingredients i on i.nama = v.nama_bahan
 where m.slug = 'paket-bento-ayam-kremes'
-on conflict (menu_id, ingredient_id) do update set jumlah = excluded.jumlah;
-
--- Paket Nasi Kotak Nila Bakar Rica
-insert into public.menus (
-  category_id, slug, nama, deskripsi, deskripsi_panjang, harga_jual,
-  satuan_jual, foto, isi, populer, tersedia, minimal_pesan,
-  biaya_kemasan, biaya_tenaga_kerja)
-select
-  c.id, 'paket-nasi-kotak-nila-bakar', 'Paket Nasi Kotak Nila Bakar Rica',
-  'Ikan nila bakar bumbu rica, tempe goreng, oseng kol, lalapan, dan sambal matah.',
-  'Ikan nila segar ukuran sedang dibakar dengan bumbu rica hingga harum, disajikan bersama nasi putih, tempe goreng, oseng kol, lalapan, dan sambal matah. Pilihan untuk tamu yang menghindari daging merah.',
-  32000, 'per box', '',
-  array['Nasi putih pandan wangi', 'Nila bakar bumbu rica', 'Tempe goreng', 'Oseng kol', 'Lalapan & sambal matah']::text[],
-  false, true, 10, 1800, 2500
-from public.categories c
-where c.nama = 'Nasi Box'
-on conflict (slug) do update set
-  category_id        = excluded.category_id,
-  nama               = excluded.nama,
-  deskripsi          = excluded.deskripsi,
-  deskripsi_panjang  = excluded.deskripsi_panjang,
-  harga_jual         = excluded.harga_jual,
-  satuan_jual        = excluded.satuan_jual,
-  isi                = excluded.isi,
-  populer            = excluded.populer,
-  tersedia           = excluded.tersedia,
-  minimal_pesan      = excluded.minimal_pesan,
-  biaya_kemasan      = excluded.biaya_kemasan,
-  biaya_tenaga_kerja = excluded.biaya_tenaga_kerja,
-  diubah_pada        = now();
-
-insert into public.recipes (menu_id, ingredient_id, jumlah)
-select m.id, i.id, v.jumlah
-from public.menus m
-cross join (values
-  ('Beras Pandan Wangi', 0.1500),
-  ('Ikan Nila', 0.1800),
-  ('Tempe', 0.2500),
-  ('Kol', 0.0300),
-  ('Cabai Merah', 0.0250),
-  ('Bawang Merah', 0.0150),
-  ('Bumbu Dapur Racik', 0.3000),
-  ('Minyak Goreng', 0.0200)
-) as v(nama_bahan, jumlah)
-join public.ingredients i on i.nama = v.nama_bahan
-where m.slug = 'paket-nasi-kotak-nila-bakar'
 on conflict (menu_id, ingredient_id) do update set jumlah = excluded.jumlah;
 
 -- Prasmanan Paket Silver
@@ -719,7 +723,7 @@ on conflict (menu_id, ingredient_id) do update set jumlah = excluded.jumlah;
 
 -- ------------------------------------------------------------------ periksa
 -- Jalankan bagian ini untuk memastikan datanya masuk.
--- Angka yang diharapkan: 5 kategori, 28 bahan, 14 menu, 116 baris resep.
+-- Angka yang diharapkan: 5 kategori, 31 bahan, 14 menu, 117 baris resep.
 
 select 'kategori' as tabel, count(*) as jumlah from public.categories
 union all

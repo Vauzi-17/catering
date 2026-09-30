@@ -18,9 +18,9 @@ import { supabaseAktif } from "@/lib/supabase";
 import type { Bahan, Menu, Pesanan, StatusPesanan } from "@/lib/types";
 
 const KUNCI = {
-  menu: "asri.menu.v2",
-  bahan: "asri.bahan.v2",
-  pesanan: "asri.pesanan.v2",
+  menu: "asri.menu.v3",
+  bahan: "asri.bahan.v3",
+  pesanan: "asri.pesanan.v3",
   keranjang: "asri.keranjang.v1",
   sesi: "asri.sesi.v1",
   pengaturan: "asri.pengaturan.v1",
