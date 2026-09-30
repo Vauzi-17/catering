@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ChevronDown, Clock, Mail, MapPin, Phone } from "lucide-react";
+import { DaftarKeunggulan } from "@/components/DaftarKeunggulan";
+import { HeroHalaman } from "@/components/HeroHalaman";
 import { IconInstagram, IconWhatsapp } from "@/components/Icons";
 import { GambarPlaceholder, PetaPlaceholder } from "@/components/Placeholder";
-import { PageHeader, Remah, SectionHeading } from "@/components/Ui";
+import { SectionHeading } from "@/components/Ui";
 import { profil } from "@/data/profil";
+import { fotoDekorasi } from "@/lib/foto";
 
 export const metadata: Metadata = {
   title: "Tentang Kami",
@@ -15,10 +18,11 @@ export const metadata: Metadata = {
 export default function HalamanTentang() {
   return (
     <>
-      <PageHeader
-        remah={<Remah jejak={[{ label: "Beranda", href: "/" }, { label: "Tentang" }]} />}
+      <HeroHalaman
+        remah={[{ label: "Beranda", href: "/" }, { label: "Tentang" }]}
         judul="Tentang Asri Catering"
-        deskripsi={profil.deskripsiSingkat}
+        deskripsi={`Dari dapur rumah Ibu Asri sejak ${profil.berdiri}, kini melayani kantor, sekolah, dan acara keluarga di Bandung.`}
+        foto={fotoDekorasi.slice(1)}
       />
 
       {/* Sejarah & pemilik */}
@@ -78,6 +82,31 @@ export default function HalamanTentang() {
                 </div>
               ))}
             </dl>
+          </div>
+        </div>
+      </section>
+
+      {/* Yang kami jaga, dengan mozaik foto */}
+      <section className="container-page pb-14 sm:pb-20">
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+          {fotoDekorasi.length > 0 && (
+            <div className="grid grid-cols-2 gap-3 sm:gap-4" aria-hidden="true">
+              {fotoDekorasi.slice(0, 4).map((src, i) => (
+                <span
+                  key={src}
+                  className={`overflow-hidden rounded-2xl ${i % 2 === 1 ? "translate-y-6" : ""}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt="" className="aspect-square w-full object-cover" />
+                </span>
+              ))}
+            </div>
+          )}
+          <div>
+            <SectionHeading judul="Yang Kami Jaga" />
+            <div className="mt-8">
+              <DaftarKeunggulan susunan="kolom" />
+            </div>
           </div>
         </div>
       </section>

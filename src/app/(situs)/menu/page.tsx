@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { HeroHalaman } from "@/components/HeroHalaman";
 import { KatalogMenu } from "@/components/KatalogMenu";
-import { PageHeader, Remah } from "@/components/Ui";
+import { fotoDekorasi } from "@/lib/foto";
 
 export const metadata: Metadata = {
   title: "Menu & Harga",
@@ -12,10 +13,11 @@ export const metadata: Metadata = {
 export default function HalamanMenu() {
   return (
     <>
-      <PageHeader
-        remah={<Remah jejak={[{ label: "Beranda", href: "/" }, { label: "Menu" }]} />}
+      <HeroHalaman
+        remah={[{ label: "Beranda", href: "/" }, { label: "Menu" }]}
         judul="Menu & Harga"
-        deskripsi="Harga sudah termasuk kemasan dan alat makan. Tambahkan paket ke keranjang, lalu atur jumlah porsinya saat checkout."
+        deskripsi="Harga sudah termasuk kemasan dan alat makan."
+        foto={fotoDekorasi}
       />
       <Suspense
         fallback={

@@ -15,13 +15,8 @@ import { KartuFavorit, RingkasMenu } from "@/components/beranda/SorotanHero";
 import { IconWhatsapp } from "@/components/Icons";
 import { FotoMenu } from "@/components/Placeholder";
 import { SectionHeading } from "@/components/Ui";
-import { menuAwal } from "@/data/menu";
 import { profil } from "@/data/profil";
-
-/** Foto dekorasi diambil dari data contoh, kosong bila belum ada. */
-function foto(slug: string) {
-  return menuAwal.find((m) => m.slug === slug)?.foto ?? "";
-}
+import { fotoMenu as foto } from "@/lib/foto";
 
 const pitaPromo = [
   "Antar gratis dalam Kota Bandung, min. 25 porsi",

@@ -32,36 +32,6 @@ export function SectionHeading({
   );
 }
 
-export function PageHeader({
-  judul,
-  deskripsi,
-  remah,
-  children,
-}: {
-  judul: string;
-  deskripsi?: string;
-  /** Remah roti di atas judul, mis. Beranda / Menu. */
-  remah?: ReactNode;
-  children?: ReactNode;
-}) {
-  return (
-    <section className="border-b border-kabut-line bg-white">
-      <div className="container-page py-10 sm:py-14">
-        {remah && <div className="mb-5">{remah}</div>}
-        <h1 className="max-w-3xl text-[34px] font-semibold leading-[1.08] sm:text-[46px]">
-          {judul}
-        </h1>
-        {deskripsi && (
-          <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-ink-soft sm:text-base">
-            {deskripsi}
-          </p>
-        )}
-        {children && <div className="mt-7">{children}</div>}
-      </div>
-    </section>
-  );
-}
-
 const gayaStatus: Record<StatusPesanan, string> = {
   "Menunggu Konfirmasi": "border-amber-200 bg-amber-50 text-amber-800",
   Diproses: "border-sky-200 bg-sky-50 text-sky-800",
@@ -95,18 +65,28 @@ export function Kosong({
 }
 
 /** Remah roti untuk halaman publik. Item terakhir dianggap halaman aktif. */
-export function Remah({ jejak }: { jejak: { label: string; href?: string }[] }) {
+export function Remah({
+  jejak,
+  terang = false,
+}: {
+  jejak: { label: string; href?: string }[];
+  /** Warna putih untuk dipasang di atas latar gelap/oranye. */
+  terang?: boolean;
+}) {
   return (
-    <nav aria-label="Remah roti" className="flex flex-wrap items-center gap-1.5 text-[13px] text-ink-muted">
+    <nav
+      aria-label="Remah roti"
+      className={`flex flex-wrap items-center gap-1.5 text-[13px] ${terang ? "text-white/75" : "text-ink-muted"}`}
+    >
       {jejak.map((j, i) => (
         <span key={j.label} className="inline-flex items-center gap-1.5">
           {i > 0 && <ChevronRight size={14} aria-hidden="true" />}
           {j.href ? (
-            <Link href={j.href} className="hover:text-zamrud-700">
+            <Link href={j.href} className={terang ? "hover:text-white" : "hover:text-zamrud-700"}>
               {j.label}
             </Link>
           ) : (
-            <span className="font-semibold text-ink" aria-current="page">
+            <span className={`font-semibold ${terang ? "text-white" : "text-ink"}`} aria-current="page">
               {j.label}
             </span>
           )}
