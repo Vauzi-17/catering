@@ -21,6 +21,7 @@ import { IconWhatsapp } from "@/components/Icons";
 import { FotoMenu } from "@/components/Placeholder";
 import { LangkahCheckout } from "@/components/pesan/LangkahCheckout";
 import { PesananBerhasil } from "@/components/pesan/PesananBerhasil";
+import { SaranPaket } from "@/components/pesan/SaranPaket";
 import { RingkasanPesanan, type BarisKeranjang } from "@/components/pesan/RingkasanPesanan";
 import { profil } from "@/data/profil";
 import { rupiah, satuanMenu, tanggalPlus } from "@/lib/format";
@@ -74,7 +75,6 @@ export function FormPesanan() {
   const [form, setForm] = useState<Formulir>(formAwal);
   const [jamLain, setJamLain] = useState(false);
   const [galat, setGalat] = useState<Record<string, string>>({});
-  const [pilihanTambah, setPilihanTambah] = useState("");
   const [berhasil, setBerhasil] = useState<Pesanan | null>(null);
 
   const baris = useMemo<BarisKeranjang[]>(
@@ -195,14 +195,16 @@ export function FormPesanan() {
     return (
       <>
         <LangkahCheckout aktif={2} />
-        <PesananBerhasil pesanan={berhasil} />
+        <PesananBerhasil pesanan={berhasil} menus={menus} />
       </>
     );
   }
 
-  const menuTambahan = menus.filter(
-    (m) => m.tersedia && !keranjang.some((k) => k.menuId === m.id),
-  );
+  // Paket yang belum ada di keranjang; yang populer dan berfoto didahulukan.
+  const menuTambahan = menus
+    .filter((m) => m.tersedia && !keranjang.some((k) => k.menuId === m.id))
+    .sort((a, b) => Number(b.populer) - Number(a.populer) || Number(!!b.foto) - Number(!!a.foto))
+    .slice(0, 8);
 
   return (
     <>
@@ -232,7 +234,7 @@ export function FormPesanan() {
                         Keranjang masih kosong
                       </h2>
                       <p className="mt-2 max-w-sm text-sm text-ink-muted">
-                        Pilih paket dari katalog, atau tambahkan langsung lewat pilihan di bawah.
+                        Pilih paket dari katalog, atau langsung tambahkan salah satu paket di bawah.
                       </p>
                       <Link href="/menu" className="tombol tombol-md tombol-jingga mt-6">
                         Lihat Menu
@@ -259,53 +261,17 @@ export function FormPesanan() {
                 </div>
 
                 {menuTambahan.length > 0 && (
-                  <div className="mt-6 rounded-2xl border border-kabut-line bg-kabut-deep p-5 sm:p-6">
-                    <div className="flex items-center justify-between gap-3">
-                      <h2 className="inline-flex items-center gap-2 font-sans text-[16px] font-semibold">
-                        <Plus size={18} className="text-zamrud-700" />
-                        Tambah paket lain
-                      </h2>
-                      <Link
-                        href="/menu"
-                        className="text-[13px] font-semibold text-zamrud-700 hover:text-zamrud-800"
-                      >
-                        Buka katalog
-                      </Link>
-                    </div>
-                    <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
-                      <select
-                        value={pilihanTambah}
-                        onChange={(e) => setPilihanTambah(e.target.value)}
-                        className="isian h-11 min-w-0 bg-white sm:flex-1"
-                        aria-label="Pilih paket untuk ditambahkan"
-                      >
-                        <option value="">Pilih paket…</option>
-                        {menuTambahan.map((m) => (
-                          <option key={m.id} value={m.id}>
-                            {m.nama} — {rupiah(m.hargaJual)} {m.satuanJual}
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        type="button"
-                        className="tombol tombol-md tombol-garis"
-                        disabled={!pilihanTambah}
-                        onClick={() => {
-                          const menu = menus.find((m) => m.id === pilihanTambah);
-                          if (!menu) return;
-                          tambahKeranjang(menu.id, menu.minimalPesan);
-                          setPilihanTambah("");
-                          setGalat((g) => {
-                            const { menu: _, ...sisa } = g;
-                            return sisa;
-                          });
-                        }}
-                      >
-                        <Plus size={16} />
-                        Tambahkan
-                      </button>
-                    </div>
-                  </div>
+                  <SaranPaket
+                    judul={baris.length === 0 ? "Mulai dari paket favorit" : "Tambah paket lain"}
+                    daftar={menuTambahan}
+                    onTambah={(menu) => {
+                      tambahKeranjang(menu.id, menu.minimalPesan);
+                      setGalat((g) => {
+                        const { menu: _, ...sisa } = g;
+                        return sisa;
+                      });
+                    }}
+                  />
                 )}
               </>
             ) : (

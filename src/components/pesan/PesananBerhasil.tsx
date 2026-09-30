@@ -3,7 +3,8 @@ import { ArrowLeft, CalendarDays, Check, Headset, Search } from "lucide-react";
 import { IconWhatsapp } from "@/components/Icons";
 import { profil } from "@/data/profil";
 import { rupiah, tanggalPanjang } from "@/lib/format";
-import type { Pesanan } from "@/lib/types";
+import { FotoMenu } from "@/components/Placeholder";
+import type { Menu, Pesanan } from "@/lib/types";
 
 const tahapan = [
   {
@@ -28,7 +29,7 @@ const tahapan = [
   },
 ];
 
-export function PesananBerhasil({ pesanan }: { pesanan: Pesanan }) {
+export function PesananBerhasil({ pesanan, menus }: { pesanan: Pesanan; menus: Menu[] }) {
   const totalPorsi = pesanan.items.reduce((a, it) => a + it.qty, 0);
   const pesanWa = encodeURIComponent(
     `Halo Asri Catering, saya baru membuat pesanan dengan kode ${pesanan.kode}.`,
@@ -67,13 +68,30 @@ export function PesananBerhasil({ pesanan }: { pesanan: Pesanan }) {
                 <dt className="text-ink-muted">Kode pesanan</dt>
                 <dd className="font-semibold tracking-wide">{pesanan.kode}</dd>
               </div>
-              <div className="flex justify-between gap-4">
-                <dt className="shrink-0 text-ink-muted">Paket</dt>
-                <dd className="text-right">
-                  <span className="font-semibold">{totalPorsi} porsi</span>
-                  <span className="block text-[12px] text-ink-muted">
-                    {pesanan.items.map((it) => `${it.qty}× ${it.nama}`).join(", ")}
-                  </span>
+              <div>
+                <dt className="text-ink-muted">Paket ({totalPorsi} porsi)</dt>
+                <dd className="mt-2.5 space-y-2.5">
+                  {pesanan.items.map((it) => (
+                    <div key={it.menuId} className="flex items-center gap-3">
+                      <span className="w-11 shrink-0 overflow-hidden rounded-lg">
+                        <FotoMenu
+                          src={menus.find((m) => m.id === it.menuId)?.foto}
+                          nama={it.nama}
+                          rasio="aspect-square"
+                          mini
+                        />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-semibold">{it.nama}</span>
+                        <span className="block text-[12px] text-ink-muted">
+                          {it.qty} × {rupiah(it.harga)}
+                        </span>
+                      </span>
+                      <span className="shrink-0 font-semibold tabular-nums">
+                        {rupiah(it.harga * it.qty)}
+                      </span>
+                    </div>
+                  ))}
                 </dd>
               </div>
               <div className="flex justify-between gap-4">
