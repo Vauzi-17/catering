@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Check, Plus } from "lucide-react";
+import { Check, Flame, Plus } from "lucide-react";
 import { FotoMenu } from "@/components/Placeholder";
 import { rupiah, satuanMenu } from "@/lib/format";
 import type { Menu } from "@/lib/types";
@@ -28,6 +28,12 @@ export function MenuCard({ menu }: { menu: Menu }) {
         aria-hidden="true"
       >
         <FotoMenu src={menu.foto} nama={menu.nama} rasio="aspect-[4/3]" className="rounded-xl" />
+        {menu.populer && menu.tersedia && (
+          <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-jingga-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm">
+            <Flame size={12} strokeWidth={2.2} />
+            Favorit
+          </span>
+        )}
         <span className="absolute right-2.5 top-2.5 rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-ink-soft shadow-sm">
           {menu.tersedia ? `Min. ${menu.minimalPesan} ${satuan}` : "Sedang kosong"}
         </span>

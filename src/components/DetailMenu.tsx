@@ -53,7 +53,11 @@ export function DetailMenu({ menuAwalan }: { menuAwalan: Menu }) {
       <div className="mt-6 grid gap-8 lg:grid-cols-12 lg:gap-10">
         <div className="lg:col-span-7">
           <div className="kartu p-3">
-            <FotoMenu src={menu.foto} nama={menu.nama} className="rounded-xl" />
+            {menu.foto ? (
+              <PanggungFoto src={menu.foto} nama={menu.nama} />
+            ) : (
+              <FotoMenu src={menu.foto} nama={menu.nama} className="rounded-xl" />
+            )}
           </div>
 
           <div className="kartu mt-6 p-6 sm:p-7">
@@ -211,6 +215,31 @@ export function DetailMenu({ menuAwalan }: { menuAwalan: Menu }) {
           </div>
         </section>
       )}
+    </div>
+  );
+}
+
+/**
+ * Foto di tengah dengan latar versi buram dari foto yang sama, supaya foto
+ * beresolusi kecil tidak perlu direntangkan memenuhi kotak besar.
+ */
+function PanggungFoto({ src, nama }: { src: string; nama: string }) {
+  return (
+    <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl bg-jingga-100">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full scale-125 object-cover opacity-70 blur-2xl"
+      />
+      <span className="absolute inset-0 bg-gradient-to-br from-jingga-600/25 to-transparent" aria-hidden="true" />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={nama}
+        className="relative aspect-square h-[78%] rounded-2xl object-cover shadow-[0_24px_48px_-20px_rgba(60,30,5,0.55)] ring-4 ring-white/80"
+      />
     </div>
   );
 }

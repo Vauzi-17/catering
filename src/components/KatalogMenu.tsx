@@ -39,7 +39,12 @@ export function KatalogMenu() {
       if (urut === "murah") return a.hargaJual - b.hargaJual;
       if (urut === "mahal") return b.hargaJual - a.hargaJual;
       if (urut === "nama") return a.nama.localeCompare(b.nama);
-      return Number(b.populer) - Number(a.populer) || a.hargaJual - b.hargaJual;
+      // Paling dipesan: populer dulu, lalu yang sudah berfoto, lalu termurah.
+      return (
+        Number(b.populer) - Number(a.populer) ||
+        Number(Boolean(b.foto)) - Number(Boolean(a.foto)) ||
+        a.hargaJual - b.hargaJual
+      );
     });
   }, [menus, kategori, cari, urut]);
 
