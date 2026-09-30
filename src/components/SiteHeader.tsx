@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu as IconMenu, Phone, ShoppingBag, UserRound, X } from "lucide-react";
+import { Menu as IconMenu, Phone, ShoppingBag, X } from "lucide-react";
+import { IconWhatsapp } from "@/components/Icons";
 import { Logo } from "@/components/Logo";
 import { profil } from "@/data/profil";
 import { useData } from "@/store/DataProvider";
@@ -38,8 +39,18 @@ export function SiteHeader() {
   const aktif = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
+  // Angka keranjang hanya tampil bila ada isinya.
   const label = (item: (typeof navigasi)[number]) =>
-    item.keranjang ? `${item.label} (${jumlahPaket})` : item.label;
+    item.keranjang && jumlahPaket > 0 ? (
+      <>
+        {item.label}
+        <span className="ml-1.5 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-jingga-600 px-1 text-[10px] font-bold text-white">
+          {jumlahPaket}
+        </span>
+      </>
+    ) : (
+      item.label
+    );
 
   return (
     <header className="sticky top-0 z-50 border-b border-kabut-line bg-white/95 backdrop-blur-sm">
@@ -54,7 +65,7 @@ export function SiteHeader() {
               key={item.href}
               href={item.href}
               aria-current={aktif(item.href) ? "page" : undefined}
-              className={`rounded-lg px-3.5 py-2 text-[13px] font-semibold tracking-wide transition-colors ${
+              className={`inline-flex items-center rounded-lg px-3.5 py-2 text-[13px] font-semibold tracking-wide transition-colors ${
                 aktif(item.href)
                   ? "bg-zamrud-700 text-white"
                   : "text-ink-soft hover:bg-kabut-deep hover:text-ink"
@@ -79,14 +90,15 @@ export function SiteHeader() {
             )}
           </Link>
 
-          <Link
-            href="/admin/login"
-            className="hidden h-10 w-10 items-center justify-center rounded-full bg-zamrud-700 text-white transition-colors hover:bg-zamrud-800 lg:inline-flex"
-            aria-label="Masuk admin"
-            title="Masuk admin"
+          <a
+            href={`https://wa.me/${profil.teleponRaw}`}
+            target="_blank"
+            rel="noreferrer"
+            className="hidden h-10 items-center gap-2 rounded-full border border-zamrud-200 px-4 text-[13px] font-semibold text-zamrud-700 transition-colors hover:bg-zamrud-50 lg:inline-flex"
           >
-            <UserRound size={18} strokeWidth={1.8} />
-          </Link>
+            <IconWhatsapp width={16} height={16} />
+            Hubungi Kami
+          </a>
 
           <button
             type="button"
@@ -117,21 +129,20 @@ export function SiteHeader() {
                 {label(item)}
               </Link>
             ))}
-            <div className="mt-2 flex items-center justify-between border-t border-kabut-line px-3 pt-4">
+            <div className="mt-2 grid grid-cols-2 gap-2 border-t border-kabut-line pt-4">
               <a
-                href={`tel:${profil.teleponRaw}`}
-                className="inline-flex items-center gap-2 text-sm font-semibold text-ink-muted"
+                href={`https://wa.me/${profil.teleponRaw}`}
+                target="_blank"
+                rel="noreferrer"
+                className="tombol tombol-md tombol-zamrud"
               >
-                <Phone size={16} strokeWidth={1.8} />
-                {profil.telepon}
+                <IconWhatsapp width={16} height={16} />
+                WhatsApp
               </a>
-              <Link
-                href="/admin/login"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-zamrud-700"
-              >
-                <UserRound size={16} strokeWidth={1.8} />
-                Masuk admin
-              </Link>
+              <a href={`tel:${profil.teleponRaw}`} className="tombol tombol-md tombol-garis">
+                <Phone size={16} strokeWidth={1.8} />
+                Telepon
+              </a>
             </div>
           </nav>
         </div>
