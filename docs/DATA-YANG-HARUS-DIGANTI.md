@@ -42,7 +42,7 @@ Tidak tersimpan di basis data, jadi selalu disunting di berkas ini.
 | `sejarah` | Empat tonggak 2016 – 2025 |
 | `keunggulan` | Empat poin |
 | `testimoni` | **Tiga testimoni fiktif — wajib diganti atau dihapus** |
-| `faq` | Lima tanya jawab, termasuk soal cara pembayaran |
+| `faq` | Tanya jawab, termasuk pengantaran gratis dan pembayaran online |
 
 > Testimoni paling perlu diperhatikan. Menampilkan ulasan karangan seolah dari
 > pelanggan nyata itu menyesatkan. Ganti dengan ulasan asli (seizin orangnya)
@@ -99,12 +99,26 @@ Tiga tempat menyebut `asricatering.id` sebagai domain sementara:
 
 ## 7. Akun admin
 
-Masih memakai `admin` / `asri2025` yang tertulis di dalam kode. Pindahkan ke
-Supabase Auth mengikuti `SETUP-BACKEND.md` bagian D, lalu jalankan
-`supabase/04-rls-produksi.sql`.
+Pada mode Supabase, login admin memakai Supabase Auth — akun demo `admin` /
+`asri2025` hanya berlaku pada mode data contoh. Daftarkan email Ibu Asri
+sebagai admin mengikuti `SETUP-PEMBAYARAN.md` bagian 1.4, dan pastikan
+`supabase/06-akun-pembayaran.sql` sudah dijalankan.
 
-**Ini yang paling mendesak.** Selama belum dikerjakan, siapa pun yang membuka
-alamat panel admin bisa masuk dengan menebak akun demo itu.
+## 8. Titik dapur dan radius layanan
+
+Titik dapur bawaan (`-6.917464, 107.619123`, pusat Kota Bandung) dan radius
+25 km adalah **karangan**. Keduanya menentukan alamat mana yang boleh memesan
+dengan pengantaran gratis. Ganti lewat SQL mengikuti `SETUP-PEMBAYARAN.md`
+bagian 1.5. Nilai cadangan di `src/lib/useInfoPengantaran.ts` hanya dipakai
+bila Supabase belum tersambung.
+
+## 9. Pembayaran
+
+Selama kunci Midtrans masih kunci **sandbox** (diawali `SB-`), tidak ada uang
+sungguhan yang masuk. Sebelum menerima pesanan nyata: selesaikan verifikasi
+usaha di Midtrans, ganti ke kunci produksi, dan isi Notification URL produksi
+(`SETUP-PEMBAYARAN.md` bagian 2.4). Periksa juga tarif per transaksi Midtrans
+karena memengaruhi margin.
 
 ---
 
@@ -117,5 +131,7 @@ alamat panel admin bisa masuk dengan menebak akun demo itu.
 - [ ] Pesanan `ASR-DEMO-%` dihapus
 - [ ] Foto asli dipasang
 - [ ] Domain diperbarui di tiga tempat
-- [ ] Login admin pindah ke Supabase Auth
-- [ ] `04-rls-produksi.sql` dijalankan
+- [ ] `06-akun-pembayaran.sql` dijalankan, akun Ibu Asri terdaftar sebagai admin
+- [ ] Titik dapur dan radius layanan diganti
+- [ ] Email verifikasi memakai SMTP sendiri dan teks Bahasa Indonesia
+- [ ] Midtrans pindah ke kunci produksi, Notification URL produksi diisi
