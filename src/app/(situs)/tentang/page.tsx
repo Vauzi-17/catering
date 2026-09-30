@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ChevronDown, Clock, Mail, MapPin, Phone } from "lucide-react";
-import { DaftarKeunggulan } from "@/components/DaftarKeunggulan";
-import { DaftarTestimoni } from "@/components/DaftarTestimoni";
 import { IconInstagram, IconWhatsapp } from "@/components/Icons";
 import { GambarPlaceholder, PetaPlaceholder } from "@/components/Placeholder";
 import { PageHeader, Remah, SectionHeading } from "@/components/Ui";
@@ -84,108 +82,88 @@ export default function HalamanTentang() {
         </div>
       </section>
 
-      {/* Keunggulan */}
-      <section className="border-y border-kabut-line bg-kabut-deep py-14 sm:py-20">
-        <div className="container-page">
-          <SectionHeading judul="Yang Kami Jaga" />
-          <div className="mt-9">
-            <DaftarKeunggulan />
-          </div>
-        </div>
-      </section>
-
       {/* Informasi & lokasi */}
-      <section className="container-page py-14 sm:py-20">
-        <SectionHeading judul="Alamat, Jam Buka, dan Kontak" />
+      <section className="border-y border-kabut-line bg-white">
+        <div className="container-page py-14 sm:py-20">
+          <SectionHeading judul="Alamat, Jam Buka, dan Kontak" />
 
-        <div className="mt-9 grid gap-5 lg:grid-cols-3">
-          <div className="kartu p-6">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-zamrud-50 text-zamrud-700">
-              <MapPin size={20} strokeWidth={1.8} />
-            </span>
-            <h3 className="mt-5 font-sans text-[17px] font-semibold">Alamat dapur</h3>
-            <p className="mt-2 text-[14px] leading-relaxed text-ink-muted">{profil.alamat}</p>
-            <div className="mt-5 border-t border-kabut-line pt-4">
-              <p className="text-[13px] font-semibold text-ink">Area layanan</p>
-              <ul className="mt-2 flex flex-wrap gap-1.5">
-                {profil.areaLayanan.map((a) => (
-                  <li
-                    key={a}
-                    className="rounded-full bg-kabut px-2.5 py-1 text-[12px] text-ink-soft"
-                  >
-                    {a}
-                  </li>
+          <div className="mt-9 grid gap-5 lg:grid-cols-3">
+            <div className="rounded-2xl bg-kabut p-6">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-zamrud-700">
+                <MapPin size={20} strokeWidth={1.8} />
+              </span>
+              <h3 className="mt-5 font-sans text-[17px] font-semibold">Alamat dapur</h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-ink-muted">{profil.alamat}</p>
+              <div className="mt-5 border-t border-kabut-line pt-4">
+                <p className="text-[13px] font-semibold text-ink">Area layanan</p>
+                <ul className="mt-2 flex flex-wrap gap-1.5">
+                  {profil.areaLayanan.map((a) => (
+                    <li
+                      key={a}
+                      className="rounded-full bg-white px-2.5 py-1 text-[12px] text-ink-soft"
+                    >
+                      {a}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-kabut p-6">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-zamrud-700">
+                <Clock size={20} strokeWidth={1.8} />
+              </span>
+              <h3 className="mt-5 font-sans text-[17px] font-semibold">Jam operasional</h3>
+              <dl className="mt-3 divide-y divide-kabut-line">
+                {profil.jamOperasional.map((j) => (
+                  <div key={j.hari} className="flex justify-between gap-4 py-2.5 text-[14px]">
+                    <dt className="text-ink-muted">{j.hari}</dt>
+                    <dd className="font-semibold tabular-nums text-ink">{j.jam}</dd>
+                  </div>
                 ))}
+              </dl>
+            </div>
+
+            <div className="flex flex-col rounded-2xl bg-kabut p-6">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-zamrud-700">
+                <Phone size={20} strokeWidth={1.8} />
+              </span>
+              <h3 className="mt-5 font-sans text-[17px] font-semibold">Kontak</h3>
+              <ul className="mt-3 space-y-3 text-[14px] text-ink-soft">
+                <li className="flex items-center gap-2.5">
+                  <Phone size={16} strokeWidth={1.8} className="shrink-0 text-ink-muted" />
+                  <a href={`tel:${profil.teleponRaw}`} className="hover:text-zamrud-700">
+                    {profil.telepon}
+                  </a>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Mail size={16} strokeWidth={1.8} className="shrink-0 text-ink-muted" />
+                  <a href={`mailto:${profil.email}`} className="hover:text-zamrud-700">
+                    {profil.email}
+                  </a>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <IconInstagram width={16} height={16} className="shrink-0 text-ink-muted" />
+                  <span>{profil.instagram}</span>
+                </li>
               </ul>
+              <a
+                href={`https://wa.me/${profil.teleponRaw}`}
+                target="_blank"
+                rel="noreferrer"
+                className="tombol tombol-blok tombol-zamrud mt-auto"
+              >
+                <IconWhatsapp width={18} height={18} />
+                Chat WhatsApp
+              </a>
             </div>
           </div>
 
-          <div className="kartu p-6">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-zamrud-50 text-zamrud-700">
-              <Clock size={20} strokeWidth={1.8} />
-            </span>
-            <h3 className="mt-5 font-sans text-[17px] font-semibold">Jam operasional</h3>
-            <dl className="mt-3 divide-y divide-kabut-line">
-              {profil.jamOperasional.map((j) => (
-                <div key={j.hari} className="flex justify-between gap-4 py-2.5 text-[14px]">
-                  <dt className="text-ink-muted">{j.hari}</dt>
-                  <dd className="font-semibold tabular-nums text-ink">{j.jam}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-
-          <div className="kartu flex flex-col p-6">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-zamrud-50 text-zamrud-700">
-              <Phone size={20} strokeWidth={1.8} />
-            </span>
-            <h3 className="mt-5 font-sans text-[17px] font-semibold">Kontak</h3>
-            <ul className="mt-3 space-y-3 text-[14px] text-ink-soft">
-              <li className="flex items-center gap-2.5">
-                <Phone size={16} strokeWidth={1.8} className="shrink-0 text-ink-muted" />
-                <a href={`tel:${profil.teleponRaw}`} className="hover:text-zamrud-700">
-                  {profil.telepon}
-                </a>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Mail size={16} strokeWidth={1.8} className="shrink-0 text-ink-muted" />
-                <a href={`mailto:${profil.email}`} className="hover:text-zamrud-700">
-                  {profil.email}
-                </a>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <IconInstagram width={16} height={16} className="shrink-0 text-ink-muted" />
-                <span>{profil.instagram}</span>
-              </li>
-            </ul>
-            <a
-              href={`https://wa.me/${profil.teleponRaw}`}
-              target="_blank"
-              rel="noreferrer"
-              className="tombol tombol-blok tombol-zamrud mt-auto"
-            >
-              <IconWhatsapp width={18} height={18} />
-              Chat WhatsApp
-            </a>
-          </div>
-        </div>
-
-        <div className="kartu mt-5 p-3">
-          <div className="overflow-hidden rounded-xl">
+          <div className="mt-5 overflow-hidden rounded-2xl">
             <PetaPlaceholder
               label="Peta lokasi — sematkan Google Maps di sini"
               rasio="aspect-[4/3] sm:aspect-[3/1]"
             />
-          </div>
-        </div>
-      </section>
-
-      {/* Testimoni */}
-      <section className="border-y border-kabut-line bg-white py-14 sm:py-20">
-        <div className="container-page">
-          <SectionHeading judul="Kata Pelanggan" />
-          <div className="mt-9">
-            <DaftarTestimoni />
           </div>
         </div>
       </section>
