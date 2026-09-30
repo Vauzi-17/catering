@@ -30,6 +30,7 @@ create table if not exists public.profiles (
   dibuat_pada timestamptz   not null default now(),
   diubah_pada timestamptz   not null default now()
 );
+alter table public.profiles enable row level security;
 
 -- Profil dibuat otomatis saat akun didaftarkan. Nama dan telepon diambil dari
 -- data yang dikirim formulir pendaftaran (options.data pada signUp).
@@ -143,6 +144,7 @@ create table if not exists public.payments (
   mentah             jsonb         not null default '{}'::jsonb,
   dibuat_pada        timestamptz   not null default now()
 );
+alter table public.payments enable row level security;
 
 -- Notifikasi yang sama bisa dikirim ulang oleh Midtrans; cukup dicatat sekali.
 -- Index penuh (bukan bersyarat) supaya bisa dipakai upsert dari aplikasi;
