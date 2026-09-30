@@ -3,16 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Menu as IconMenu, Phone, ShoppingBag, UserRound, X } from "lucide-react";
 import { Logo } from "@/components/Logo";
-import { IconClose, IconMenu, IconPhone } from "@/components/Icons";
 import { profil } from "@/data/profil";
 import { useData } from "@/store/DataProvider";
 
 const navigasi = [
   { label: "Beranda", href: "/" },
-  { label: "Menu & Harga", href: "/menu" },
-  { label: "Tentang Kami", href: "/tentang" },
-  { label: "Lacak Pesanan", href: "/lacak" },
+  { label: "Menu", href: "/menu" },
+  { label: "Tentang", href: "/tentang" },
+  { label: "Keranjang", href: "/pesan", keranjang: true },
+  { label: "Status Pesanan", href: "/lacak" },
 ];
 
 export function SiteHeader() {
@@ -20,7 +21,8 @@ export function SiteHeader() {
   const [buka, setBuka] = useState(false);
   const { keranjang, siap } = useData();
 
-  const jumlahKeranjang = keranjang.reduce((a, k) => a + k.qty, 0);
+  const jumlahKeranjang = siap ? keranjang.reduce((a, k) => a + k.qty, 0) : 0;
+  const jumlahPaket = siap ? keranjang.length : 0;
 
   useEffect(() => {
     setBuka(false);
@@ -36,26 +38,14 @@ export function SiteHeader() {
   const aktif = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
-  return (
-    <header className="sticky top-0 z-50 border-b border-line bg-cream/95 backdrop-blur-[2px]">
-      <div className="hidden border-b border-line/80 bg-brand-800 text-white md:block">
-        <div className="container-page flex h-9 items-center justify-between text-[12px]">
-          <p className="text-brand-100">
-            Melayani Bandung &amp; sekitarnya · Pesanan H-1 masih bisa dikerjakan
-          </p>
-          <a
-            href={`tel:${profil.teleponRaw}`}
-            className="inline-flex items-center gap-1.5 font-semibold text-white hover:text-brand-100"
-          >
-            <IconPhone width={14} height={14} />
-            {profil.telepon}
-          </a>
-        </div>
-      </div>
+  const label = (item: (typeof navigasi)[number]) =>
+    item.keranjang ? `${item.label} (${jumlahPaket})` : item.label;
 
+  return (
+    <header className="sticky top-0 z-50 border-b border-kabut-line bg-white/95 backdrop-blur-sm">
       <div className="container-page flex h-16 items-center justify-between gap-4 lg:h-[72px]">
         <Link href="/" aria-label="Asri Catering — beranda">
-          <Logo />
+          <Logo warna="zamrud" />
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Navigasi utama">
@@ -63,66 +53,86 @@ export function SiteHeader() {
             <Link
               key={item.href}
               href={item.href}
-              className={`rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors ${
+              aria-current={aktif(item.href) ? "page" : undefined}
+              className={`rounded-lg px-3.5 py-2 text-[13px] font-semibold tracking-wide transition-colors ${
                 aktif(item.href)
-                  ? "bg-brand-100 text-brand-800"
-                  : "text-ink-soft hover:bg-brand-50 hover:text-brand-800"
+                  ? "bg-zamrud-700 text-white"
+                  : "text-ink-soft hover:bg-kabut-deep hover:text-ink"
               }`}
             >
-              {item.label}
+              {label(item)}
             </Link>
           ))}
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link href="/pesan" className="btn btn-primary btn-md hidden sm:inline-flex">
-            Pesan Sekarang
-            {siap && jumlahKeranjang > 0 && (
-              <span className="ml-0.5 rounded-full bg-white px-1.5 py-0.5 text-[11px] font-bold text-brand-800">
-                {jumlahKeranjang}
+          <Link
+            href="/pesan"
+            className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-kabut-line text-ink-soft transition-colors hover:bg-kabut-deep lg:hidden"
+            aria-label={`Keranjang, ${jumlahKeranjang} porsi`}
+          >
+            <ShoppingBag size={18} strokeWidth={1.8} />
+            {jumlahPaket > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-jingga-600 px-1 text-[10px] font-bold text-white">
+                {jumlahPaket}
               </span>
             )}
+          </Link>
+
+          <Link
+            href="/admin/login"
+            className="hidden h-10 w-10 items-center justify-center rounded-full bg-zamrud-700 text-white transition-colors hover:bg-zamrud-800 lg:inline-flex"
+            aria-label="Masuk admin"
+            title="Masuk admin"
+          >
+            <UserRound size={18} strokeWidth={1.8} />
           </Link>
 
           <button
             type="button"
             onClick={() => setBuka((v) => !v)}
-            className="btn btn-outline h-11 w-11 p-0 lg:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-kabut-line text-ink-soft transition-colors hover:bg-kabut-deep lg:hidden"
             aria-expanded={buka}
             aria-label={buka ? "Tutup menu navigasi" : "Buka menu navigasi"}
           >
-            {buka ? <IconClose /> : <IconMenu />}
+            {buka ? <X size={18} /> : <IconMenu size={18} />}
           </button>
         </div>
       </div>
 
       {buka && (
-        <div className="border-t border-line bg-cream lg:hidden">
+        <div className="border-t border-kabut-line bg-white lg:hidden">
           <nav className="container-page flex flex-col py-3" aria-label="Navigasi seluler">
             {navigasi.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={aktif(item.href) ? "page" : undefined}
                 className={`rounded-lg px-3 py-3 text-[15px] font-semibold ${
                   aktif(item.href)
-                    ? "bg-brand-100 text-brand-800"
-                    : "text-ink-soft hover:bg-brand-50"
+                    ? "bg-zamrud-50 text-zamrud-800"
+                    : "text-ink-soft hover:bg-kabut"
                 }`}
               >
-                {item.label}
+                {label(item)}
               </Link>
             ))}
-            <Link href="/pesan" className="btn btn-primary btn-md mt-2 w-full">
-              Pesan Sekarang
-              {siap && jumlahKeranjang > 0 && ` (${jumlahKeranjang})`}
-            </Link>
-            <a
-              href={`tel:${profil.teleponRaw}`}
-              className="mt-2 inline-flex items-center justify-center gap-2 py-2 text-sm font-semibold text-ink-muted"
-            >
-              <IconPhone width={16} height={16} />
-              {profil.telepon}
-            </a>
+            <div className="mt-2 flex items-center justify-between border-t border-kabut-line px-3 pt-4">
+              <a
+                href={`tel:${profil.teleponRaw}`}
+                className="inline-flex items-center gap-2 text-sm font-semibold text-ink-muted"
+              >
+                <Phone size={16} strokeWidth={1.8} />
+                {profil.telepon}
+              </a>
+              <Link
+                href="/admin/login"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-zamrud-700"
+              >
+                <UserRound size={16} strokeWidth={1.8} />
+                Masuk admin
+              </Link>
+            </div>
           </nav>
         </div>
       )}
