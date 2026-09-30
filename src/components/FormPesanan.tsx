@@ -56,6 +56,15 @@ export function FormPesanan() {
   const [galatKirim, setGalatKirim] = useState("");
   const [tahap, setTahap] = useState<"isi" | "bayar">("isi");
 
+  // Pesan galat sebuah kolom hilang begitu kolom itu diubah.
+  const hapusGalat = (...kunci: string[]) =>
+    setGalat((g) => {
+      if (!kunci.some((k) => k in g)) return g;
+      const baru = { ...g };
+      kunci.forEach((k) => delete baru[k]);
+      return baru;
+    });
+
   // Isian awal dari profil akun, sekali saja supaya ketikan tidak tertimpa.
   const [terisi, setTerisi] = useState(false);
   useEffect(() => {
@@ -231,13 +240,13 @@ export function FormPesanan() {
             <Bagian nomor="01" judul="Pemesan & jadwal" deskripsi="Untuk konfirmasi pesanan dan koordinasi di lokasi.">
               <div className="grid gap-4 sm:grid-cols-2">
                 <Isian id="nama" label="Nama pemesan / instansi" galat={galat.nama}>
-                  <input id="nama" className="isian" value={nama} onChange={(e) => setNama(e.target.value)} autoComplete="name" />
+                  <input id="nama" className="isian" value={nama} onChange={(e) => { setNama(e.target.value); hapusGalat("nama"); }} autoComplete="name" />
                 </Isian>
                 <Isian id="telepon" label="Nomor WhatsApp" galat={galat.telepon}>
-                  <input id="telepon" inputMode="tel" className="isian" value={telepon} onChange={(e) => setTelepon(e.target.value)} autoComplete="tel" />
+                  <input id="telepon" inputMode="tel" className="isian" value={telepon} onChange={(e) => { setTelepon(e.target.value); hapusGalat("telepon"); }} autoComplete="tel" />
                 </Isian>
                 <Isian id="tanggal" label="Tanggal acara" galat={galat.tanggal}>
-                  <input id="tanggal" type="date" min={tanggalJakarta(new Date(), 1)} className="isian" value={tanggal} onChange={(e) => setTanggal(e.target.value)} />
+                  <input id="tanggal" type="date" min={tanggalJakarta(new Date(), 1)} className="isian" value={tanggal} onChange={(e) => { setTanggal(e.target.value); hapusGalat("tanggal"); }} />
                 </Isian>
               </div>
 
@@ -296,7 +305,15 @@ export function FormPesanan() {
 
               {diantar && (
                 <div className="mt-6">
-                  <IsianAlamat nilai={alamat} onUbah={setAlamat} galat={{ alamat: galat.alamat, titik: galat.titik }} />
+                  <IsianAlamat
+                    nilai={alamat}
+                    onUbah={(n) => {
+                      if (n.alamat !== alamat.alamat) hapusGalat("alamat");
+                      if (n.titik !== alamat.titik) hapusGalat("titik");
+                      setAlamat(n);
+                    }}
+                    galat={{ alamat: galat.alamat, titik: galat.titik }}
+                  />
                   <label className="mt-4 flex items-center gap-2.5 text-[14px] text-ink-soft">
                     <input type="checkbox" checked={simpanAlamat} onChange={(e) => setSimpanAlamat(e.target.checked)} className="h-4 w-4 accent-zamrud-700" />
                     Simpan sebagai alamat utama di akun saya

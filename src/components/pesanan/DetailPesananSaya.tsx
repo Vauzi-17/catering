@@ -340,7 +340,7 @@ export function DetailPesananSaya({ kode }: { kode: string }) {
             </dl>
             {p.pembayaran && p.pembayaran.length > 0 && (
               <>
-                <h3 className="mt-5 text-[13px] font-semibold text-ink-soft">Histori transaksi</h3>
+                <h3 className="mt-5 font-sans text-[13px] font-semibold text-ink-soft">Histori transaksi</h3>
                 <ul className="mt-2 divide-y divide-kabut-line rounded-xl bg-kabut px-3.5 text-[13px]">
                   {p.pembayaran.map((b) => (
                     <li key={b.id} className="flex justify-between gap-3 py-2.5">

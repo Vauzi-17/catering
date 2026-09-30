@@ -59,8 +59,9 @@ export function KeranjangLaci() {
 
   const tujuanCheckout = auth.aktif && !auth.pengguna ? `/masuk/?lanjut=${encodeURIComponent("/pesan/")}` : "/pesan/";
 
+  // inert saat tertutup: isi laci tidak bisa dijangkau Tab atau pembaca layar.
   return (
-    <div className={`fixed inset-0 z-50 ${buka ? "" : "pointer-events-none"}`} aria-hidden={!buka}>
+    <div className={`fixed inset-0 z-50 ${buka ? "" : "pointer-events-none"}`} inert={!buka}>
       <div
         className={`absolute inset-0 bg-ink/40 transition-opacity duration-300 ${buka ? "opacity-100" : "opacity-0"}`}
         onClick={tutupKeranjang}
@@ -154,7 +155,7 @@ export function KeranjangLaci() {
           )}
 
           {saran.length > 0 && (
-            <div className="-mx-5 mt-2 px-5">
+            <div className="mt-2">
               <SaranPaket
                 judul={baris.length ? "Tambah paket lain" : "Paket favorit"}
                 daftar={saran}
