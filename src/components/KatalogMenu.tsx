@@ -2,9 +2,8 @@
 
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
+import { Search, SearchX } from "lucide-react";
 import { MenuCard } from "@/components/MenuCard";
-import { IconSearch } from "@/components/Icons";
-import { Kosong } from "@/components/Ui";
 import { kategoriMenu } from "@/data/menu";
 import { useData } from "@/store/DataProvider";
 
@@ -44,80 +43,101 @@ export function KatalogMenu() {
     });
   }, [menus, kategori, cari, urut]);
 
+  const jumlahPerKategori = useMemo(() => {
+    const hitung: Record<string, number> = { Semua: menus.length };
+    for (const m of menus) hitung[m.kategori] = (hitung[m.kategori] ?? 0) + 1;
+    return hitung;
+  }, [menus]);
+
   const daftarKategori = ["Semua", ...kategoriMenu];
 
   return (
-    <div className="container-page py-10 sm:py-14">
-      <div className="card p-4 sm:p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="relative w-full lg:max-w-sm">
-            <IconSearch
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted"
-              width={18}
-              height={18}
-            />
-            <input
-              type="search"
-              value={cari}
-              onChange={(e) => setCari(e.target.value)}
-              placeholder="Cari menu, misalnya: ayam bakar"
-              className="field pl-10"
-              aria-label="Cari menu"
-            />
-          </div>
-
-          <div className="flex items-center gap-3">
-            <label htmlFor="urutan" className="shrink-0 text-[13px] font-semibold text-ink-muted">
-              Urutkan
-            </label>
-            <select
-              id="urutan"
-              value={urut}
-              onChange={(e) => setUrut(e.target.value)}
-              className="field w-full lg:w-52"
-            >
-              {urutan.map((u) => (
-                <option key={u.nilai} value={u.nilai}>
-                  {u.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-2 border-t border-line pt-4">
+    <div className="container-page py-10 sm:py-12">
+      <div className="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
+        <div className="flex w-max gap-1.5 rounded-full border border-kabut-line bg-white p-1">
           {daftarKategori.map((k) => (
             <button
               key={k}
               type="button"
               onClick={() => setKategori(k)}
               aria-pressed={kategori === k}
-              className={`chip transition-colors ${
+              className={`inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full px-4 text-[13px] font-semibold transition-colors ${
                 kategori === k
-                  ? "border-brand-700 bg-brand-700 text-white"
-                  : "border-line-strong bg-white text-ink-soft hover:border-brand-300 hover:bg-brand-50"
+                  ? "bg-zamrud-700 text-white"
+                  : "text-ink-soft hover:bg-kabut hover:text-ink"
               }`}
             >
               {k}
+              <span
+                className={`text-[11px] tabular-nums ${
+                  kategori === k ? "text-white/70" : "text-ink-muted"
+                }`}
+              >
+                {jumlahPerKategori[k] ?? 0}
+              </span>
             </button>
           ))}
         </div>
       </div>
 
-      <p className="mt-6 text-sm text-ink-muted">
-        Menampilkan <span className="font-semibold text-ink">{hasil.length}</span> menu
-        {kategori !== "Semua" && ` pada kategori ${kategori}`}.
-      </p>
+      <div className="mt-5 flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-[13px] text-ink-muted" aria-live="polite">
+          {hasil.length} menu
+          {kategori !== "Semua" && ` di kategori ${kategori}`}
+          {cari.trim() && ` untuk “${cari.trim()}”`}
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="relative sm:w-72">
+            <Search
+              size={17}
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted"
+            />
+            <input
+              type="search"
+              value={cari}
+              onChange={(e) => setCari(e.target.value)}
+              placeholder="Cari menu, misalnya rendang"
+              className="isian h-11 bg-white pl-10"
+              aria-label="Cari menu"
+            />
+          </div>
+          <select
+            value={urut}
+            onChange={(e) => setUrut(e.target.value)}
+            className="isian h-11 bg-white sm:w-48"
+            aria-label="Urutkan menu"
+          >
+            {urutan.map((u) => (
+              <option key={u.nilai} value={u.nilai}>
+                {u.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       {hasil.length === 0 ? (
-        <div className="mt-6">
-          <Kosong
-            judul="Menu tidak ditemukan"
-            deskripsi="Coba kata kunci lain atau pilih kategori Semua untuk melihat seluruh daftar menu."
-          />
+        <div className="kartu mt-6 flex flex-col items-center px-6 py-16 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-kabut text-ink-muted">
+            <SearchX size={22} strokeWidth={1.8} />
+          </span>
+          <h2 className="mt-4 font-sans text-[17px] font-semibold">Menu tidak ditemukan</h2>
+          <p className="mt-2 max-w-sm text-sm text-ink-muted">
+            Coba kata kunci lain, atau pilih kategori Semua.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setCari("");
+              setKategori("Semua");
+            }}
+            className="tombol tombol-md tombol-garis mt-6"
+          >
+            Tampilkan semua menu
+          </button>
         </div>
       ) : (
-        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {hasil.map((menu) => (
             <MenuCard key={menu.id} menu={menu} />
           ))}

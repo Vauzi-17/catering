@@ -1,14 +1,14 @@
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 import type { StatusPesanan } from "@/lib/types";
 
 export function SectionHeading({
-  eyebrow,
   judul,
   deskripsi,
   align = "left",
   aksi,
 }: {
-  eyebrow?: string;
   judul: string;
   deskripsi?: string;
   align?: "left" | "center";
@@ -17,17 +17,14 @@ export function SectionHeading({
   const tengah = align === "center";
   return (
     <div
-      className={`flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between ${
+      className={`flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between ${
         tengah ? "sm:flex-col sm:items-center" : ""
       }`}
     >
       <div className={`max-w-2xl ${tengah ? "text-center" : ""}`}>
-        {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-        <h2 className="mt-2.5 font-display text-[26px] leading-tight sm:text-[32px]">
-          {judul}
-        </h2>
+        <h2 className="text-[30px] font-semibold leading-[1.1] sm:text-[38px]">{judul}</h2>
         {deskripsi && (
-          <p className="mt-3 text-[15px] leading-relaxed text-ink-muted">{deskripsi}</p>
+          <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">{deskripsi}</p>
         )}
       </div>
       {aksi && <div className="shrink-0">{aksi}</div>}
@@ -36,25 +33,26 @@ export function SectionHeading({
 }
 
 export function PageHeader({
-  eyebrow,
   judul,
   deskripsi,
+  remah,
   children,
 }: {
-  eyebrow: string;
   judul: string;
   deskripsi?: string;
+  /** Remah roti di atas judul, mis. Beranda / Menu. */
+  remah?: ReactNode;
   children?: ReactNode;
 }) {
   return (
-    <section className="border-b border-line bg-white">
-      <div className="container-page py-12 sm:py-16">
-        <p className="eyebrow">{eyebrow}</p>
-        <h1 className="mt-3 max-w-3xl font-display text-[32px] leading-[1.15] sm:text-[44px]">
+    <section className="border-b border-kabut-line bg-white">
+      <div className="container-page py-10 sm:py-14">
+        {remah && <div className="mb-5">{remah}</div>}
+        <h1 className="max-w-3xl text-[34px] font-semibold leading-[1.08] sm:text-[46px]">
           {judul}
         </h1>
         {deskripsi && (
-          <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-ink-muted sm:text-base">
+          <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-ink-soft sm:text-base">
             {deskripsi}
           </p>
         )}
@@ -93,5 +91,27 @@ export function Kosong({
       <p className="mt-2 max-w-md text-sm text-ink-muted">{deskripsi}</p>
       {aksi && <div className="mt-6">{aksi}</div>}
     </div>
+  );
+}
+
+/** Remah roti untuk halaman publik. Item terakhir dianggap halaman aktif. */
+export function Remah({ jejak }: { jejak: { label: string; href?: string }[] }) {
+  return (
+    <nav aria-label="Remah roti" className="flex flex-wrap items-center gap-1.5 text-[13px] text-ink-muted">
+      {jejak.map((j, i) => (
+        <span key={j.label} className="inline-flex items-center gap-1.5">
+          {i > 0 && <ChevronRight size={14} aria-hidden="true" />}
+          {j.href ? (
+            <Link href={j.href} className="hover:text-zamrud-700">
+              {j.label}
+            </Link>
+          ) : (
+            <span className="font-semibold text-ink" aria-current="page">
+              {j.label}
+            </span>
+          )}
+        </span>
+      ))}
+    </nav>
   );
 }

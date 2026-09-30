@@ -1,10 +1,10 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { LacakPesanan } from "@/components/LacakPesanan";
-import { PageHeader } from "@/components/Ui";
+import { PageHeader, Remah } from "@/components/Ui";
 
 export const metadata: Metadata = {
-  title: "Lacak Pesanan",
+  title: "Status Pesanan",
   description:
     "Cek status pesanan Asri Catering menggunakan kode pesanan, mulai dari konfirmasi sampai pesanan selesai diantar.",
 };
@@ -13,9 +13,9 @@ export default function HalamanLacak() {
   return (
     <>
       <PageHeader
-        eyebrow="Status pesanan"
-        judul="Lacak pesanan Anda"
-        deskripsi="Masukkan kode pesanan Anda untuk melihat status terbarunya."
+        remah={<Remah jejak={[{ label: "Beranda", href: "/" }, { label: "Status Pesanan" }]} />}
+        judul="Status Pesanan"
+        deskripsi="Masukkan kode pesanan untuk melihat status terbarunya."
       />
       <Suspense
         fallback={
