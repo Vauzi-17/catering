@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CalendarDays, Check, CircleAlert, Search } from "lucide-react";
+import { ArrowRight, CalendarDays, Check, CircleAlert, Search } from "lucide-react";
 import { IconWhatsapp } from "@/components/Icons";
+import { FotoMenu } from "@/components/Placeholder";
 import { profil } from "@/data/profil";
 import { rupiah, tanggalPanjang, waktuRelatif } from "@/lib/format";
 import type { Pesanan, StatusPesanan } from "@/lib/types";
@@ -29,7 +30,7 @@ const gayaStatus: Record<StatusPesanan, string> = {
 
 export function LacakPesanan() {
   const params = useSearchParams();
-  const { cariPesanan, siap } = useData();
+  const { cariPesanan, siap, menus } = useData();
 
   const [kode, setKode] = useState(params.get("kode") ?? "");
   const [hasil, setHasil] = useState<Pesanan | null>(null);
@@ -97,10 +98,9 @@ export function LacakPesanan() {
               {mencari ? "Mencari…" : "Cek Status"}
             </button>
           </div>
-          <p className="mt-3 text-[13px] text-ink-muted">
-            Kode ini muncul setelah Anda mengirim pesanan.
-          </p>
         </form>
+
+        {!dicari && !mencari && <AjakanPesan fotos={menus.filter((m) => m.foto).slice(0, 3).map((m) => m.foto)} />}
 
         {dicari && !hasil && !mencari && (
           <div className="kartu mt-5 flex gap-3 p-5 sm:p-6">
@@ -237,9 +237,20 @@ export function LacakPesanan() {
 
               <ul className="mt-2 space-y-2.5 rounded-xl bg-kabut p-4 text-sm">
                 {hasil.items.map((it) => (
-                  <li key={it.menuId} className="flex justify-between gap-4">
-                    <span className="text-ink-soft">
-                      {it.nama} <span className="text-ink-muted">× {it.qty}</span>
+                  <li key={it.menuId} className="flex items-center gap-3">
+                    <span className="w-11 shrink-0 overflow-hidden rounded-lg">
+                      <FotoMenu
+                        src={menus.find((m) => m.id === it.menuId)?.foto}
+                        nama={it.nama}
+                        rasio="aspect-square"
+                        mini
+                      />
+                    </span>
+                    <span className="min-w-0 flex-1 text-ink-soft">
+                      <span className="block truncate font-semibold text-ink">{it.nama}</span>
+                      <span className="text-[12px] text-ink-muted">
+                        {it.qty} × {rupiah(it.harga)}
+                      </span>
                     </span>
                     <span className="shrink-0 font-semibold tabular-nums">
                       {rupiah(it.harga * it.qty)}
@@ -274,6 +285,32 @@ export function LacakPesanan() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Ditampilkan sebelum pencarian: ajakan memesan bagi yang belum punya kode. */
+function AjakanPesan({ fotos }: { fotos: string[] }) {
+  return (
+    <div className="mt-5 flex flex-col items-start gap-5 overflow-hidden rounded-2xl bg-zamrud-800 p-6 text-white sm:flex-row sm:items-center sm:p-7">
+      {fotos.length > 0 && (
+        <div className="flex -space-x-4" aria-hidden="true">
+          {fotos.map((src) => (
+            <span key={src} className="h-16 w-16 overflow-hidden rounded-full border-[3px] border-zamrud-800">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt="" className="h-full w-full object-cover" />
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="flex-1">
+        <p className="text-[17px] font-semibold">Belum punya kode pesanan?</p>
+        <p className="mt-1 text-[14px] text-white/75">Kode muncul setelah Anda mengirim pesanan.</p>
+      </div>
+      <Link href="/menu" className="tombol tombol-md shrink-0 bg-jingga-500 text-white hover:bg-jingga-600">
+        Lihat Menu
+        <ArrowRight size={17} />
+      </Link>
     </div>
   );
 }
