@@ -40,7 +40,7 @@ select
   'Ambil di Tempat', 'Mohon sambalnya dipisah ya.',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('nasi-rames-komplit'::text, 45)
+    ('paket-nasi-kotak-acara-kantor'::text, 45)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Selesai', current_date - 16 + time '08:00';
@@ -49,7 +49,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('nasi-rames-komplit'::text, 45)
+  ('paket-nasi-kotak-acara-kantor'::text, 45)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-01';
@@ -66,7 +66,7 @@ select
   (select sum(m.harga_jual * v.qty)
    from (values
     ('snack-box-isi-3'::text, 60),
-    ('nasi-rames-hemat', 60)
+    ('paket-bento-ayam-kremes', 60)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Selesai', current_date - 15 + time '08:00';
@@ -76,7 +76,7 @@ select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
   ('snack-box-isi-3'::text, 60),
-  ('nasi-rames-hemat', 60)
+  ('paket-bento-ayam-kremes', 60)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-02';
@@ -119,7 +119,7 @@ select
   'Antar ke Alamat', '',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('nasi-box-ayam-bakar'::text, 30)
+    ('paket-nasi-kuning-bento-royal'::text, 30)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Selesai', current_date - 13 + time '08:00';
@@ -128,7 +128,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('nasi-box-ayam-bakar'::text, 30)
+  ('paket-nasi-kuning-bento-royal'::text, 30)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-04';
@@ -169,7 +169,7 @@ select
   'Ambil di Tempat', '',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('nasi-rames-komplit'::text, 25),
+    ('paket-nasi-kotak-acara-kantor'::text, 25),
     ('ayam-goreng-lengkuas', 25)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
@@ -179,7 +179,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('nasi-rames-komplit'::text, 25),
+  ('paket-nasi-kotak-acara-kantor'::text, 25),
   ('ayam-goreng-lengkuas', 25)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
@@ -196,7 +196,7 @@ select
   'Antar ke Alamat', 'Tolong nasi jangan terlalu pedas.',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('nasi-box-rendang-sapi'::text, 20)
+    ('paket-nasi-kotak-rendang-vip'::text, 20)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Selesai', current_date - 10 + time '08:00';
@@ -205,7 +205,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('nasi-box-rendang-sapi'::text, 20)
+  ('paket-nasi-kotak-rendang-vip'::text, 20)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-07';
@@ -246,7 +246,7 @@ select
   'Antar ke Alamat', 'Mohon sambalnya dipisah ya.',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('nasi-rames-hemat'::text, 100)
+    ('paket-bento-ayam-kremes'::text, 100)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Selesai', current_date - 8 + time '08:00';
@@ -255,7 +255,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('nasi-rames-hemat'::text, 100)
+  ('paket-bento-ayam-kremes'::text, 100)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-09';
@@ -296,7 +296,7 @@ select
   'Ambil di Tempat', 'Ada 3 porsi tanpa daging, untuk tamu vegetarian.',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('nasi-box-nila-bakar'::text, 35),
+    ('paket-nasi-kotak-nila-bakar'::text, 35),
     ('gudeg-nangka', 35)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
@@ -306,7 +306,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('nasi-box-nila-bakar'::text, 35),
+  ('paket-nasi-kotak-nila-bakar'::text, 35),
   ('gudeg-nangka', 35)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
@@ -348,7 +348,7 @@ select
   'Antar ke Alamat', 'Pengantaran lewat pintu samping gedung.',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('nasi-rames-komplit'::text, 55),
+    ('paket-nasi-kotak-acara-kantor'::text, 55),
     ('snack-box-isi-3', 55)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
@@ -358,7 +358,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('nasi-rames-komplit'::text, 55),
+  ('paket-nasi-kotak-acara-kantor'::text, 55),
   ('snack-box-isi-3', 55)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
@@ -375,7 +375,7 @@ select
   'Antar ke Alamat', '',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('nasi-box-ayam-bakar'::text, 18),
+    ('paket-nasi-kuning-bento-royal'::text, 18),
     ('tahu-tempe-bacem', 18)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
@@ -385,7 +385,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('nasi-box-ayam-bakar'::text, 18),
+  ('paket-nasi-kuning-bento-royal'::text, 18),
   ('tahu-tempe-bacem', 18)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
@@ -427,7 +427,7 @@ select
   'Ambil di Tempat', '',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('nasi-rames-hemat'::text, 70)
+    ('paket-bento-ayam-kremes'::text, 70)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Diproses', current_date - 3 + time '08:00';
@@ -436,7 +436,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('nasi-rames-hemat'::text, 70)
+  ('paket-bento-ayam-kremes'::text, 70)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-16';
@@ -477,7 +477,7 @@ select
   'Antar ke Alamat', 'Tolong tambahkan sendok dan tisu ekstra.',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('nasi-rames-komplit'::text, 40)
+    ('paket-nasi-kotak-acara-kantor'::text, 40)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Menunggu Konfirmasi', current_date - 2 + time '08:00';
@@ -486,7 +486,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('nasi-rames-komplit'::text, 40)
+  ('paket-nasi-kotak-acara-kantor'::text, 40)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-18';
@@ -527,7 +527,7 @@ select
   'Antar ke Alamat', '',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('nasi-box-rendang-sapi'::text, 24),
+    ('paket-nasi-kotak-rendang-vip'::text, 24),
     ('snack-box-premium', 24)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
@@ -537,7 +537,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('nasi-box-rendang-sapi'::text, 24),
+  ('paket-nasi-kotak-rendang-vip'::text, 24),
   ('snack-box-premium', 24)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
@@ -554,7 +554,7 @@ select
   'Ambil di Tempat', 'Pengantaran lewat pintu samping gedung.',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('nasi-rames-komplit'::text, 32)
+    ('paket-nasi-kotak-acara-kantor'::text, 32)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Menunggu Konfirmasi', current_date + 1 + time '08:00';
@@ -563,7 +563,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('nasi-rames-komplit'::text, 32)
+  ('paket-nasi-kotak-acara-kantor'::text, 32)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-21';
@@ -604,7 +604,7 @@ select
   'Antar ke Alamat', 'Tolong nasi jangan terlalu pedas.',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('nasi-rames-komplit'::text, 45)
+    ('paket-nasi-kotak-acara-kantor'::text, 45)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Menunggu Konfirmasi', current_date + 5 + time '08:00';
@@ -613,7 +613,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('nasi-rames-komplit'::text, 45)
+  ('paket-nasi-kotak-acara-kantor'::text, 45)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-23';

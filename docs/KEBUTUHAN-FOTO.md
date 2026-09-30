@@ -31,11 +31,11 @@ nama ini sudah dipakai sistem, jadi tidak boleh diubah sendiri.
 
 | No | Menu | Kategori | Nama berkas |
 | --- | --- | --- | --- |
-| 1 | Nasi Rames Komplit | Nasi Box | `nasi-rames-komplit.webp` |
-| 2 | Nasi Rames Hemat | Nasi Box | `nasi-rames-hemat.webp` |
-| 3 | Nasi Box Ayam Bakar Madu | Nasi Box | `nasi-box-ayam-bakar.webp` |
-| 4 | Nasi Box Rendang Sapi | Nasi Box | `nasi-box-rendang-sapi.webp` |
-| 5 | Nasi Box Nila Bakar | Nasi Box | `nasi-box-nila-bakar.webp` |
+| 1 | Paket Nasi Kuning Bento Royal | Nasi Box | `paket-nasi-kuning-bento-royal.webp` |
+| 2 | Paket Nasi Kotak Acara Kantor | Nasi Box | `paket-nasi-kotak-acara-kantor.webp` |
+| 3 | Paket Nasi Kotak Rendang VIP | Nasi Box | `paket-nasi-kotak-rendang-vip.webp` |
+| 4 | Paket Bento Ayam Kremes Spesial | Nasi Box | `paket-bento-ayam-kremes.webp` |
+| 5 | Paket Nasi Kotak Nila Bakar Rica | Nasi Box | `paket-nasi-kotak-nila-bakar.webp` |
 | 6 | Prasmanan Paket Silver | Prasmanan | `prasmanan-paket-silver.webp` |
 | 7 | Prasmanan Paket Gold | Prasmanan | `prasmanan-paket-gold.webp` |
 | 8 | Tumpeng Mini | Tumpeng | `tumpeng-mini.webp` |
@@ -157,7 +157,7 @@ Cara paling mudah, tanpa memasang aplikasi:
 1. Salin semua berkas ke folder `public/images/menu/` di dalam proyek.
 2. Untuk tiap menu: buka **Panel Admin → Menu → Ubah**, isi kolom **Foto menu**
    dengan alamat berkasnya, contoh:
-   `/images/menu/nasi-rames-komplit.jpg`
+   `/images/menu/paket-nasi-kuning-bento-royal.jpg`
 3. Klik **Simpan menu**. Kotak abu-abu langsung berganti foto.
 
 Foto sampul beranda, foto Ibu Asri, dan og-image diganti langsung di kode —
@@ -172,11 +172,11 @@ boleh dilengkapi bertahap. Tidak ada yang rusak kalau baru sebagian yang ada.
 
 Menu:
 
-- [ ] nasi-rames-komplit
-- [ ] nasi-rames-hemat
-- [ ] nasi-box-ayam-bakar
-- [ ] nasi-box-rendang-sapi
-- [ ] nasi-box-nila-bakar
+- [ ] paket-nasi-kuning-bento-royal
+- [ ] paket-nasi-kotak-acara-kantor
+- [ ] paket-nasi-kotak-rendang-vip
+- [ ] paket-bento-ayam-kremes
+- [ ] paket-nasi-kotak-nila-bakar
 - [ ] prasmanan-paket-silver
 - [ ] prasmanan-paket-gold
 - [ ] tumpeng-mini

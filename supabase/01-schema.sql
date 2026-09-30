@@ -85,7 +85,7 @@ create index if not exists menus_category_idx  on public.menus (category_id);
 create index if not exists menus_tersedia_idx  on public.menus (tersedia);
 
 comment on column public.menus.foto is
-  'Path foto, contoh /images/menu/nasi-rames-komplit.jpg. Kosong = tampil kotak placeholder.';
+  'Path foto, contoh /images/menu/paket-nasi-kuning-bento-royal.jpg. Kosong = tampil kotak placeholder.';
 
 -- ---------------------------------------------------------------------------
 -- recipes — relasi menu dengan bahan baku beserta takarannya

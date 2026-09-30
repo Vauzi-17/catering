@@ -26,7 +26,7 @@ export const contohPertanyaan = [
   "Menu apa yang paling banyak terjual minggu ini?",
   "Menu mana yang marginnya paling besar?",
   "Bahan apa yang perlu dibelanjakan?",
-  "Berapa HPP nasi rames komplit?",
+  "Berapa HPP paket nasi kotak rendang VIP?",
   "Ada berapa pesanan yang belum dikonfirmasi?",
 ];
 

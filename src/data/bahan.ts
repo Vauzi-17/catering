@@ -27,4 +27,6 @@ export const bahanAwal: Bahan[] = [
   { id: "bh-24", nama: "Box Nasi Kertas", satuan: "pcs", hargaSatuan: 1800, kategori: "Kemasan", stok: 500, stokMinimum: 200 },
   { id: "bh-25", nama: "Dus Snack Box", satuan: "pcs", hargaSatuan: 1500, kategori: "Kemasan", stok: 350, stokMinimum: 150 },
   { id: "bh-26", nama: "Daun Pisang", satuan: "ikat", hargaSatuan: 6000, kategori: "Kemasan", stok: 12, stokMinimum: 5 },
+  { id: "bh-27", nama: "Kunyit", satuan: "kg", hargaSatuan: 20000, kategori: "Bumbu", stok: 3, stokMinimum: 1 },
+  { id: "bh-28", nama: "Kotak Bento Sekat", satuan: "pcs", hargaSatuan: 3200, kategori: "Kemasan", stok: 300, stokMinimum: 120 },
 ];
