@@ -6,9 +6,11 @@ import { teksSignature, type StatusMidtrans } from "@/lib/pembayaran";
 /**
  * Pemanggil API Midtrans (Snap + status transaksi).
  *
- * Kunci sandbox Midtrans selalu diawali "SB-", jadi mode sandbox/produksi
- * ditentukan otomatis dari server key. MIDTRANS_IS_PRODUCTION=true/false
- * bisa dipakai untuk memaksa salah satunya.
+ * Mode produksi hanya aktif bila MIDTRANS_IS_PRODUCTION=true. Awalan kunci
+ * tidak bisa dijadikan patokan: akun sandbox lama memakai "SB-Mid-...",
+ * akun sandbox baru memakai "Mid-..." seperti kunci produksi. Bawaan sandbox
+ * juga lebih aman — kunci produksi yang dikirim ke sandbox langsung ditolak,
+ * tidak ada uang yang berpindah.
  */
 function kunciServer(): string {
   const kunci = process.env.MIDTRANS_SERVER_KEY;
@@ -17,10 +19,7 @@ function kunciServer(): string {
 }
 
 export function modeProduksi(): boolean {
-  const paksa = process.env.MIDTRANS_IS_PRODUCTION;
-  if (paksa === "true") return true;
-  if (paksa === "false") return false;
-  return !kunciServer().startsWith("SB-");
+  return process.env.MIDTRANS_IS_PRODUCTION === "true";
 }
 
 function alamat() {

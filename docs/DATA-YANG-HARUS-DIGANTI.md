@@ -114,10 +114,11 @@ bila Supabase belum tersambung.
 
 ## 9. Pembayaran
 
-Selama kunci Midtrans masih kunci **sandbox** (diawali `SB-`), tidak ada uang
-sungguhan yang masuk. Sebelum menerima pesanan nyata: selesaikan verifikasi
-usaha di Midtrans, ganti ke kunci produksi, dan isi Notification URL produksi
-(`SETUP-PEMBAYARAN.md` bagian 2.4). Periksa juga tarif per transaksi Midtrans
+Selama kunci Midtrans masih kunci **sandbox** dan `MIDTRANS_IS_PRODUCTION`
+belum `true`, tidak ada uang sungguhan yang masuk. Sebelum menerima pesanan
+nyata: selesaikan verifikasi usaha di Midtrans atas nama Asri Catering, ganti
+ke kunci produksi, isi `MIDTRANS_IS_PRODUCTION=true`, dan isi Notification URL
+produksi (`SETUP-PEMBAYARAN.md` bagian 2.4). Periksa juga tarif per transaksi Midtrans
 karena memengaruhi margin.
 
 ---
