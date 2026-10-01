@@ -29,7 +29,9 @@ Setelah bagian ini selesai:
 | 1 | `01-schema.sql` | Sudah dari tahap sebelumnya |
 | 2 | `03-seed.sql` | Sudah dari tahap sebelumnya |
 | 3 | **`06-akun-pembayaran.sql`** | Akun pelanggan, pembayaran, RLS produksi |
-| opsional | `05-contoh-pesanan.sql` | Pesanan contoh untuk Dasbor |
+| 4 | **`07-foto-menu.sql`** | Bucket Storage `menu` untuk unggah foto dari panel admin |
+| opsional | `08-contoh-pesanan-lunas.sql` | 5 pesanan lunas (kode `ASR-UJI-`) untuk menguji laporan, margin, dan catatan AI |
+| opsional | `05-contoh-pesanan.sql` | 23 pesanan contoh versi lama (kode `ASR-DEMO-`) |
 
 `06` **menggantikan** seluruh aturan pada `02-rls.sql` dan `04-rls-produksi.sql`
 (policy lama dihapus lebih dulu). Jangan jalankan `02` atau `04` lagi

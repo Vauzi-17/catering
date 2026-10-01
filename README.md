@@ -138,6 +138,8 @@ supabase/
 ├─ 03-seed.sql              Menu, bahan baku, resep (dihasilkan skrip)
 ├─ 04-rls-produksi.sql      Keamanan baris lama — tidak dipakai lagi
 ├─ 05-contoh-pesanan.sql    Pesanan contoh, opsional (dihasilkan skrip)
+├─ 07-foto-menu.sql         Bucket Storage untuk foto menu
+├─ 08-contoh-pesanan-lunas.sql  5 pesanan lunas untuk menguji laporan, opsional
 └─ 06-akun-pembayaran.sql   Akun pelanggan, pembayaran, RLS produksi
 scripts/
 ├─ muat-data.mjs                 Memuat src/data/*.ts untuk kedua skrip di bawah
@@ -266,9 +268,10 @@ di [`docs/KEBUTUHAN-FOTO.md`](docs/KEBUTUHAN-FOTO.md) — dokumen itu bisa langs
 diteruskan ke klien.
 
 Ringkasnya: semua gambar sekarang berupa kotak abu-abu placeholder
-(`src/components/Placeholder.tsx`). Untuk foto menu, taruh berkasnya di
-`public/images/menu/` lalu isi kolom **Foto menu** di panel admin dengan
-alamatnya. Kolom yang dikosongkan tetap menampilkan kotak abu-abu, jadi foto
+(`src/components/Placeholder.tsx`). Untuk foto menu, buka **Panel Admin → Menu → Ubah**, lalu klik **Unggah
+foto**. Foto dikecilkan di peramban (sisi terpanjang 1600 px, WebP) lalu
+disimpan di Supabase Storage — jalankan `supabase/07-foto-menu.sql` sekali
+sebelumnya. Pada mode data contoh, kolom itu berupa isian alamat gambar. Kolom yang dikosongkan tetap menampilkan kotak abu-abu, jadi foto
 boleh dilengkapi bertahap.
 
 Foto sampul beranda dan foto pemilik diganti di kode: ganti

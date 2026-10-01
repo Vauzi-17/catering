@@ -332,7 +332,7 @@ export function FormPesanan() {
             <Bagian
               nomor="03"
               judul="Pembayaran"
-              deskripsi="Dibayar penuh sekarang lewat Midtrans. Status pesanan berubah otomatis begitu pembayaran masuk."
+              deskripsi="Bayar penuh di muka. Pesanan langsung kami siapkan begitu pembayaran diterima."
             >
               <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
                 {[
@@ -347,9 +347,6 @@ export function FormPesanan() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-3 text-[12px] text-ink-muted">
-                Metode yang muncul di popup mengikuti yang diaktifkan pada akun Midtrans.
-              </p>
             </Bagian>
           </div>
 

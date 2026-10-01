@@ -64,9 +64,7 @@ export function PesanForm({ jenis, children }: { jenis: "galat" | "info" | "suks
 export function TanpaSupabase() {
   return (
     <PesanForm jenis="info">
-      Akun pelanggan dan pembayaran online membutuhkan Supabase. Isi variabel lingkungan
-      Supabase lalu jalankan <code>supabase/06-akun-pembayaran.sql</code> (lihat
-      docs/SETUP-PEMBAYARAN.md).
+      Pemesanan online sedang tidak tersedia. Silakan hubungi kami lewat WhatsApp untuk memesan.
     </PesanForm>
   );
 }
