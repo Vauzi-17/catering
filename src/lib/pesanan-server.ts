@@ -6,6 +6,7 @@ import {
   orderIdMidtrans,
   pembaruanDariMidtrans,
   keIsoWib,
+  tanggalJakarta,
   type StatusMidtrans,
 } from "@/lib/pembayaran";
 import { GalatApi, supabaseServer } from "@/lib/supabase-server";
@@ -26,11 +27,12 @@ export interface BarisPesananServer {
   snap_token: string | null;
   snap_redirect_url: string | null;
   batas_bayar: string | null;
+  tanggal_acara: string;
   order_details: { menu_id: string | null; nama_menu: string; qty: number; harga: number | string }[];
 }
 
 const KOLOM =
-  "id, kode, user_id, nama, telepon, email, total, status, status_bayar, midtrans_order_id, snap_token, snap_redirect_url, batas_bayar, order_details(menu_id, nama_menu, qty, harga)";
+  "id, kode, user_id, nama, telepon, email, total, status, status_bayar, midtrans_order_id, snap_token, snap_redirect_url, batas_bayar, tanggal_acara, order_details(menu_id, nama_menu, qty, harga)";
 
 export async function ambilPesananKode(kode: string): Promise<BarisPesananServer> {
   const { data, error } = await supabaseServer().from("orders").select(KOLOM).eq("kode", kode).maybeSingle();
@@ -65,6 +67,11 @@ export async function siapkanTagihan(
   if (pesanan.status_bayar === "Lunas") throw new GalatApi(409, "Pesanan ini sudah lunas.");
   if (pesanan.status !== "Menunggu Pembayaran" && pesanan.status !== "Dibatalkan") {
     throw new GalatApi(409, "Pesanan ini tidak menunggu pembayaran.");
+  }
+  // Pesanan yang batal karena kedaluwarsa boleh dibayar ulang selama jadwal
+  // acaranya masih memenuhi aturan H-1, sama seperti pesanan baru.
+  if (pesanan.status === "Dibatalkan" && pesanan.tanggal_acara < tanggalJakarta(new Date(), 1)) {
+    throw new GalatApi(409, "Jadwal acara sudah terlalu dekat. Silakan buat pesanan baru.");
   }
 
   const masihBerlaku =

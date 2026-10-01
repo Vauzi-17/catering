@@ -205,7 +205,7 @@ export function DetailPesananSaya({ kode }: { kode: string }) {
           {batal && (
             <PesanForm jenis="info">
               {p.statusBayar === "Kedaluwarsa"
-                ? "Pesanan dibatalkan karena pembayaran melewati batas waktu. Anda masih bisa membayar ulang bila jadwal acara belum lewat."
+                ? "Pesanan dibatalkan karena pembayaran melewati batas waktu. Selama jadwal acara masih paling cepat besok, Anda bisa membayar ulang."
                 : KETERANGAN_STATUS.Dibatalkan}
             </PesanForm>
           )}
@@ -323,7 +323,7 @@ export function DetailPesananSaya({ kode }: { kode: string }) {
             <dl className="mt-3 space-y-2">
               <div className="flex justify-between gap-3">
                 <dt className="text-ink-muted">Status</dt>
-                <dd>{p.statusBayar ? <LencanaBayar status={p.statusBayar} /> : "Manual"}</dd>
+                <dd>{p.statusBayar ? <LencanaBayar status={p.statusBayar} /> : "—"}</dd>
               </div>
               {p.metodeBayar && (
                 <div className="flex justify-between gap-3">

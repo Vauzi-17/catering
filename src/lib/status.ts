@@ -12,7 +12,7 @@ export const ALUR_PESANAN: StatusPesanan[] = [
 export const KETERANGAN_STATUS: Record<StatusPesanan, string> = {
   "Menunggu Pembayaran": "Selesaikan pembayaran supaya pesanan masuk antrean dapur.",
   "Menunggu Konfirmasi": "Pesanan menunggu konfirmasi admin.",
-  Dibayar: "Pembayaran diterima otomatis. Pesanan sudah masuk antrean dapur.",
+  Dibayar: "Pembayaran sudah kami terima. Pesanan masuk antrean dapur.",
   Diproses: "Pesanan sedang disiapkan dan dimasak di dapur.",
   Dikirim: "Pesanan dalam perjalanan ke lokasi Anda.",
   Selesai: "Pesanan sudah diterima. Terima kasih telah memesan di Asri Catering.",
