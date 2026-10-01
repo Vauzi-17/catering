@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { JudulHalaman } from "@/components/admin/AdminShell";
 import { KartuStat } from "@/components/admin/Bagian";
 import { DialogKonfirmasi } from "@/components/admin/DialogKonfirmasi";
+import { IsianFoto } from "@/components/admin/IsianFoto";
 import { FotoMenu } from "@/components/Placeholder";
 import {
   IconClose,
@@ -283,6 +284,7 @@ function FormulirMenu({
   const [form, setForm] = useState<Menu>({ ...awal });
   const [isiTeks, setIsiTeks] = useState(awal.isi.join("\n"));
   const [galat, setGalat] = useState<Record<string, string>>({});
+  const [unggahFoto, setUnggahFoto] = useState(false);
 
   const pratinjau = hitungHpp(
     { ...form, isi: isiTeks.split("\n").filter(Boolean) },
@@ -370,6 +372,16 @@ function FormulirMenu({
               {galat.nama && <p className="mt-1.5 text-[12.5px] font-semibold text-red-700">{galat.nama}</p>}
             </div>
 
+            <div className="sm:col-span-2">
+              <IsianFoto
+                nilai={form.foto}
+                nama={form.nama}
+                slug={form.slug || slugify(form.nama)}
+                onUbah={(url) => ubah("foto", url)}
+                onSibuk={setUnggahFoto}
+              />
+            </div>
+
             <div>
               <label className="field-label" htmlFor="kategori">
                 Kategori
@@ -386,23 +398,6 @@ function FormulirMenu({
                   </option>
                 ))}
               </select>
-            </div>
-
-            <div>
-              <label className="field-label" htmlFor="foto">
-                Foto menu
-              </label>
-              <input
-                id="foto"
-                className="field"
-                value={form.foto}
-                onChange={(e) => ubah("foto", e.target.value)}
-                placeholder="/images/menu/nama-file.jpg"
-              />
-              <p className="mt-1.5 text-[12px] text-ink-muted">
-                Boleh path berkas lokal, boleh juga URL dari Supabase Storage.
-                Kosongkan bila foto belum ada — kotak abu-abu tampil sementara.
-              </p>
             </div>
 
             <div>
@@ -644,8 +639,8 @@ function FormulirMenu({
           <button type="button" onClick={tutup} className="btn btn-outline btn-md">
             Batal
           </button>
-          <button type="submit" className="btn btn-primary btn-md" disabled={sibuk}>
-            {sibuk ? "Menyimpan…" : "Simpan menu"}
+          <button type="submit" className="btn btn-primary btn-md" disabled={sibuk || unggahFoto}>
+            {sibuk ? "Menyimpan…" : unggahFoto ? "Menunggu foto…" : "Simpan menu"}
           </button>
         </div>
       </form>

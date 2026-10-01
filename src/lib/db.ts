@@ -440,3 +440,27 @@ export async function simpanPengaturanDb(p: {
   });
   if (error) throw error;
 }
+
+// ------------------------------------------------------------ foto menu
+
+const BUCKET_FOTO = "menu";
+
+/**
+ * Mengunggah foto menu ke Supabase Storage (bucket "menu", lihat
+ * supabase/07-foto-menu.sql) lalu mengembalikan URL publiknya untuk
+ * disimpan di kolom menus.foto. Nama berkas selalu baru supaya cache
+ * peramban dan CDN tidak menampilkan foto lama.
+ */
+export async function unggahFotoMenu(berkas: Blob, slug: string): Promise<string> {
+  const ekstensi = berkas.type === "image/webp" ? "webp" : berkas.type === "image/png" ? "png" : "jpg";
+  const dasar = (slug || "menu").replace(/[^a-z0-9-]/g, "").slice(0, 60) || "menu";
+  const jalur = `${dasar}-${Date.now().toString(36)}.${ekstensi}`;
+  const penyimpanan = wajibSupabase().storage.from(BUCKET_FOTO);
+  const { error } = await penyimpanan.upload(jalur, berkas, {
+    contentType: berkas.type,
+    cacheControl: "31536000",
+    upsert: false,
+  });
+  if (error) throw error;
+  return penyimpanan.getPublicUrl(jalur).data.publicUrl;
+}
