@@ -413,7 +413,7 @@ function FormulirMenu({
                 id="harga"
                 type="number"
                 min={0}
-                step={500}
+                step={1}
                 className="field"
                 value={form.hargaJual}
                 onChange={(e) => ubah("hargaJual", Number(e.target.value) || 0)}
@@ -537,7 +537,7 @@ function FormulirMenu({
                   id="kemasan"
                   type="number"
                   min={0}
-                  step={100}
+                  step={1}
                   className="field"
                   value={form.biayaKemasan}
                   onChange={(e) => ubah("biayaKemasan", Number(e.target.value) || 0)}
@@ -551,7 +551,7 @@ function FormulirMenu({
                   id="tenaga"
                   type="number"
                   min={0}
-                  step={100}
+                  step={1}
                   className="field"
                   value={form.biayaTenagaKerja}
                   onChange={(e) => ubah("biayaTenagaKerja", Number(e.target.value) || 0)}
@@ -579,7 +579,7 @@ function FormulirMenu({
                   </div>
                   <input
                     type="number"
-                    step={0.005}
+                    step="any"
                     min={0}
                     className="field-sm w-28"
                     value={r.jumlah}

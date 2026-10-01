@@ -350,7 +350,7 @@ function FormulirBahan({
               id="hargaBahan"
               type="number"
               min={0}
-              step={100}
+              step={1}
               className="field"
               value={form.hargaSatuan}
               onChange={(e) => ubah("hargaSatuan", Number(e.target.value) || 0)}
@@ -370,7 +370,7 @@ function FormulirBahan({
               id="stokBahan"
               type="number"
               min={0}
-              step={0.5}
+              step="any"
               className="field"
               value={form.stok}
               onChange={(e) => ubah("stok", Number(e.target.value) || 0)}
@@ -385,7 +385,7 @@ function FormulirBahan({
               id="stokMin"
               type="number"
               min={0}
-              step={0.5}
+              step="any"
               className="field"
               value={form.stokMinimum}
               onChange={(e) => ubah("stokMinimum", Number(e.target.value) || 0)}
