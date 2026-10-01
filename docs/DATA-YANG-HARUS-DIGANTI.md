@@ -129,7 +129,7 @@ karena memengaruhi margin.
 - [ ] Testimoni diganti ulasan asli, atau seksinya dihapus
 - [ ] Menu, harga, isi paket, dan resep dikonfirmasi Ibu Asri
 - [ ] Harga bahan baku disesuaikan harga pasar setempat
-- [ ] Pesanan `ASR-DEMO-%` dihapus
+- [ ] Pesanan `ASR-DEMO-%` dan `ASR-UJI-%` dihapus
 - [ ] Foto asli dipasang
 - [ ] Domain diperbarui di tiga tempat
 - [ ] `06-akun-pembayaran.sql` dijalankan, akun Ibu Asri terdaftar sebagai admin

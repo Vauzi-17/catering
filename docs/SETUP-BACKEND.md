@@ -53,7 +53,14 @@ dari pesanan, bukan dari menu.
 
 Ada dua cara mengisinya.
 
-**Cara cepat — jalankan `supabase/05-contoh-pesanan.sql`**
+**Paling cepat — jalankan `supabase/08-contoh-pesanan-lunas.sql`**
+
+Lima pesanan berstatus lunas (kode `ASR-UJI-01` … `05`) pada enam hari terakhir
+sampai hari ini, lengkap dengan histori transaksi. Semuanya langsung terhitung
+di Dasbor, Laporan, dan Hitung HPP. Hapus dengan
+`delete from public.orders where kode like 'ASR-UJI-%';`
+
+**Versi lama — `supabase/05-contoh-pesanan.sql`**
 
 Berkas ini mengisi 23 pesanan contoh yang tersebar pada dua minggu terakhir dan
 dua minggu ke depan, dengan campuran status. 17 di antaranya berstatus
