@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/store/AuthProvider";
@@ -42,7 +43,18 @@ export const metadata: Metadata = {
       "Nasi kotak, bento, prasmanan, tumpeng, dan snack box untuk acara di Bandung. Pesan online, harga tercantum jelas.",
   },
   robots: { index: true, follow: true },
+  // Terjemahan otomatis peramban mengganti teks halaman diam-diam dan membuat
+  // React gagal memperbarui halaman ("Application error"). Situs ini
+  // berbahasa Indonesia untuk pelanggan lokal, jadi terjemahan dimatikan.
+  other: { google: "notranslate" },
 };
+
+/**
+ * Pengaman bila ada penerjemah atau ekstensi yang tetap mengubah teks: React
+ * tidak lagi crash saat simpul yang ingin dihapus/disisipi sudah dipindah
+ * pihak lain (lihat facebook/react#11538).
+ */
+const PENGAMAN_DOM = `(function(){if(typeof Node!=="function"||!Node.prototype)return;var r=Node.prototype.removeChild;Node.prototype.removeChild=function(c){if(c.parentNode!==this)return c;return r.apply(this,arguments)};var i=Node.prototype.insertBefore;Node.prototype.insertBefore=function(n,ref){if(ref&&ref.parentNode!==this)return n;return i.apply(this,arguments)}})();`;
 
 export const viewport: Viewport = {
   themeColor: "#235337",
@@ -54,8 +66,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="id" className={`${sans.variable} ${display.variable}`}>
+    <html lang="id" translate="no" className={`${sans.variable} ${display.variable}`}>
       <body>
+        <Script id="pengaman-dom" strategy="beforeInteractive">
+          {PENGAMAN_DOM}
+        </Script>
         <AuthProvider>
           <DataProvider>{children}</DataProvider>
         </AuthProvider>
