@@ -23,7 +23,7 @@ declare
   hilang text;
 begin
   select string_agg(s, ', ') into hilang
-  from unnest(array['paket-bento-ayam-kremes', 'paket-nasi-kotak-acara-kantor', 'paket-nasi-kotak-rendang-vip', 'paket-nasi-kuning-bento-royal', 'prasmanan-paket-gold', 'snack-box-isi-3', 'snack-box-premium', 'tumpeng-komplit-nampan']) as s
+  from unnest(array['paket-nasi-kuning-bento-royal', 'paket-nasi-kotak-acara-kantor', 'paket-nasi-kotak-rendang-vip', 'paket-nasi-kuning-bento-royal', 'paket-nasi-kotak-acara-kantor', 'snack-box-isi-3', 'snack-box-isi-3', 'tumpeng-mini']) as s
   where not exists (select 1 from public.menus m where m.slug = s);
   if hilang is not null then
     raise exception 'Menu belum ada: %. Jalankan 03-seed.sql versi terbaru dulu.', hilang;
@@ -32,7 +32,7 @@ end $$;
 
 delete from public.orders where kode like 'ASR-UJI-%';
 
--- ASR-UJI-01 · Dinas Pendidikan Kota Bandung
+-- ASR-UJI-01 · Dinas Pendidikan Kabupaten Cilacap
 with v(slug, qty) as (values
     ('paket-nasi-kotak-acara-kantor'::text, 80),
     ('snack-box-isi-3'::text, 80)
@@ -44,7 +44,7 @@ o as (
     dibayar_pada, dibuat_pada)
   select
     'ASR-UJI-01', (select id from auth.users where email = 'vauzitriutomo5@gmail.com'),
-    'Dinas Pendidikan Kota Bandung', '0812-9087-1122', '', 'Jl. Ahmad Yani No. 239, Bandung', current_date - 6, '11:30', 'Antar ke Alamat',
+    'Dinas Pendidikan Kabupaten Cilacap', '0812-9087-1122', '', 'Jl. Ahmad Yani No. 239, Cilacap', current_date - 6, '11:30', 'Antar ke Alamat',
     'Antar ke lobi, hubungi Bu Rina.',
     (select sum(m.harga_jual * v.qty) from v join public.menus m on m.slug = v.slug),
     'Selesai', 'Lunas', 'BCA Virtual Account', 'ASR-UJI-01-1',
@@ -81,7 +81,7 @@ where o.kode = 'ASR-UJI-01';
 
 -- ASR-UJI-02 · Keluarga Hendra Saputra
 with v(slug, qty) as (values
-    ('tumpeng-komplit-nampan'::text, 1),
+    ('tumpeng-mini'::text, 1),
     ('paket-nasi-kuning-bento-royal'::text, 40)
 ),
 o as (
@@ -91,7 +91,7 @@ o as (
     dibayar_pada, dibuat_pada)
   select
     'ASR-UJI-02', (select id from auth.users where email = 'vauzitriutomo5@gmail.com'),
-    'Keluarga Hendra Saputra', '0813-2201-7788', '', 'Jl. Sukajadi No. 112, Bandung', current_date - 4, '17:00', 'Antar ke Alamat',
+    'Keluarga Hendra Saputra', '0813-2201-7788', '', 'Jl. Sukajadi No. 112, Cilacap', current_date - 4, '17:00', 'Antar ke Alamat',
     'Syukuran rumah baru.',
     (select sum(m.harga_jual * v.qty) from v join public.menus m on m.slug = v.slug),
     'Selesai', 'Lunas', 'QRIS', 'ASR-UJI-02-1',
@@ -129,7 +129,7 @@ where o.kode = 'ASR-UJI-02';
 -- ASR-UJI-03 · PT Sinar Mandiri Abadi
 with v(slug, qty) as (values
     ('paket-nasi-kotak-rendang-vip'::text, 60),
-    ('snack-box-premium'::text, 60)
+    ('snack-box-isi-3'::text, 60)
 ),
 o as (
   insert into public.orders (
@@ -138,7 +138,7 @@ o as (
     dibayar_pada, dibuat_pada)
   select
     'ASR-UJI-03', (select id from auth.users where email = 'vauzitriutomo5@gmail.com'),
-    'PT Sinar Mandiri Abadi', '0811-2299-3040', '', 'Gedung Pasifik Lt. 3, Jl. Asia Afrika No. 8, Bandung', current_date - 2, '11:30', 'Antar ke Alamat',
+    'PT Sinar Mandiri Abadi', '0811-2299-3040', '', 'Gedung Pasifik Lt. 3, Jl. Asia Afrika No. 8, Cilacap', current_date - 2, '11:30', 'Antar ke Alamat',
     '',
     (select sum(m.harga_jual * v.qty) from v join public.menus m on m.slug = v.slug),
     'Selesai', 'Lunas', 'Mandiri Bill Payment', 'ASR-UJI-03-1',
@@ -175,7 +175,7 @@ where o.kode = 'ASR-UJI-03';
 
 -- ASR-UJI-04 · Rina Kusumawati
 with v(slug, qty) as (values
-    ('paket-bento-ayam-kremes'::text, 35)
+    ('paket-nasi-kuning-bento-royal'::text, 35)
 ),
 o as (
   insert into public.orders (
@@ -219,9 +219,9 @@ cross join (values
 ) as s(status, waktu)
 where o.kode = 'ASR-UJI-04';
 
--- ASR-UJI-05 · SMA Negeri 3 Bandung
+-- ASR-UJI-05 · SMA Negeri 1 Jeruklegi
 with v(slug, qty) as (values
-    ('prasmanan-paket-gold'::text, 100)
+    ('paket-nasi-kotak-acara-kantor'::text, 100)
 ),
 o as (
   insert into public.orders (
@@ -230,7 +230,7 @@ o as (
     dibayar_pada, dibuat_pada)
   select
     'ASR-UJI-05', (select id from auth.users where email = 'vauzitriutomo5@gmail.com'),
-    'SMA Negeri 3 Bandung', '0821-4455-6677', '', 'Jl. Belitung No. 8, Bandung', current_date, '12:00', 'Antar ke Alamat',
+    'SMA Negeri 1 Jeruklegi', '0821-4455-6677', '', 'Jl. Belitung No. 8, Cilacap', current_date, '12:00', 'Antar ke Alamat',
     'Untuk rapat komite sekolah.',
     (select sum(m.harga_jual * v.qty) from v join public.menus m on m.slug = v.slug),
     'Dikirim', 'Lunas', 'BRI Virtual Account', 'ASR-UJI-05-1',

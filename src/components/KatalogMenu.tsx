@@ -54,7 +54,8 @@ export function KatalogMenu() {
     return hitung;
   }, [menus]);
 
-  const daftarKategori = ["Semua", ...kategoriMenu];
+  // Kategori tanpa menu tidak ditampilkan supaya pelanggan tidak menemui daftar kosong.
+  const daftarKategori = ["Semua", ...kategoriMenu.filter((k) => (jumlahPerKategori[k] ?? 0) > 0)];
 
   return (
     <div className="container-page py-10 sm:py-12">

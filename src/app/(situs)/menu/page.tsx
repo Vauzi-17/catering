@@ -7,7 +7,7 @@ import { fotoDekorasi } from "@/lib/foto";
 export const metadata: Metadata = {
   title: "Menu & Harga",
   description:
-    "Katalog lengkap menu Asri Catering: nasi kotak, bento, prasmanan, tumpeng, snack box, dan lauk satuan beserta isi paket dan harga per porsi.",
+    "Katalog lengkap menu Asri Catering: nasi kotak, bento, tumpeng, dan snack box beserta isi paket dan harga per porsi.",
 };
 
 export default function HalamanMenu() {
