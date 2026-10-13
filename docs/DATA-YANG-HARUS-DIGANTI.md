@@ -38,7 +38,7 @@ Tidak tersimpan di basis data, jadi selalu disunting di berkas ini.
 | `instagram` | @asricatering.id |
 | `jamOperasional` | Setiap hari 07.00–18.00 — **jamnya perkiraan, pastikan ke pemilik**; pesanan katering paling lambat H-2 |
 | `areaLayanan` | Jeruklegi dan sekitarnya, Kota Cilacap, Kabupaten Cilacap — sesuaikan dengan jangkauan kurir |
-| `statistik` | Buka sejak 2026, 6 paket, terima pesanan setiap hari, batas H-2 |
+| `statistik` | Buka sejak 2026, ongkir gratis, terima pesanan setiap hari, batas H-2 |
 | `sejarah` | Agustus 2026 warung rames dibuka; kini merintis paket katering |
 | `keunggulan` | Empat poin |
 | `testimoni` | Kosong, seksi testimoni di beranda tersembunyi sampai ada ulasan asli |
