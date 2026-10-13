@@ -14,6 +14,7 @@ import {
   qrisBernominal,
   statusSesudahLunas,
   tanggalJakarta,
+  tanggalPalingCepat,
   titikSah,
   uraiTlv,
   type CalonPesanan,
@@ -59,6 +60,7 @@ test("tanggal memakai zona Asia/Jakarta", () => {
   const t = new Date("2026-09-30T20:00:00Z");
   assert.equal(tanggalJakarta(t), "2026-10-01");
   assert.equal(tanggalJakarta(t, 1), "2026-10-02");
+  assert.equal(tanggalPalingCepat(t), "2026-10-03");
 });
 
 // ------------------------------------------------------------------ QRIS

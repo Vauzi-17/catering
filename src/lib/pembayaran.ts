@@ -44,6 +44,14 @@ export function tanggalJakarta(sekarang: Date, geserHari = 0): string {
   return wib.toISOString().slice(0, 10);
 }
 
+/** Pesanan paling lambat dibuat H-2: acara hari ini dan besok ditolak. */
+export const JEDA_PESAN_HARI = 2;
+
+/** Tanggal acara paling awal yang masih boleh dipesan (WIB). */
+export function tanggalPalingCepat(sekarang: Date): string {
+  return tanggalJakarta(sekarang, JEDA_PESAN_HARI);
+}
+
 // ----------------------------------------------------------------- harga
 
 export interface MenuHarga {

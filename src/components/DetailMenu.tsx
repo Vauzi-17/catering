@@ -115,7 +115,7 @@ export function DetailMenu({ menuAwalan }: { menuAwalan: Menu }) {
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-ink-muted">{t("Pesan paling lambat", "Order no later than")}</dt>
-                <dd className="font-semibold">{t("H-1 sebelum acara", "1 day before the event")}</dd>
+                <dd className="font-semibold">{t("H-2 sebelum acara", "2 days before the event")}</dd>
               </div>
             </dl>
 

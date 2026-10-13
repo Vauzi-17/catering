@@ -1,4 +1,4 @@
-import { hitungRincian, jarakKm, tanggalJakarta, titikSah, type BarisDipesan } from "@/lib/pembayaran";
+import { hitungRincian, jarakKm, tanggalPalingCepat, titikSah, type BarisDipesan } from "@/lib/pembayaran";
 import { ambilPesananKode, buatTagihan, infoPengantaran, qrisToko } from "@/lib/pesanan-server";
 import { GalatApi, jawabGalat, penggunaDariRequest, supabaseServer } from "@/lib/supabase-server";
 
@@ -42,8 +42,8 @@ export async function POST(req: Request) {
     if (nama.length < 3) throw new GalatApi(400, "Nama pemesan minimal 3 huruf.");
     if (!/^[0-9+\-\s()]{9,}$/.test(telepon)) throw new GalatApi(400, "Nomor WhatsApp tidak valid.");
     if (!waktuAntar) throw new GalatApi(400, "Pilih jam pengantaran.");
-    if (!tanggalAcara || tanggalAcara < tanggalJakarta(new Date(), 1)) {
-      throw new GalatApi(400, "Tanggal acara paling cepat besok (H-1).");
+    if (!tanggalAcara || tanggalAcara < tanggalPalingCepat(new Date())) {
+      throw new GalatApi(400, "Pesanan paling lambat H-2: tanggal acara paling cepat lusa.");
     }
 
     if (metode === "Antar ke Alamat") {

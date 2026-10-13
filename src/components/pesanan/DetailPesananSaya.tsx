@@ -180,8 +180,8 @@ export function DetailPesananSaya({ kode }: { kode: string }) {
             <PesanForm jenis="info">
               {p.statusBayar === "Kedaluwarsa"
                 ? t(
-                    "Pesanan dibatalkan karena pembayaran melewati batas waktu. Selama jadwal acara masih paling cepat besok, Anda bisa membuat QRIS baru.",
-                    "This order was cancelled because the payment deadline passed. As long as the event is tomorrow or later, you can create a new QRIS.",
+                    "Pesanan dibatalkan karena pembayaran melewati batas waktu. Selama jadwal acara masih paling cepat lusa (H-2), Anda bisa membuat QRIS baru.",
+                    "This order was cancelled because the payment deadline passed. As long as the event is at least 2 days away, you can create a new QRIS.",
                   )
                 : keteranganStatus("Dibatalkan", bahasa)}
             </PesanForm>

@@ -19,7 +19,7 @@ import { LangkahCheckout } from "@/components/pesan/LangkahCheckout";
 import { profil as profilUsaha } from "@/data/profil";
 import { rupiah } from "@/lib/format";
 import { satuan, teksMenu } from "@/lib/teks";
-import { jarakKm, tanggalJakarta } from "@/lib/pembayaran";
+import { jarakKm, tanggalPalingCepat } from "@/lib/pembayaran";
 import { panggilApi } from "@/lib/api-klien";
 import type { Menu } from "@/lib/types";
 import { useInfoPengantaran } from "@/lib/useInfoPengantaran";
@@ -141,7 +141,7 @@ export function FormPesanan() {
     if (nama.trim().length < 3) g.nama = t("Nama pemesan minimal 3 huruf.", "Name must be at least 3 characters.");
     if (!/^[0-9+\-\s()]{9,}$/.test(telepon.trim())) g.telepon = t("Masukkan nomor WhatsApp yang aktif.", "Enter an active WhatsApp number.");
     if (!tanggal) g.tanggal = t("Pilih tanggal acara.", "Choose the event date.");
-    else if (tanggal < tanggalJakarta(new Date(), 1)) g.tanggal = t("Tanggal acara paling cepat besok (H-1).", "The event date must be tomorrow or later.");
+    else if (tanggal < tanggalPalingCepat(new Date())) g.tanggal = t("Pesanan paling lambat H-2. Pilih tanggal mulai lusa.", "Orders must be placed at least 2 days ahead. Choose a date from the day after tomorrow.");
     if (!/^\d{2}:\d{2}$/.test(jam)) g.jam = t("Pilih jam pengantaran.", "Choose a delivery time.");
     if (diantar) {
       if (!alamat.titik) g.titik = t("Tandai lokasi acara di peta.", "Pin the event location on the map.");
@@ -250,7 +250,7 @@ export function FormPesanan() {
                   <input id="telepon" inputMode="tel" className="isian" value={telepon} onChange={(e) => { setTelepon(e.target.value); hapusGalat("telepon"); }} autoComplete="tel" />
                 </Isian>
                 <Isian id="tanggal" label={t("Tanggal acara", "Event date")} galat={galat.tanggal}>
-                  <input id="tanggal" type="date" min={tanggalJakarta(new Date(), 1)} className="isian" value={tanggal} onChange={(e) => { setTanggal(e.target.value); hapusGalat("tanggal"); }} />
+                  <input id="tanggal" type="date" min={tanggalPalingCepat(new Date())} className="isian" value={tanggal} onChange={(e) => { setTanggal(e.target.value); hapusGalat("tanggal"); }} />
                 </Isian>
               </div>
 

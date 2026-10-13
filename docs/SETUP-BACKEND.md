@@ -93,7 +93,7 @@ Dua hal yang sering membingungkan di sini:
   bisa kedaluwarsa. Pesanan lama berstatus *Menunggu Konfirmasi* diperlakukan
   sama.
 - **Laporan dikelompokkan menurut tanggal acara, bukan tanggal pesan.** Formulir
-  hanya menerima acara paling cepat besok (H-1), jadi pesanan yang Anda buat
+  hanya menerima acara paling cepat lusa (H-2), jadi pesanan yang Anda buat
   sekarang akan muncul di kolom tanggal acaranya — bukan hari ini. Karena grafik
   menampilkan tujuh hari ke belakang, pesanan untuk minggu depan belum akan
   terlihat di sana. Ini cara hitung yang lazim untuk katering: pendapatan diakui

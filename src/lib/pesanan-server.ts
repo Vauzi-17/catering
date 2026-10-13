@@ -7,7 +7,7 @@ import {
   nominalDariTeks,
   qrisBernominal,
   statusSesudahLunas,
-  tanggalJakarta,
+  tanggalPalingCepat,
   type HasilCocok,
 } from "@/lib/pembayaran";
 import { GalatApi, supabaseServer } from "@/lib/supabase-server";
@@ -125,7 +125,7 @@ export async function buatTagihan(pesanan: BarisPesananServer, statis?: string):
 
 /**
  * Tagihan untuk halaman pesanan: dipakai ulang selama masih berlaku, dibuat
- * baru bila pesanan batal karena kedaluwarsa dan jadwalnya masih H-1.
+ * baru bila pesanan batal karena kedaluwarsa dan jadwalnya masih memenuhi H-2.
  */
 export async function siapkanTagihan(pesanan: BarisPesananServer): Promise<Tagihan> {
   if (pesanan.status_bayar === "Lunas") throw new GalatApi(409, "Pesanan ini sudah lunas.");
@@ -142,7 +142,7 @@ export async function siapkanTagihan(pesanan: BarisPesananServer): Promise<Tagih
   if (pesanan.status === "Dibatalkan" && pesanan.status_bayar !== "Kedaluwarsa") {
     throw new GalatApi(409, "Pesanan ini sudah dibatalkan.");
   }
-  if (pesanan.tanggal_acara < tanggalJakarta(new Date(), 1)) {
+  if (pesanan.tanggal_acara < tanggalPalingCepat(new Date())) {
     throw new GalatApi(409, "Jadwal acara sudah terlalu dekat. Silakan buat pesanan baru.");
   }
   return buatTagihan(pesanan);
