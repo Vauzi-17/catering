@@ -24,7 +24,7 @@ export function KartuFavorit() {
         <FotoMenu src={favorit.foto} nama={teksMenu(favorit, bahasa).nama} rasio="aspect-square" mini />
       </span>
       <span className="min-w-0">
-        <span className="block text-[11px] font-semibold text-jingga-700">{t("Paling Favorit", "Customer Favourite")}</span>
+        <span className="block text-[11px] font-semibold text-jingga-700">{t("Rekomendasi Kami", "Our Pick")}</span>
         <span className="block truncate text-[14px] font-semibold text-ink">{teksMenu(favorit, bahasa).nama}</span>
         <span className="block text-[12px] tabular-nums text-ink-muted">
           {rupiah(favorit.hargaJual)} {satuanJual(favorit, bahasa)}

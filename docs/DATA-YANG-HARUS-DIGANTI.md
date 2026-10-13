@@ -28,25 +28,26 @@ sumber untuk membuat ulang berkas seed — bukan lagi isi website.
 
 Tidak tersimpan di basis data, jadi selalu disunting di berkas ini.
 
-| Kolom | Isi sekarang (karangan) |
+| Kolom | Isi sekarang |
 | --- | --- |
-| `pemilik` | Ibu Asri Wulandari |
-| `berdiri` | 2016 |
+| `pemilik` | Asri (sudah asli) |
+| `berdiri` | 28 Agustus 2026 — warung nasi rames dibuka (sudah asli) |
 | `alamat` | Jl. Nata Bangsa RT 01 RW 10, Jambusari, Jeruklegi, Cilacap (sudah alamat asli) |
-| `telepon` / `teleponRaw` | 0812-2345-6789 |
+| `telepon` / `teleponRaw` | 0851-3375-0156 (sudah asli) |
 | `email` | halo@asricatering.id |
 | `instagram` | @asricatering.id |
-| `jamOperasional` | Senin–Jumat 07.00–18.00, dst. |
+| `jamOperasional` | Setiap hari 07.00–18.00 — **jamnya perkiraan, pastikan ke pemilik**; pesanan katering paling lambat H-2 |
 | `areaLayanan` | Jeruklegi dan sekitarnya, Kota Cilacap, Kabupaten Cilacap — sesuaikan dengan jangkauan kurir |
-| `statistik` | 9 tahun, 1.200+ acara, 150 box/hari, ulasan 4,8 |
-| `sejarah` | Empat tonggak 2016 – 2025 |
+| `statistik` | Buka sejak 2026, 6 paket, terima pesanan setiap hari, batas H-2 |
+| `sejarah` | Agustus 2026 warung rames dibuka; kini merintis paket katering |
 | `keunggulan` | Empat poin |
-| `testimoni` | **Tiga testimoni fiktif — wajib diganti atau dihapus** |
+| `testimoni` | Kosong, seksi testimoni di beranda tersembunyi sampai ada ulasan asli |
 | `faq` | Tanya jawab, termasuk pengantaran gratis dan pembayaran online |
 
-> Testimoni paling perlu diperhatikan. Menampilkan ulasan karangan seolah dari
-> pelanggan nyata itu menyesatkan. Ganti dengan ulasan asli (seizin orangnya)
-> atau hapus seksinya dari halaman Tentang Kami.
+> Testimoni sengaja dikosongkan karena usaha katering baru dirintis. Tambahkan
+> ulasan asli (seizin orangnya) ke `testimoni` di `profil.ts` dan
+> `profil-en.ts`; seksi **Kata Pelanggan** di beranda muncul otomatis.
+> Jangan mengisi ulasan karangan.
 
 `teleponRaw` dipakai untuk tautan WhatsApp, formatnya tanpa tanda baca dan
 diawali 62 — contoh `6281223456789`.

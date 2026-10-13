@@ -20,8 +20,8 @@ export function Tentang() {
         remah={[{ label: ["Beranda", "Home"], href: "/" }, { label: ["Tentang", "About"] }]}
         judul={["Tentang Asri Catering", "About Asri Catering"]}
         deskripsi={[
-          `Dari dapur rumah Ibu Asri sejak ${profil.berdiri}, kini melayani kantor, sekolah, dan acara keluarga di Cilacap.`,
-          `From Ibu Asri's home kitchen since ${profil.berdiri}, now serving offices, schools, and family events across Cilacap.`,
+          `Berawal dari warung nasi rames yang buka sejak ${profil.berdiri} di Jeruklegi, Cilacap. Kini Asri mulai merintis paket katering untuk acara Anda.`,
+          `It began with a nasi rames stall that opened on ${profil.berdiri} in Jeruklegi, Cilacap. Now Asri is starting catering packages for your events.`,
         ]}
         foto={fotoDekorasi.slice(1)}
       />
@@ -33,14 +33,14 @@ export function Tentang() {
             <SectionHeading judul={t("Perjalanan Usaha", "Our Story")} />
             <ol className="mt-9">
               {profil.sejarah.map((s, i) => (
-                <li key={s.tahun} className="relative flex gap-5 pb-9 last:pb-0">
+                <li key={s.judul} className="relative flex gap-5 pb-9 last:pb-0">
                   {i < profil.sejarah.length - 1 && (
                     <span
-                      className="absolute left-[27px] top-9 h-[calc(100%-2.25rem)] w-px bg-zamrud-200"
+                      className="absolute left-[39px] top-9 h-[calc(100%-2.25rem)] w-px bg-zamrud-200"
                       aria-hidden="true"
                     />
                   )}
-                  <span className="flex h-9 w-14 shrink-0 items-center justify-center rounded-full bg-zamrud-700 text-[13px] font-bold tabular-nums text-white">
+                  <span className="flex h-9 w-20 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-zamrud-700 text-[13px] font-bold tabular-nums text-white">
                     {s.tahun}
                   </span>
                   <div className="pt-1.5">
@@ -57,7 +57,7 @@ export function Tentang() {
           <div className="lg:col-span-5">
             <div className="kartu p-3">
               <GambarPlaceholder
-                label={t("Foto Ibu Asri di dapur — 1200 × 900 px", "Photo of Ibu Asri in the kitchen — 1200 × 900 px")}
+                label={t("Foto Asri di dapur — 1200 × 900 px", "Photo of Asri in the kitchen — 1200 × 900 px")}
                 className="rounded-xl border-0"
               />
               <div className="px-3 pb-3 pt-5">
@@ -65,8 +65,8 @@ export function Tentang() {
                 <h3 className="mt-0.5 text-[24px] font-semibold">{profil.pemilik}</h3>
                 <p className="mt-2 text-[14px] leading-relaxed text-ink-muted">
                   {t(
-                    `Memulai usaha dari dapur rumah pada ${profil.berdiri} dan sampai kini masih mengawasi langsung proses masak setiap hari.`,
-                    `Started the business from her home kitchen in ${profil.berdiri} and still oversees the cooking every day.`,
+                    `Membuka warung nasi rames pada ${profil.berdiri} dan kini merintis paket katering dari dapur yang sama. Pesanan katering diterima setiap hari.`,
+                    `Opened a nasi rames stall on ${profil.berdiri} and is now starting catering packages from the same kitchen. Catering orders are taken every day.`,
                   )}
                 </p>
               </div>

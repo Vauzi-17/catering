@@ -6,44 +6,33 @@ import { profil } from "@/data/profil";
  */
 export const profilEn: typeof profil = {
   ...profil,
+  berdiri: "28 August 2026",
   tagline: "Rice box & bento catering for every occasion",
   deskripsiSingkat:
-    "Asri Catering serves rice boxes, bento, tumpeng, and snack boxes for office events, schools, religious gatherings, and family occasions. Everything is cooked in our own kitchen on the day of delivery.",
+    "Asri Catering takes orders for rice boxes, bento, mini tumpeng, and snack boxes for office events, schools, religious gatherings, and family occasions. Everything is cooked in our own kitchen on the day of delivery.",
   sejarah: [
     {
-      tahun: "2016",
-      judul: "Started in a home kitchen",
-      isi: "Ibu Asri began taking orders for mixed rice plates from neighbours and the nearby village office. On an average day she cooked 20 to 30 boxes herself with one kitchen helper.",
+      tahun: "Aug 2026",
+      judul: "Opening a rice stall",
+      isi: "On 28 August 2026 Asri opened a nasi rames (mixed rice) stall in Jambusari, Jeruklegi. The stall is still open today for walk-in customers.",
     },
     {
-      tahun: "2019",
-      judul: "Serving office orders",
-      isi: "Orders started coming in from government offices and schools. The kitchen was expanded, more serving equipment was added, and the team grew to four people.",
-    },
-    {
-      tahun: "2022",
-      judul: "Adding tumpeng & buffet service",
-      isi: "Demand for thanksgiving events and weddings grew. Asri Catering began offering complete tumpeng packages and buffet service with serving staff.",
-    },
-    {
-      tahun: "2025",
-      judul: "Digital order records",
-      isi: "Orders that used to be written in a notebook moved to a digital system, complete with cost-of-goods calculations and daily revenue reports.",
+      tahun: "Now",
+      judul: "Starting catering packages",
+      isi: "From the same kitchen, Asri has started taking catering orders for events: rice boxes, bento, mini tumpeng, and snack boxes. The menu is still small because the service is new, and it will grow as orders come in.",
     },
   ],
   alamat: "Jl. Nata Bangsa RT 01 RW 10, Jambusari Village, Jeruklegi District, Cilacap Regency, Central Java",
   jamOperasional: [
-    { hari: "Monday - Friday", jam: "07.00 - 18.00" },
-    { hari: "Saturday", jam: "07.00 - 16.00" },
-    { hari: "Sunday", jam: "08.00 - 14.00" },
-    { hari: "Public holidays", jam: "By appointment" },
+    { hari: "Every day", jam: "07.00 - 18.00" },
+    { hari: "Catering orders", jam: "At least 2 days ahead" },
   ],
   areaLayanan: ["Jeruklegi and surroundings", "Cilacap city", "Cilacap Regency"],
   statistik: [
-    { angka: "9", label: "Years of service" },
-    { angka: "1,200+", label: "Events served" },
-    { angka: "150", label: "Boxes per day" },
-    { angka: "4.8", label: "Average rating" },
+    { angka: "2026", label: "Rice stall open since 28 August" },
+    { angka: "6", label: "Catering packages" },
+    { angka: "7 days", label: "Orders taken every day" },
+    { angka: "2 days", label: "Minimum order notice" },
   ],
   keunggulan: [
     { judul: "Cooked the same day", isi: "Prepared in the early hours before delivery, never yesterday's stock." },
@@ -51,23 +40,7 @@ export const profilEn: typeof profil = {
     { judul: "Taste first", isi: "Orders above 100 portions can request a free tasting portion." },
     { judul: "Every order tracked", isi: "Each order has a code so you can follow its status." },
   ],
-  testimoni: [
-    {
-      nama: "Rina Kusumawati",
-      peran: "General Affairs, Education Office",
-      isi: "We have ordered rice boxes for our monthly meetings for three years. Always on time and the taste is consistent. The office event package is the participants' favourite.",
-    },
-    {
-      nama: "Bapak Hendra",
-      peran: "Community Thanksgiving Committee",
-      isi: "We ordered a 150-portion buffet only two days ahead and were still served well. The serving staff were neat and quick to clean up after the event.",
-    },
-    {
-      nama: "Dewi Anggraeni",
-      peran: "Individual customer",
-      isi: "The mini tumpeng looks lovely and the portion is just right for a small family. Plenty of side dishes, and it tastes like home cooking rather than mass catering.",
-    },
-  ],
+  testimoni: [],
   langkahPesan: [
     {
       judul: "Choose a menu",
@@ -76,8 +49,8 @@ export const profilEn: typeof profil = {
     },
     {
       judul: "Set date & location",
-      ringkas: "Sign in, pick a date, pin the location.",
-      isi: "Sign in to your account, choose the event date and time, then pin the delivery location on the map.",
+      ringkas: "Sign in, pick a date (2+ days ahead), pin the location.",
+      isi: "Sign in to your account, choose an event date at least two days from today and the time, then pin the delivery location on the map.",
     },
     {
       judul: "Pay online",
@@ -99,7 +72,7 @@ export const profilEn: typeof profil = {
     {
       tanya: "How far in advance should I order?",
       jawab:
-        "For orders under 100 portions we accept orders one day ahead. For more than 100 portions, please order at least three days before the event.",
+        "At least two days before the event (H-2). Orders for today or tomorrow cannot be placed. We take orders every day, and large orders are best placed earlier.",
     },
     {
       tanya: "Is there a delivery fee?",

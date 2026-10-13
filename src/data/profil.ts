@@ -1,30 +1,20 @@
 export const profil = {
   nama: "Asri Catering",
   tagline: "Katering nasi kotak & bento untuk setiap acara",
-  pemilik: "Ibu Asri Wulandari",
-  berdiri: 2016,
+  pemilik: "Asri",
+  berdiri: "28 Agustus 2026",
   deskripsiSingkat:
-    "Asri Catering melayani nasi kotak, bento, tumpeng, dan snack box untuk acara kantor, sekolah, pengajian, dan keluarga. Semua masakan diolah pada hari pengantaran di dapur sendiri.",
+    "Asri Catering menerima pesanan nasi kotak, bento, tumpeng mini, dan snack box untuk acara kantor, sekolah, pengajian, dan keluarga. Semua masakan diolah pada hari pengantaran di dapur sendiri.",
   sejarah: [
     {
-      tahun: "2016",
-      judul: "Berawal dari dapur rumah",
-      isi: "Ibu Asri mulai menerima pesanan nasi rames dari tetangga dan kantor kelurahan sekitar. Dalam sehari rata-rata hanya 20 sampai 30 box yang dimasak sendiri bersama satu orang pembantu dapur.",
+      tahun: "Agt 2026",
+      judul: "Membuka warung nasi rames",
+      isi: "Pada 28 Agustus 2026 Asri membuka warung nasi rames di Jambusari, Jeruklegi. Sampai sekarang warung ini tetap buka untuk pembeli yang datang langsung.",
     },
     {
-      tahun: "2019",
-      judul: "Melayani pesanan kantor",
-      isi: "Pesanan mulai datang dari instansi dan sekolah. Dapur diperluas, peralatan prasmanan ditambah, dan jumlah pegawai bertambah menjadi empat orang.",
-    },
-    {
-      tahun: "2022",
-      judul: "Menambah layanan tumpeng & prasmanan",
-      isi: "Permintaan acara syukuran dan pernikahan meningkat. Asri Catering mulai menyediakan paket tumpeng lengkap dan layanan prasmanan dengan petugas penyaji.",
-    },
-    {
-      tahun: "2025",
-      judul: "Pencatatan pesanan digital",
-      isi: "Pencatatan pesanan yang semula ditulis di buku tulis dipindahkan ke sistem digital, lengkap dengan perhitungan harga pokok produksi dan laporan pendapatan harian.",
+      tahun: "Kini",
+      judul: "Merintis paket katering",
+      isi: "Dari dapur yang sama, Asri mulai menerima pesanan katering untuk acara: nasi kotak, bento, tumpeng mini, dan snack box. Pilihan menunya masih sedikit karena baru dirintis, dan akan bertambah seiring pesanan yang masuk.",
     },
   ],
   alamat: "Jl. Nata Bangsa RT 01 RW 10, Desa Jambusari, Kecamatan Jeruklegi, Kabupaten Cilacap, Jawa Tengah",
@@ -34,10 +24,8 @@ export const profil = {
   email: "halo@asricatering.id",
   instagram: "@asricatering.id",
   jamOperasional: [
-    { hari: "Senin - Jumat", jam: "07.00 - 18.00" },
-    { hari: "Sabtu", jam: "07.00 - 16.00" },
-    { hari: "Minggu", jam: "08.00 - 14.00" },
-    { hari: "Hari Besar", jam: "Dengan perjanjian" },
+    { hari: "Setiap hari", jam: "07.00 - 18.00" },
+    { hari: "Pesanan katering", jam: "Paling lambat H-2" },
   ],
   areaLayanan: [
     "Jeruklegi dan sekitarnya",
@@ -45,10 +33,10 @@ export const profil = {
     "Kabupaten Cilacap",
   ],
   statistik: [
-    { angka: "9", label: "Tahun melayani" },
-    { angka: "1.200+", label: "Acara tertangani" },
-    { angka: "150", label: "Box per hari" },
-    { angka: "4,8", label: "Rata-rata ulasan" },
+    { angka: "2026", label: "Warung rames buka sejak 28 Agustus" },
+    { angka: "6", label: "Paket katering" },
+    { angka: "7 hari", label: "Terima pesanan setiap hari" },
+    { angka: "H-2", label: "Batas paling lambat memesan" },
   ],
   keunggulan: [
     {
@@ -68,23 +56,9 @@ export const profil = {
       isi: "Tiap pesanan punya kode untuk memantau statusnya.",
     },
   ],
-  testimoni: [
-    {
-      nama: "Rina Kusumawati",
-      peran: "Staf Umum, Dinas Pendidikan",
-      isi: "Sudah tiga tahun kami pesan nasi box untuk rapat bulanan. Datang selalu tepat waktu dan rasanya konsisten. Paket nasi kotak acara kantornya paling disukai peserta.",
-    },
-    {
-      nama: "Bapak Hendra",
-      peran: "Panitia Syukuran Warga",
-      isi: "Pesan prasmanan 150 porsi dadakan H-2, masih dilayani dengan baik. Petugas penyajinya rapi dan sigap membereskan setelah acara.",
-    },
-    {
-      nama: "Dewi Anggraeni",
-      peran: "Pelanggan Perorangan",
-      isi: "Tumpeng mininya cantik dan porsinya pas untuk keluarga kecil. Lauknya lengkap, bumbunya terasa masakan rumah bukan katering pabrikan.",
-    },
-  ],
+  // Usaha katering baru dirintis, belum ada ulasan pelanggan. Isi dengan
+  // ulasan asli (nama, peran, isi); seksi testimoni muncul begitu ada isinya.
+  testimoni: [] as { nama: string; peran: string; isi: string }[],
   langkahPesan: [
     {
       judul: "Pilih menu",
@@ -93,8 +67,8 @@ export const profil = {
     },
     {
       judul: "Isi jadwal & lokasi",
-      ringkas: "Masuk, pilih tanggal, tandai lokasi.",
-      isi: "Masuk ke akun Anda, pilih tanggal dan jam acara, lalu tandai lokasi pengantaran di peta.",
+      ringkas: "Masuk, pilih tanggal (min. H-2), tandai lokasi.",
+      isi: "Masuk ke akun Anda, pilih tanggal acara paling cepat lusa (H-2) beserta jamnya, lalu tandai lokasi pengantaran di peta.",
     },
     {
       judul: "Bayar online",
@@ -116,7 +90,7 @@ export const profil = {
     {
       tanya: "Berapa hari sebelumnya pesanan harus dibuat?",
       jawab:
-        "Untuk pesanan di bawah 100 porsi kami menerima pesanan H-1. Untuk pesanan di atas 100 porsi, sebaiknya dipesan minimal tiga hari sebelum acara.",
+        "Paling lambat H-2, artinya dua hari sebelum acara. Pesanan untuk hari ini dan besok tidak bisa dibuat. Pesanan diterima setiap hari, dan untuk jumlah besar sebaiknya dipesan lebih awal.",
     },
     {
       tanya: "Apakah ada biaya antar?",

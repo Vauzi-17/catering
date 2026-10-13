@@ -23,7 +23,7 @@ import { fotoMenu as foto } from "@/lib/foto";
 
 const pitaPromo: [string, string][] = [
   ["Ongkir gratis dalam area layanan", "Free delivery within our service area"],
-  ["Bisa pesan H-1 untuk di bawah 100 porsi", "Order one day ahead for under 100 portions"],
+  ["Pesan paling lambat H-2 sebelum acara", "Order at least 2 days before your event"],
   ["Porsi cicip gratis untuk pesanan 100+ porsi", "Free tasting portion for orders of 100+"],
   ["Dimasak pagi di hari pengantaran", "Cooked on the morning of delivery"],
   ["Isi paket bisa disesuaikan", "Package contents can be customised"],
@@ -56,8 +56,8 @@ export function Beranda() {
             </h1>
             <p className="mt-5 max-w-md text-[16px] leading-relaxed text-white/85 sm:text-[17px]">
               {t(
-                "Dimasak pagi di hari pengantaran, dari dapur Ibu Asri di Jeruklegi, Cilacap.",
-                "Cooked on the morning of delivery in Ibu Asri's kitchen in Jeruklegi, Cilacap.",
+                "Dimasak pagi di hari pengantaran, dari dapur Asri di Jeruklegi, Cilacap.",
+                "Cooked on the morning of delivery in Asri's kitchen in Jeruklegi, Cilacap.",
               )}
             </p>
 
@@ -129,10 +129,10 @@ export function Beranda() {
         </ul>
       </section>
 
-      {/* Menu paling laris */}
+      {/* Menu pilihan */}
       <section className="container-page py-16 sm:py-20">
         <SectionHeading
-          judul={t("Paling Laris", "Best Sellers")}
+          judul={t("Menu Pilihan", "Featured Menu")}
           aksi={
             <Link
               href="/menu"
@@ -160,7 +160,7 @@ export function Beranda() {
       <section className="bg-zamrud-800 text-white">
         <div className="container-page grid gap-8 py-12 sm:py-14 lg:grid-cols-[1fr_2fr] lg:items-center">
           <h2 className="text-[28px] font-semibold leading-tight sm:text-[34px]">
-            {t("Dipercaya sejak", "Trusted since")} {profil.berdiri}
+            {t("Dari warung rames ke katering", "From a rice stall to catering")}
           </h2>
           <dl className="grid grid-cols-2 gap-6 sm:grid-cols-4">
             {profil.statistik.map((s) => (
@@ -183,7 +183,7 @@ export function Beranda() {
         <div>
           <SectionHeading
             judul={t("Cara Pesan", "How to Order")}
-            deskripsi={t("Kurang dari 100 porsi bisa dipesan H-1.", "Under 100 portions can be ordered one day ahead.")}
+            deskripsi={t("Pesanan diterima setiap hari, paling lambat H-2 sebelum acara.", "We take orders every day, at least 2 days before your event.")}
           />
 
           <ol className="mt-9 grid gap-4 sm:grid-cols-2">
@@ -215,18 +215,20 @@ export function Beranda() {
         <HitungCepat />
       </section>
 
-      {/* Testimoni */}
-      <section className="border-t border-kabut-line bg-white py-16 sm:py-20">
-        <div className="container-page">
-          <SectionHeading judul={t("Kata Pelanggan", "What Customers Say")} />
-          <div className="mt-9">
-            <DaftarTestimoni />
+      {/* Testimoni — tampil hanya bila sudah ada ulasan asli */}
+      {profil.testimoni.length > 0 && (
+        <section className="border-t border-kabut-line bg-white py-16 sm:py-20">
+          <div className="container-page">
+            <SectionHeading judul={t("Kata Pelanggan", "What Customers Say")} />
+            <div className="mt-9">
+              <DaftarTestimoni />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Ajakan dengan kolase foto */}
-      <section className="bg-white pb-16 sm:pb-20">
+      <section className={`pb-16 sm:pb-20 ${profil.testimoni.length > 0 ? "bg-white" : ""}`}>
         <div className="container-page">
           <div className="relative grid items-center gap-10 overflow-hidden rounded-3xl bg-zamrud-800 px-6 py-10 text-white sm:px-10 lg:grid-cols-[1.2fr_1fr] lg:py-14">
             <div>
