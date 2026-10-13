@@ -16,6 +16,7 @@ import { HitungCepat } from "@/components/beranda/HitungCepat";
 import { MenuLaris } from "@/components/beranda/MenuLaris";
 import { PilihAcara } from "@/components/beranda/PilihAcara";
 import { KartuFavorit, RingkasMenu, StikerHarga } from "@/components/beranda/SorotanHero";
+import { ParalaksHero } from "@/components/efek/ParalaksHero";
 import { IconWhatsapp } from "@/components/Icons";
 import { FotoMenu } from "@/components/Placeholder";
 import { SectionHeading } from "@/components/Ui";
@@ -35,6 +36,17 @@ const pitaPromo: [string, string][] = [
 
 const ikonLangkah = [ShoppingBag, ClipboardList, Ticket, Truck];
 
+// Kedalaman lapisan paralaks hero: makin besar angkanya, makin jauh bergeser
+// mengikuti kursor (lihat ParalaksHero).
+const halus = "transition-[translate] duration-500 ease-out";
+const lapis = {
+  latar: `[translate:calc(var(--px,0)*-12px)_calc(var(--py,0)*-12px)] ${halus}`,
+  cincin: `[translate:calc(var(--px,0)*8px)_calc(var(--py,0)*8px)] ${halus}`,
+  piring: `[translate:calc(var(--px,0)*14px)_calc(var(--py,0)*14px)] ${halus}`,
+  dekat: `[translate:calc(var(--px,0)*24px)_calc(var(--py,0)*24px)] ${halus}`,
+  terdekat: `[translate:calc(var(--px,0)*34px)_calc(var(--py,0)*34px)] ${halus}`,
+};
+
 export function Beranda() {
   const profil = useProfil();
   const { bahasa, t } = useBahasa();
@@ -51,10 +63,36 @@ export function Beranda() {
     <>
       {/* Hero */}
       <section className="relative overflow-hidden rounded-b-[50%_56px] bg-gradient-to-br from-jingga-700 via-jingga-600 to-jingga-400 text-white sm:rounded-b-[50%_88px]">
-        <div className="container-page grid items-center gap-16 pb-24 pt-12 sm:pb-28 lg:grid-cols-[1fr_1.1fr] lg:gap-8 lg:pb-32 lg:pt-16">
+        <span
+          className="hero-gumpal pointer-events-none absolute -left-24 top-8 h-72 w-72 rounded-full bg-jingga-300/40 blur-3xl"
+          aria-hidden="true"
+        />
+        <span
+          className="hero-gumpal pointer-events-none absolute -right-24 bottom-0 h-[26rem] w-[26rem] rounded-full bg-amber-200/30 blur-3xl [animation-delay:-7s]"
+          aria-hidden="true"
+        />
+        <div className="container-page relative grid items-center gap-16 pb-24 pt-12 sm:pb-28 lg:grid-cols-[1fr_1.1fr] lg:gap-8 lg:pb-32 lg:pt-16">
           <div>
             <h1 className="text-[42px] font-medium leading-[1.03] sm:text-[58px] lg:text-[66px]">
-              {t("Nasi Kotak & Bento untuk Setiap Acara", "Rice Boxes & Bento for Every Occasion")}
+              {t("Nasi Kotak & Bento untuk ", "Rice Boxes & Bento for ")}
+              <span className="relative inline-block whitespace-nowrap">
+                {t("Setiap Acara", "Every Occasion")}
+                <svg
+                  className="hero-coret absolute -bottom-3 left-0 h-3 w-full text-jingga-200 sm:-bottom-5 sm:h-4"
+                  viewBox="0 0 300 20"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M4 14 C 70 4, 160 3, 296 9"
+                    pathLength={1}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
             </h1>
             <p className="mt-5 max-w-md text-[16px] leading-relaxed text-white/85 sm:text-[17px]">
               {t(
@@ -68,7 +106,7 @@ export function Beranda() {
             </div>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link href="/menu" className="tombol tombol-lg bg-white text-jingga-800 hover:bg-jingga-50">
+              <Link href="/menu" className="tombol tombol-lg tombol-kilap bg-white text-jingga-800 hover:bg-jingga-50">
                 {t("Lihat Menu", "View Menu")}
                 <ArrowRight size={18} />
               </Link>
@@ -81,19 +119,19 @@ export function Beranda() {
             </div>
           </div>
 
-          <div className="relative mx-auto mt-4 w-full max-w-[320px] sm:max-w-[440px] lg:mt-0 lg:max-w-[520px]">
+          <ParalaksHero className="relative mx-auto mt-4 w-full max-w-[320px] sm:max-w-[440px] lg:mt-0 lg:max-w-[520px]">
             {/* Cahaya hangat di belakang piring */}
             <span
-              className="hero-denyut pointer-events-none absolute -inset-10 rounded-full bg-[radial-gradient(circle,rgba(255,236,200,0.75)_0%,rgba(255,214,150,0.35)_40%,transparent_70%)] blur-2xl"
+              className={`hero-denyut pointer-events-none absolute -inset-10 rounded-full bg-[radial-gradient(circle,rgba(255,236,200,0.75)_0%,rgba(255,214,150,0.35)_40%,transparent_70%)] blur-2xl ${lapis.latar}`}
               aria-hidden="true"
             />
             {/* Cincin putus-putus yang berputar pelan */}
-            <span
-              className="hero-putar pointer-events-none absolute -inset-3 rounded-full border-2 border-dashed border-white/45 sm:-inset-5"
-              aria-hidden="true"
-            />
+            <span className={`pointer-events-none absolute -inset-3 sm:-inset-5 ${lapis.cincin}`} aria-hidden="true">
+              <span className="hero-putar block h-full w-full rounded-full border-2 border-dashed border-white/45" />
+            </span>
 
             {/* Piring utama */}
+            <div className={`relative ${lapis.piring}`}>
             <div className="hero-muncul group relative rounded-full bg-white/25 p-3 shadow-[0_45px_90px_-30px_rgba(80,30,0,0.75)] ring-1 ring-white/40 backdrop-blur-sm sm:p-4">
               <div className="overflow-hidden rounded-full ring-4 ring-white/70">
                 {fotoUtama ? (
@@ -109,28 +147,36 @@ export function Beranda() {
               </div>
             </div>
 
+            {/* Uap hangat yang naik dari piring */}
+            <span className="pointer-events-none absolute -top-[4%] left-1/2 flex -translate-x-1/2 gap-6" aria-hidden="true">
+              <span className="hero-uap block h-20 w-6 rounded-full bg-white blur-lg" />
+              <span className="hero-uap block h-24 w-7 rounded-full bg-white blur-lg [animation-delay:1.5s]" />
+              <span className="hero-uap block h-16 w-6 rounded-full bg-white blur-lg [animation-delay:3s]" />
+            </span>
+            </div>
+
             {/* Kilau kecil */}
             <Sparkles
-              className="hero-kerlip absolute -left-2 top-[18%] h-6 w-6 text-jingga-100 sm:h-7 sm:w-7"
+              className={`hero-kerlip absolute -left-2 top-[18%] h-6 w-6 text-jingga-100 sm:h-7 sm:w-7 ${lapis.terdekat}`}
               aria-hidden="true"
             />
             <Sparkles
-              className="hero-kerlip absolute right-[8%] top-[46%] h-5 w-5 text-white [animation-delay:1.1s]"
+              className={`hero-kerlip absolute right-[8%] top-[46%] h-5 w-5 text-white [animation-delay:1.1s] ${lapis.terdekat}`}
               aria-hidden="true"
             />
             <Sparkles
-              className="hero-kerlip absolute bottom-[22%] left-[30%] h-4 w-4 text-jingga-100 [animation-delay:2s]"
+              className={`hero-kerlip absolute bottom-[22%] left-[30%] h-4 w-4 text-jingga-100 [animation-delay:2s] ${lapis.terdekat}`}
               aria-hidden="true"
             />
 
             {/* Stiker harga */}
-            <div className="hero-muncul absolute -left-3 -top-3 [animation-delay:0.25s] sm:-left-6 sm:-top-2">
+            <div className={`hero-muncul absolute -left-3 -top-3 [animation-delay:0.25s] sm:-left-6 sm:-top-2 ${lapis.dekat}`}>
               <StikerHarga />
             </div>
 
             {/* Foto kecil yang mengapung di sekitar piring */}
             {fotoOrbit[0] && (
-              <span className="hero-muncul absolute -right-2 top-0 [animation-delay:0.35s] sm:-right-8 sm:top-2">
+              <span className={`hero-muncul absolute -right-2 top-0 [animation-delay:0.35s] sm:-right-8 sm:top-2 ${lapis.terdekat}`}>
                 <span className="hero-apung block h-24 w-24 overflow-hidden rounded-full border-4 border-white shadow-[0_18px_36px_-14px_rgba(80,30,0,0.7)] sm:h-32 sm:w-32">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={fotoOrbit[0]} alt="" className="h-full w-full object-cover" />
@@ -138,7 +184,7 @@ export function Beranda() {
               </span>
             )}
             {fotoOrbit[1] && (
-              <span className="hero-muncul absolute -right-1 bottom-[18%] [animation-delay:0.5s] sm:-right-10">
+              <span className={`hero-muncul absolute -right-1 bottom-[18%] [animation-delay:0.5s] sm:-right-10 ${lapis.dekat}`}>
                 <span className="hero-apung block h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-[0_18px_36px_-14px_rgba(80,30,0,0.7)] [animation-delay:1.5s] sm:h-28 sm:w-28">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={fotoOrbit[1]} alt="" className="h-full w-full object-cover" />
@@ -147,7 +193,7 @@ export function Beranda() {
             )}
 
             {/* Label segar */}
-            <span className="hero-muncul absolute -left-8 top-[52%] hidden [animation-delay:0.6s] sm:block">
+            <span className={`hero-muncul absolute -left-8 top-[52%] hidden [animation-delay:0.6s] sm:block ${lapis.dekat}`}>
               <span className="hero-apung flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-[13px] font-semibold text-ink shadow-[0_14px_30px_-14px_rgba(80,30,0,0.6)] [animation-delay:0.8s]">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-jingga-100 text-jingga-600">
                   <Flame size={14} strokeWidth={2.2} />
@@ -156,10 +202,10 @@ export function Beranda() {
               </span>
             </span>
 
-            <div className="hero-muncul absolute -bottom-6 left-1 max-w-[calc(100%-1rem)] [animation-delay:0.7s] sm:-left-6">
+            <div className={`hero-muncul absolute -bottom-6 left-1 max-w-[calc(100%-1rem)] [animation-delay:0.7s] sm:-left-6 ${lapis.dekat}`}>
               <KartuFavorit />
             </div>
-          </div>
+          </ParalaksHero>
         </div>
       </section>
 
@@ -216,8 +262,13 @@ export function Beranda() {
             {t("Dari warung rames ke katering", "From a rice stall to catering")}
           </h2>
           <dl className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-            {profil.statistik.map((s) => (
-              <div key={s.label} className="border-l border-white/20 pl-4">
+            {profil.statistik.map((s, i) => (
+              <div
+                key={s.label}
+                data-muncul
+                style={{ "--tunda": `${i * 120}ms` } as React.CSSProperties}
+                className="border-l border-white/20 pl-4"
+              >
                 <dt className="sr-only">{s.label}</dt>
                 <dd>
                   <span className="block text-[32px] font-bold leading-none tabular-nums text-jingga-300 sm:text-[38px]">
@@ -243,7 +294,12 @@ export function Beranda() {
             {profil.langkahPesan.map((langkah, i) => {
               const Ikon = ikonLangkah[i % ikonLangkah.length];
               return (
-                <li key={langkah.judul} className="rounded-2xl bg-white p-5 sm:p-6">
+                <li
+                  key={langkah.judul}
+                  data-muncul
+                  style={{ "--tunda": `${i * 110}ms` } as React.CSSProperties}
+                  className="rounded-2xl bg-white p-5 transition-shadow duration-300 hover:shadow-[0_22px_44px_-26px_rgba(94,49,16,0.45)] sm:p-6"
+                >
                   <div className="flex items-center justify-between">
                     <span className="flex h-11 w-11 items-center justify-center rounded-full bg-jingga-50 text-jingga-600">
                       <Ikon size={20} strokeWidth={1.8} />
@@ -265,7 +321,9 @@ export function Beranda() {
           </ol>
         </div>
 
-        <HitungCepat />
+        <div data-muncul style={{ "--tunda": "150ms" } as React.CSSProperties}>
+          <HitungCepat />
+        </div>
       </section>
 
       {/* Testimoni — tampil hanya bila sudah ada ulasan asli */}
@@ -283,7 +341,7 @@ export function Beranda() {
       {/* Ajakan dengan kolase foto */}
       <section className={`pb-16 sm:pb-20 ${profil.testimoni.length > 0 ? "bg-white" : ""}`}>
         <div className="container-page">
-          <div className="relative grid items-center gap-10 overflow-hidden rounded-3xl bg-zamrud-800 px-6 py-10 text-white sm:px-10 lg:grid-cols-[1.2fr_1fr] lg:py-14">
+          <div data-muncul className="relative grid items-center gap-10 overflow-hidden rounded-3xl bg-zamrud-800 px-6 py-10 text-white sm:px-10 lg:grid-cols-[1.2fr_1fr] lg:py-14">
             <div>
               <h2 className="text-[30px] font-semibold leading-tight sm:text-[40px]">
                 {t("Punya acara dalam waktu dekat?", "Have an event coming up?")}
@@ -295,7 +353,7 @@ export function Beranda() {
                 )}
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                <Link href="/menu" className="tombol tombol-lg bg-jingga-500 text-white hover:bg-jingga-600">
+                <Link href="/menu" className="tombol tombol-lg tombol-kilap bg-jingga-500 text-white hover:bg-jingga-600">
                   {t("Lihat Menu", "View Menu")}
                   <ArrowRight size={18} />
                 </Link>
@@ -316,16 +374,19 @@ export function Beranda() {
                 src ? (
                   <span
                     key={src}
-                    className={`absolute w-40 overflow-hidden rounded-2xl border-4 border-white shadow-xl lg:w-44 ${
-                      [
-                        "left-[4%] top-6 -rotate-6",
-                        "left-[34%] top-0 z-10 rotate-2",
-                        "left-[62%] top-10 rotate-6",
-                      ][i]
+                    className={`hero-apung absolute w-40 lg:w-44 ${
+                      ["left-[4%] top-6", "left-[34%] top-0 z-10", "left-[62%] top-10"][i]
                     }`}
+                    style={{ animationDelay: `${i * -2}s` }}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt="" className="aspect-square w-full object-cover" />
+                    <span
+                      className={`block overflow-hidden rounded-2xl border-4 border-white shadow-xl transition-transform duration-500 hover:scale-105 ${
+                        ["-rotate-6", "rotate-2", "rotate-6"][i]
+                      }`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={src} alt="" className="aspect-square w-full object-cover" />
+                    </span>
                   </span>
                 ) : null,
               )}
