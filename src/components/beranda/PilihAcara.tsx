@@ -26,11 +26,13 @@ export function PilihAcara() {
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-      {ubin.map(({ judul, menu }) => (
+      {ubin.map(({ judul, menu }, i) => (
         <Link
           key={judul[0]}
           href={`/menu/${menu!.slug}`}
-          className="group relative block overflow-hidden rounded-2xl"
+          data-muncul
+          style={{ "--tunda": `${i * 100}ms` } as React.CSSProperties}
+          className="group relative block overflow-hidden rounded-2xl shadow-[0_18px_40px_-28px_rgba(94,49,16,0.6)]"
         >
           <FotoMenu
             src={menu!.foto}

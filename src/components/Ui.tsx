@@ -18,6 +18,7 @@ export function SectionHeading({
   const tengah = align === "center";
   return (
     <div
+      data-muncul
       className={`flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between ${
         tengah ? "sm:flex-col sm:items-center" : ""
       }`}

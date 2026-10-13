@@ -25,14 +25,16 @@ export function MenuCard({ menu }: { menu: Menu }) {
   }
 
   return (
-    <article className="flex flex-col rounded-2xl border border-kabut-line bg-white p-3 shadow-lembut transition-colors hover:border-jingga-200">
+    <article className="group/kartu flex flex-col rounded-2xl border border-kabut-line bg-white p-3 shadow-lembut transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1.5 hover:border-jingga-200 hover:shadow-[0_26px_50px_-28px_rgba(94,49,16,0.5)]">
       <Link
         href={`/menu/${menu.slug}`}
         className="relative block overflow-hidden rounded-xl"
         tabIndex={-1}
         aria-hidden="true"
       >
-        <FotoMenu src={menu.foto} nama={teks.nama} rasio="aspect-[4/3]" className="rounded-xl" />
+        <div className="transition-transform duration-700 ease-out group-hover/kartu:scale-[1.06]">
+          <FotoMenu src={menu.foto} nama={teks.nama} rasio="aspect-[4/3]" className="rounded-xl" />
+        </div>
         {menu.populer && menu.tersedia && (
           <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-jingga-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm">
             <Flame size={12} strokeWidth={2.2} />

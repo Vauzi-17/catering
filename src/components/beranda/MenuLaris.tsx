@@ -17,8 +17,15 @@ export function MenuLaris({ jumlah = 4 }: { jumlah?: number }) {
 
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-      {tampil.map((menu) => (
-        <MenuCard key={menu.id} menu={menu} />
+      {tampil.map((menu, i) => (
+        <div
+          key={menu.id}
+          data-muncul
+          style={{ "--tunda": `${i * 100}ms` } as React.CSSProperties}
+          className="flex [&>article]:w-full"
+        >
+          <MenuCard menu={menu} />
+        </div>
       ))}
     </div>
   );
