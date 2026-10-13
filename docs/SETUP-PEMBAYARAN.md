@@ -1,4 +1,4 @@
-# Menyiapkan Akun Pelanggan & Pembayaran Midtrans
+# Menyiapkan Akun Pelanggan & Pembayaran QRIS
 
 Panduan ini melanjutkan [`SETUP-BACKEND.md`](SETUP-BACKEND.md). Kerjakan
 **setelah** project Supabase dibuat dan `01-schema.sql` serta `03-seed.sql`
@@ -9,10 +9,12 @@ Setelah bagian ini selesai:
 - Pelanggan wajib **daftar & verifikasi email** sebelum memesan.
 - Alamat pengantaran dipilih lewat **peta**; pengantaran gratis di dalam radius
   layanan, di luar radius pesanan ditolak.
-- Pembayaran **lunas di muka lewat Midtrans Snap** (VA bank, QRIS, e-wallet,
-  dan lainnya). Tidak ada konfirmasi manual: begitu Midtrans mengabarkan dana
-  masuk, status pesanan berubah sendiri menjadi **Dibayar**.
-- Setiap notifikasi transaksi tercatat di **Panel Admin → Transaksi**.
+- Pembayaran **lunas di muka dengan QRIS milik usaha sendiri**, tanpa payment
+  gateway. Setiap pesanan mendapat QR bernominal unik (total + kode unik
+  Rp 1–999), jadi pelanggan tidak perlu mengetik nominal.
+- Konfirmasi pembayaran **otomatis** lewat notifikasi di HP Android pemilik
+  yang diteruskan ke website, dengan **konfirmasi manual** oleh admin sebagai
+  cadangan.
 - Pelanggan memantau pesanannya di **Pesanan Saya**:
   Menunggu Pembayaran → Dibayar → Diproses → Dikirim → Selesai.
 
@@ -30,6 +32,7 @@ Setelah bagian ini selesai:
 | 2 | `03-seed.sql` | Sudah dari tahap sebelumnya |
 | 3 | **`06-akun-pembayaran.sql`** | Akun pelanggan, pembayaran, RLS produksi |
 | 4 | **`07-foto-menu.sql`** | Bucket Storage `menu` untuk unggah foto dari panel admin |
+| 5 | **`09-qris.sql`** | QRIS toko, nominal unik, log notifikasi, tagihan kedaluwarsa |
 | opsional | `08-contoh-pesanan-lunas.sql` | 5 pesanan lunas (kode `ASR-UJI-`) untuk menguji laporan, margin, dan catatan AI |
 | opsional | `05-contoh-pesanan.sql` | 23 pesanan contoh versi lama (kode `ASR-DEMO-`) |
 
@@ -113,67 +116,131 @@ dipakai **hanya di server** (`src/lib/supabase-server.ts`, berkas itu
 mengimpor `server-only`) untuk:
 
 - menyimpan pesanan setelah harga dihitung ulang di server, dan
-- menerima notifikasi Midtrans yang tidak membawa sesi pengguna.
+- menerima notifikasi pembayaran dari HP pemilik yang tidak membawa sesi
+  pengguna.
 
 Kunci ini melewati seluruh RLS. **Jangan pernah** memberinya awalan
 `NEXT_PUBLIC_`, dan jangan menempelnya di kode.
 
 ---
 
-## 2. Midtrans
+## 2. QRIS
 
-### 2.1 Akun sandbox (gratis, untuk uji coba)
+### 2.1 Siapkan QRIS milik usaha
 
-1. Daftar di <https://dashboard.midtrans.com>, lalu pindah ke lingkungan
-   **Sandbox** (sakelar di pojok dashboard).
-2. **Settings → Access Keys**, salin:
-   - **Server Key** → `MIDTRANS_SERVER_KEY` (rahasia, server saja)
-   - **Client Key** → `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` (boleh terbaca peramban)
+QRIS harus **atas nama usaha atau pemiliknya**, karena dana masuk ke rekening
+pemilik QRIS. Pilihan yang umum untuk UMKM:
 
-   Akun sandbox lama memakai kunci berawalan `SB-Mid-...`, akun sandbox baru
-   berawalan `Mid-...` seperti kunci produksi. Karena itu aplikasi **tidak**
-   menebak dari awalan: selama `MIDTRANS_IS_PRODUCTION` kosong atau `false`,
-   semua transaksi dikirim ke sandbox.
+- **GoBiz** (aplikasi GoPay Merchant) — daftar usaha di aplikasi GoBiz,
+  QRIS-nya bisa diunduh dari aplikasi.
+- **QRIS dari bank** tempat usaha punya rekening (mis. lewat aplikasi bisnis
+  bank tersebut).
 
-### 2.2 URL notifikasi (wajib)
+Syarat pendaftaran dan biaya per transaksi (MDR QRIS) ditentukan penyedia dan
+Bank Indonesia, dan bisa berubah — **perlu diverifikasi** langsung di aplikasi
+atau situs penyedia. Pilih penyedia yang **memunculkan notifikasi di HP
+setiap ada pembayaran masuk**; notifikasi itulah yang dibaca untuk konfirmasi
+otomatis.
 
-**Settings → Payment → Notification URL** (di beberapa versi dashboard:
-*Configuration*):
+### 2.2 Simpan QRIS di panel admin
 
-```
-https://catering-six-psi.vercel.app/api/midtrans/notifikasi/
-```
+1. Masuk sebagai admin, buka **Pembayaran QRIS**.
+2. Klik **Unggah gambar QR**, pilih foto atau tangkapan layar QRIS statis
+   (QR yang biasa ditempel di kasir, tanpa nominal).
+3. Pastikan tertulis *Terbaca: NAMA TOKO · QRIS statis*, lalu **Simpan QRIS ini**.
+4. Scan gambar **Contoh Rp 10.000** dengan aplikasi pembayaran di HP lain.
+   Bila nama toko dan nominal Rp 10.000 tampil, QRIS siap dipakai. Batalkan
+   saja, tidak perlu dibayar.
 
-**Garis miring di akhir wajib ada.** Situs ini memakai `trailingSlash`, jadi
-alamat tanpa garis miring dijawab dengan pengalihan 308, dan belum pasti
-Midtrans mengikuti pengalihan untuk permintaan POST.
+Selama QRIS belum disimpan, pelanggan tidak bisa membuat pesanan baru dan akan
+diminta menghubungi lewat WhatsApp.
 
-Finish / Unfinish / Error Redirect URL **tidak perlu diisi** — aplikasi sudah
-mengirimkannya pada setiap transaksi (`/pesanan/<kode>/`).
+**Cara kerja nominal otomatis.** QRIS statis berformat standar EMVCo. Server
+menyisipkan nominal (tag `54`), menandainya sebagai QR bernominal (tag `01` =
+`12`), membuang isian tip, lalu menghitung ulang kode pemeriksa CRC. Hasilnya
+dibaca aplikasi pembayar sebagai QR dengan nominal terisi. Ini **bukan QR
+dinamis resmi** dari penyedia QRIS; sebagian besar aplikasi menerimanya, tetapi
+uji dulu dengan beberapa aplikasi yang biasa dipakai pelanggan.
 
-### 2.3 Menguji pembayaran sandbox
+### 2.3 Konfirmasi otomatis dari HP (MacroDroid)
 
-1. Pesan di website, pilih metode (misalnya BCA Virtual Account).
-2. Buka simulator sandbox Midtrans (<https://simulator.sandbox.midtrans.com>),
-   pilih bank yang sama, tempel nomor VA, bayar.
-3. Dalam beberapa detik halaman pesanan berubah menjadi **Dibayar**, dan baris
-   transaksi muncul di **Panel Admin → Transaksi**.
+Butuh HP **Android** yang terpasang aplikasi GoBiz atau bank tadi. iPhone tidak
+bisa: iOS tidak mengizinkan aplikasi membaca notifikasi aplikasi lain.
 
-Tidak ada uang sungguhan yang berpindah di sandbox.
+**a. Buat token rahasia** — teks acak minimal 16 karakter, misalnya hasil
+`openssl rand -hex 24`. Isi di Vercel sebagai `QRIS_NOTIF_TOKEN`, lalu
+**Redeploy**. Di halaman **Pembayaran QRIS** harus tertulis *Terpasang*.
 
-### 2.4 Pindah ke produksi (uang sungguhan)
+**b. Pasang MacroDroid** dari Play Store, beri izin **akses notifikasi**, dan
+keluarkan MacroDroid dari **penghemat baterai** (Setelan → Baterai) supaya
+tidak dimatikan sistem.
 
-- Midtrans mewajibkan **verifikasi usaha** (data pemilik, rekening, dan
-  dokumen) sebelum akun produksi aktif. Syaratnya ditentukan Midtrans dan bisa
-  berubah — periksa langsung di dashboard.
-- **Pembayaran online tidak gratis.** Pendaftaran Midtrans tidak dipungut
-  biaya, tetapi setiap transaksi yang berhasil dikenai biaya per metode
-  (VA, QRIS, e-wallet berbeda-beda). Tarif terbaru ada di halaman harga
-  Midtrans — **perlu diverifikasi sebelum menentukan harga jual.**
-- Ganti kedua kunci dengan kunci **Production** (dashboard tanpa "sandbox" di
-  alamatnya), isi `MIDTRANS_IS_PRODUCTION=true`, lalu isi Notification URL
-  yang sama di dashboard produksi. Ketiganya harus diganti bersamaan, lalu
-  Redeploy.
+**c. Buat macro baru:**
+
+- **Pemicu (Trigger):** *Notification → Notification Received*, pilih aplikasi
+  GoBiz (atau aplikasi bank). Bila ada pilihan filter teks, isi `Rp`.
+- **Aksi (Action):** *HTTP Request* (di kelompok *Connectivity / Web
+  Interactions*):
+  - Method: `POST`
+  - URL: `https://catering-six-psi.vercel.app/api/qris/notifikasi/`
+    (garis miring di akhir wajib)
+  - Header: `Authorization` = `Bearer <token dari langkah a>`
+  - Content type: `application/json`
+  - Body:
+
+    ```json
+    {"judul": "<judul notifikasi>", "teks": "<isi notifikasi>", "aplikasi": "<nama aplikasi>"}
+    ```
+
+    Ganti `<…>` dengan **Magic Text** MacroDroid untuk judul, isi, dan nama
+    aplikasi notifikasi (tombol *Magic Text* / `{…}` di kolom body).
+
+Nama menu MacroDroid bisa sedikit berbeda antar versi. Bila aplikasi tidak
+menyediakan kolom header, token boleh ditaruh di URL:
+`…/api/qris/notifikasi/?token=<token>` (kurang aman karena token ikut tercatat
+di log).
+
+Body juga boleh teks biasa berisi isi notifikasi; server mengambil semua
+nominal `Rp…` di dalamnya.
+
+### 2.4 Uji coba
+
+1. Di **Pembayaran QRIS → Uji pembaca notifikasi**, tempel contoh isi
+   notifikasi GoBiz/bank. Nominalnya harus terbaca.
+2. Buat pesanan kecil dari akun pelanggan, bayar QRIS-nya dengan aplikasi
+   pembayaran sungguhan.
+3. Dalam beberapa detik halaman pesanan berubah menjadi **Dibayar**. Buka
+   **Transaksi → Notifikasi masuk**: baris notifikasi harus berstatus *Cocok*.
+
+Bila status tetap menunggu, lihat log *Notifikasi masuk*:
+
+| Hasil | Arti |
+| --- | --- |
+| *(kosong)* | Notifikasi tidak sampai ke server — periksa macro, izin notifikasi, internet HP, dan token |
+| Tanpa nominal | Isi notifikasi tidak memuat `Rp…`. Pastikan body memakai isi notifikasi, bukan hanya judul |
+| Tidak cocok | Nominal tidak sama dengan tagihan yang menunggu (pelanggan membayar nominal lain, atau notifikasi bukan dari pembayaran QRIS) |
+| Ganda | Notifikasi yang sama terkirim dua kali; aman diabaikan |
+
+Pesanan yang tidak terkonfirmasi otomatis selalu bisa ditandai lunas dari
+**Pesanan → Kelola → Konfirmasi lunas manual** setelah admin mengecek riwayat
+GoBiz atau rekening. Pesanan yang pelanggannya menekan **Saya sudah bayar**
+diberi tanda *Perlu dicek*.
+
+### 2.5 Batasan yang perlu diketahui
+
+- **Bergantung pada HP pemilik.** Bila HP mati, offline, atau MacroDroid
+  dihentikan sistem, notifikasi terlewat dan pesanan harus dikonfirmasi manual.
+- **Format notifikasi bisa berubah** saat aplikasi GoBiz/bank diperbarui.
+  Selama masih memuat `Rp<nominal>`, pembacanya tetap bekerja.
+- **Nominal unik adalah satu-satunya penanda.** Dua tagihan yang menunggu tidak
+  pernah punya nominal sama (dijaga index di basis data), tetapi notifikasi
+  pembayaran lain yang kebetulan bernominal sama dengan tagihan menunggu akan
+  ikut dianggap lunas. Risiko ini kecil karena nominalnya berakhiran kode unik.
+- **Kode unik masuk ke rekening, tetapi laporan memakai total pesanan** tanpa
+  kode unik.
+- Untuk volume besar atau kebutuhan konfirmasi yang sepenuhnya andal, pakai
+  payment gateway resmi (Midtrans, Xendit, dan sejenisnya) yang memberi
+  notifikasi langsung dari penyedia — dengan biaya per transaksi.
 
 ---
 
@@ -187,41 +254,39 @@ Isi di **Vercel → Project → Settings → Environment Variables** (dan di
 | `NEXT_PUBLIC_SUPABASE_URL` | ya | peramban | Supabase → Project Settings → Data API |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ya | peramban | Supabase → API Keys → anon / publishable |
 | `SUPABASE_SERVICE_ROLE_KEY` | ya | **server** | Supabase → API Keys → service_role / secret |
-| `MIDTRANS_SERVER_KEY` | ya | **server** | Midtrans → Access Keys |
-| `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` | ya | peramban | Midtrans → Access Keys |
+| `QRIS_NOTIF_TOKEN` | ya, untuk konfirmasi otomatis | **server** | Teks acak minimal 16 karakter (2.3) |
 | `NEXT_PUBLIC_SITE_URL` | disarankan | keduanya | `https://catering-six-psi.vercel.app` |
-| `MIDTRANS_IS_PRODUCTION` | tidak | server | Kosong/`false` = sandbox. `true` hanya untuk kunci produksi |
 | `GEMINI_API_KEY`, `GEMINI_MODEL` | tidak | server | Lihat `SETUP-BACKEND.md` bagian B |
 
 Variabel berawalan `NEXT_PUBLIC_` ditanam ke kode saat **build**. Setelah
-mengubahnya di Vercel, lakukan **Redeploy** — menyimpan saja tidak cukup.
+mengubah variabel apa pun di Vercel, lakukan **Redeploy** — menyimpan saja tidak
+cukup.
 
-`NEXT_PUBLIC_SITE_URL` menentukan ke mana pelanggan dikembalikan setelah
-membayar. Bila kosong, aplikasi memakai alamat permintaan yang masuk, yang
-pada Vercel bisa berupa alamat pratinjau (`*-git-*.vercel.app`).
+Variabel `MIDTRANS_*` dari versi sebelumnya tidak dipakai lagi di branch ini
+dan boleh dihapus.
 
 ---
 
 ## 4. Alur pesanan
 
 ```
-Pelanggan                      Server                          Midtrans
-─────────                      ──────                          ────────
+Pelanggan                      Server                          HP pemilik
+─────────                      ──────                          ──────────
 Isi keranjang & data acara
-Klik "Bayar"  ───────────────▶ POST /api/pesanan/
-                               · cek login (sesi hanya ada setelah
-                                  email terverifikasi)
-                               · cek H-1 dan radius
+"Buat Pesanan & Bayar" ──────▶ POST /api/pesanan/
+                               · cek login, H-1, radius
                                · hitung ulang harga dari tabel menus
-                               · simpan: Menunggu Pembayaran
-                               · minta token Snap  ───────────▶
-Popup Snap terbuka ◀───────── token
-Bayar  ─────────────────────────────────────────────────────▶
-                               POST /api/midtrans/notifikasi/ ◀── notifikasi
-                               · cek signature
-                               · ambil ulang status ke Midtrans
-                               · cocokkan nominal
-                               · catat di payments
+                               · nominal = total + kode unik 1–999
+                               · QRIS bernominal dari QRIS toko
+                               · simpan: Menunggu Pembayaran (24 jam)
+Halaman pesanan: QR + nominal ◀
+Scan & bayar di m-banking/e-wallet ─────────────────────────▶ notifikasi
+                                                               "Rp150.237 diterima"
+                               POST /api/qris/notifikasi/ ◀─── MacroDroid
+                               · cek token
+                               · ambil nominal dari teks
+                               · cocokkan dengan tagihan menunggu
+                               · catat di payments & qris_notifikasi
                                · pesanan → Dibayar
 Halaman pesanan berganti ◀──── (halaman memeriksa tiap 8 detik)
                                                    Admin: Mulai masak → Diproses
@@ -235,20 +300,19 @@ Aturan yang dijaga server:
   `menus`; mengubah harga lewat DevTools tidak berpengaruh.
 - **Peramban tidak bisa menulis pesanan.** RLS hanya mengizinkan pelanggan
   *membaca* pesanannya sendiri. Semua penulisan lewat route server.
-- **Notifikasi palsu ditolak** — signature SHA-512 diperiksa, lalu status
-  diambil ulang langsung dari API Midtrans sebelum dipercaya.
-- **Pesanan Lunas tidak pernah turun status** karena notifikasi yang datang
-  terlambat atau dari percobaan bayar sebelumnya.
-- **Batas bayar 24 jam.** Setelah itu Midtrans mengirim `expire` dan pesanan
-  dibatalkan otomatis. Pelanggan yang menutup popup bisa membayar lagi dari
-  halaman pesanan selama batas belum lewat.
-- **Pembatalan oleh admin tidak mengembalikan dana secara otomatis.** Refund
-  dilakukan dari dashboard Midtrans; notifikasi refund-nya akan tercatat dan
-  mengubah status bayar menjadi *Dikembalikan*.
-
-Bila notifikasi sempat gagal terkirim (misalnya URL salah), pesanan tetap bisa
-disinkronkan: pelanggan menekan **Sudah bayar? Cek status** di halaman pesanannya, atau
-admin menekan **Cek status pembayaran** pada dialog pesanan.
+- **Notifikasi tanpa token yang benar ditolak** (401). Token dibandingkan
+  dengan perbandingan waktu-konstan.
+- **Notifikasi ganda tidak dicatat dua kali**, dan pesanan yang sudah Lunas
+  tidak berubah lagi.
+- **Klik "Saya sudah bayar" tidak membuat pesanan lunas** — hanya menandai
+  pesanan untuk dicek admin. Bukti transfer dari pelanggan mudah dipalsukan.
+- **Batas bayar 24 jam.** Lewat dari itu pesanan dibatalkan otomatis saat
+  halaman dibuka berikutnya. Pelanggan bisa membuat **QRIS baru** selama jadwal
+  acara masih H-1. Pembayaran yang masuk paling lama 3 hari setelah tagihan
+  kedaluwarsa tetap dicocokkan (selama pelanggan belum membuat QRIS baru),
+  karena uangnya sudah diterima.
+- **Pembatalan oleh admin tidak mengembalikan dana.** Pengembalian dilakukan
+  manual oleh pemilik.
 
 ---
 
@@ -272,10 +336,12 @@ cukup dengan mengganti alamat ubin di `src/components/akun/PetaLokasi.tsx`.
 
 | Gejala | Penyebab biasanya |
 | --- | --- |
-| "Server belum dikonfigurasi" atau "Pembayaran belum dikonfigurasi" (503) | `SUPABASE_SERVICE_ROLE_KEY` atau `MIDTRANS_SERVER_KEY` belum diisi di Vercel, atau belum redeploy |
-| Gagal membuka pembayaran, log Vercel menyebut 401 / unauthorized dari Midtrans | Kunci dan mode tidak cocok: kunci sandbox dengan `MIDTRANS_IS_PRODUCTION=true`, atau sebaliknya. Kunci juga harus dari akun Midtrans yang sama dengan Notification URL |
-| Popup pembayaran tidak muncul, halaman langsung pindah ke Midtrans | `NEXT_PUBLIC_MIDTRANS_CLIENT_KEY` kosong. Pembayaran tetap jalan lewat halaman Midtrans, tetapi isi kuncinya lalu redeploy |
-| Sudah bayar di simulator, status tetap Menunggu Pembayaran | Notification URL belum diisi atau tanpa garis miring akhir. Tekan **Sudah bayar? Cek status** untuk sinkron manual, lalu perbaiki URL-nya |
+| "Server belum dikonfigurasi" (503) | `SUPABASE_SERVICE_ROLE_KEY` belum diisi di Vercel, atau belum redeploy |
+| "Pembayaran QRIS belum disiapkan" saat pesan | QRIS toko belum disimpan di **Pembayaran QRIS** (2.2), atau `09-qris.sql` belum dijalankan |
+| Aplikasi pembayar menolak QR atau nominal tidak terisi | Aplikasi itu tidak menerima QR bernominal hasil modifikasi. Pelanggan tetap bisa scan QRIS toko dan mengetik nominal persis, lalu admin mengonfirmasi manual |
+| Sudah bayar, status tetap Menunggu Pembayaran | Lihat **Transaksi → Notifikasi masuk** dan tabel di 2.4 |
+| Halaman Pembayaran QRIS: token "Belum diisi" | `QRIS_NOTIF_TOKEN` belum diisi atau kurang dari 16 karakter; isi lalu redeploy |
+| Notifikasi dijawab 401 | Token di MacroDroid tidak sama dengan `QRIS_NOTIF_TOKEN`, atau tanpa awalan `Bearer ` |
 | Tautan verifikasi membuka halaman utama, bukan `/masuk/` | Redirect URLs di Supabase belum ditambahkan (1.2) |
 | Email verifikasi tidak sampai | Jatah email bawaan Supabase habis, atau masuk folder spam. Pasang SMTP sendiri (1.3) |
 | Login admin: "Akun ini bukan akun admin" | Akun belum dimasukkan ke tabel `users` (1.4) |

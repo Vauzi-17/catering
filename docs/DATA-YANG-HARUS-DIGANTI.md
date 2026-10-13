@@ -114,12 +114,11 @@ bila Supabase belum tersambung.
 
 ## 9. Pembayaran
 
-Selama kunci Midtrans masih kunci **sandbox** dan `MIDTRANS_IS_PRODUCTION`
-belum `true`, tidak ada uang sungguhan yang masuk. Sebelum menerima pesanan
-nyata: selesaikan verifikasi usaha di Midtrans atas nama Asri Catering, ganti
-ke kunci produksi, isi `MIDTRANS_IS_PRODUCTION=true`, dan isi Notification URL
-produksi (`SETUP-PEMBAYARAN.md` bagian 2.4). Periksa juga tarif per transaksi Midtrans
-karena memengaruhi margin.
+Pembayaran memakai QRIS milik usaha. Sebelum menerima pesanan nyata: simpan
+QRIS **atas nama Asri Catering** (bukan milik pengembang) di panel admin,
+pasang penerus notifikasi di HP pemilik, dan uji satu pembayaran sungguhan
+(`SETUP-PEMBAYARAN.md` bagian 2). Periksa juga biaya QRIS (MDR) dari
+penyedia karena memengaruhi margin.
 
 ---
 
@@ -135,4 +134,4 @@ karena memengaruhi margin.
 - [ ] `06-akun-pembayaran.sql` dijalankan, akun Ibu Asri terdaftar sebagai admin
 - [ ] Titik dapur dan radius layanan diganti
 - [ ] Email verifikasi memakai SMTP sendiri dan teks Bahasa Indonesia
-- [ ] Midtrans pindah ke kunci produksi, Notification URL produksi diisi
+- [ ] QRIS atas nama usaha tersimpan, `QRIS_NOTIF_TOKEN` dan MacroDroid terpasang, satu pembayaran uji berhasil

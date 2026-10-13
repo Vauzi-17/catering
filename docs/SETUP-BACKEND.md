@@ -82,8 +82,9 @@ Rincian dan riwayat statusnya ikut terhapus otomatis.
 **Cara sungguhan — pesan lewat website sendiri**
 
 1. Daftar dan masuk sebagai pelanggan, pilih menu, isi data acara, lalu bayar
-   lewat simulator sandbox Midtrans (lihat `SETUP-PEMBAYARAN.md` bagian 2.3).
-2. Pesanan otomatis berstatus **Dibayar** dan langsung terhitung di laporan.
+   QRIS yang muncul (lihat `SETUP-PEMBAYARAN.md` bagian 2.4).
+2. Begitu notifikasi cocok atau admin mengonfirmasi manual, pesanan berstatus
+   **Dibayar** dan langsung terhitung di laporan.
 
 Dua hal yang sering membingungkan di sini:
 
@@ -243,7 +244,7 @@ Ubah alamat pada:
 
 ## Bagian D — Akun, pembayaran, dan keamanan produksi
 
-Login admin, akun pelanggan, dan pembayaran Midtrans sekarang memakai Supabase
+Login admin, akun pelanggan, dan pembayaran QRIS sekarang memakai Supabase
 Auth. Langkahnya — termasuk menjalankan `supabase/06-akun-pembayaran.sql` yang
 menggantikan `02-rls.sql` dan `04-rls-produksi.sql` — ada di
 [`SETUP-PEMBAYARAN.md`](SETUP-PEMBAYARAN.md).

@@ -3,12 +3,12 @@
 Website untuk usaha katering **Asri Catering** (milik Ibu Asri): nasi kotak,
 bento, prasmanan, tumpeng, dan snack box.
 
-**Next.js 15 (App Router) · TypeScript · Tailwind CSS · Supabase (DB + Auth) · Midtrans Snap · Leaflet/OpenStreetMap · Gemini API**
+**Next.js 15 (App Router) · TypeScript · Tailwind CSS · Supabase (DB + Auth) · QRIS · Leaflet/OpenStreetMap · Gemini API**
 
 | Dokumen | Isi |
 | --- | --- |
 | [`docs/SETUP-BACKEND.md`](docs/SETUP-BACKEND.md) | Cara menyiapkan Supabase dan Gemini, langkah demi langkah |
-| [`docs/SETUP-PEMBAYARAN.md`](docs/SETUP-PEMBAYARAN.md) | Akun pelanggan, Supabase Auth, Midtrans, webhook, env Vercel |
+| [`docs/SETUP-PEMBAYARAN.md`](docs/SETUP-PEMBAYARAN.md) | Akun pelanggan, Supabase Auth, QRIS, konfirmasi otomatis MacroDroid, env Vercel |
 | [`docs/KEBUTUHAN-FOTO.md`](docs/KEBUTUHAN-FOTO.md) | Daftar foto yang perlu disiapkan klien + panduan memotret |
 | [`docs/DATA-YANG-HARUS-DIGANTI.md`](docs/DATA-YANG-HARUS-DIGANTI.md) | Data contoh yang wajib diganti sebelum serah terima |
 
@@ -26,7 +26,7 @@ Aplikasi berjalan di salah satu dari dua mode, ditentukan otomatis dari isi
 | Data awal | `src/data/` | Hasil `03-seed.sql` |
 | Analisis | Perhitungan aplikasi | Gemini, jatuh ke perhitungan aplikasi bila mati |
 | Login admin | Akun demo `admin` / `asri2025` | Supabase Auth, akun terdaftar di tabel `users` |
-| Akun pelanggan & pembayaran | Tidak tersedia | Supabase Auth + Midtrans Snap |
+| Akun pelanggan & pembayaran | Tidak tersedia | Supabase Auth + QRIS milik usaha |
 
 Mode contoh berguna untuk melihat katalog dan panel admin tanpa membuat akun
 apa pun. Checkout, **Pesanan Saya**, dan halaman akun hanya berjalan pada mode
@@ -55,7 +55,7 @@ pembayaran, [`docs/SETUP-PEMBAYARAN.md`](docs/SETUP-PEMBAYARAN.md).
 ### Pengujian
 
 ```bash
-npm run uji        # 17 uji logika pembayaran (hitung harga, radius, notifikasi Midtrans)
+npm run uji        # 17 uji logika: harga, radius, QRIS bernominal, pencocokan notifikasi
 npx tsc --noEmit   # pemeriksaan tipe
 npm run build
 ```
@@ -79,7 +79,8 @@ npm run build
 | — | AI Assistant (tanya jawab kondisi usaha) | `/admin/asisten` |
 | — | Daftar, masuk, verifikasi email, lupa & atur ulang sandi | `/daftar`, `/masuk`, `/lupa-sandi`, `/atur-sandi` |
 | — | Profil & alamat utama pelanggan | `/akun` |
-| — | Pembayaran otomatis Midtrans + webhook | `/api/pesanan`, `/api/midtrans/notifikasi` |
+| — | Pembayaran QRIS bernominal unik + konfirmasi otomatis dari notifikasi HP | `/api/pesanan`, `/api/qris/notifikasi` |
+| — | Pengaturan QRIS toko & penerus notifikasi | `/admin/pembayaran` |
 | — | Histori transaksi pembayaran | `/admin/transaksi` |
 
 ---
@@ -98,14 +99,16 @@ src/
 │  │  ├─ masuk/ daftar/ lupa-sandi/ atur-sandi/ akun/
 │  │  └─ lacak/             Pengalihan lama ke /pesanan
 │  ├─ admin/                Panel admin (sidebar sendiri)
-│  │  ├─ login/ page.tsx pesanan/ transaksi/ menu/ bahan/ hpp/ laporan/ asisten/
+│  │  ├─ login/ page.tsx pesanan/ transaksi/ pembayaran/ menu/ bahan/ hpp/ laporan/ asisten/
 │  ├─ api/
 │  │  ├─ ai/insight/route.ts            Catatan analisis laporan & HPP (Gemini)
 │  │  ├─ ai/asisten/route.ts            Tanya jawab admin              (Gemini)
-│  │  ├─ pesanan/route.ts               Buat pesanan + tagihan Midtrans
-│  │  ├─ pesanan/[kode]/bayar/route.ts  Buka ulang pembayaran
-│  │  ├─ pesanan/[kode]/sinkron/route.ts Tarik status terbaru dari Midtrans
-│  │  └─ midtrans/notifikasi/route.ts   Webhook Midtrans
+│  │  ├─ pesanan/route.ts               Buat pesanan + tagihan QRIS
+│  │  ├─ pesanan/[kode]/bayar/route.ts  QRIS aktif / QRIS baru bila kedaluwarsa
+│  │  ├─ pesanan/[kode]/klaim/route.ts  Pelanggan menandai "sudah bayar"
+│  │  ├─ pesanan/[kode]/konfirmasi/route.ts Admin konfirmasi lunas manual
+│  │  ├─ qris/notifikasi/route.ts       Penerima notifikasi dari HP pemilik
+│  │  └─ qris/status/route.ts           Status token untuk halaman admin
 │  ├─ layout.tsx            Font, metadata, penyedia data
 │  └─ globals.css           Token warna & komponen dasar
 ├─ components/              Komponen antarmuka bersama
@@ -120,10 +123,9 @@ src/
 │  ├─ asisten.ts            Jawaban cadangan AI Assistant
 │  ├─ supabase.ts           Klien Supabase (peramban) + penanda mode
 │  ├─ supabase-server.ts    Klien service role (server saja)
-│  ├─ midtrans.ts           Snap API, status API, signature (server saja)
-│  ├─ pesanan-server.ts     Tagihan & pencatatan transaksi (server saja)
-│  ├─ pembayaran.ts         Logika murni: harga, radius, status bayar (diuji)
-│  ├─ snap.ts               Popup Snap di peramban
+│  ├─ pesanan-server.ts     Tagihan QRIS, pencocokan notifikasi (server saja)
+│  ├─ pembayaran.ts         Logika murni: harga, radius, QRIS, nominal (diuji)
+│  ├─ api-klien.ts          Pemanggil /api/* dengan token sesi
 │  ├─ status.ts             Alur, label, dan warna status
 │  ├─ db.ts                 Baca/tulis tabel Supabase
 │  ├─ gemini.ts             Pemanggil Gemini (server saja)
@@ -140,6 +142,7 @@ supabase/
 ├─ 05-contoh-pesanan.sql    Pesanan contoh, opsional (dihasilkan skrip)
 ├─ 07-foto-menu.sql         Bucket Storage untuk foto menu
 ├─ 08-contoh-pesanan-lunas.sql  5 pesanan lunas untuk menguji laporan, opsional
+├─ 09-qris.sql              QRIS toko, nominal unik, log notifikasi
 └─ 06-akun-pembayaran.sql   Akun pelanggan, pembayaran, RLS produksi
 scripts/
 ├─ muat-data.mjs                 Memuat src/data/*.ts untuk kedua skrip di bawah
@@ -170,7 +173,8 @@ Ditambah dua tabel pendukung yang dibutuhkan antarmuka:
 
 - `order_status_history` — jejak perubahan status untuk halaman lacak pesanan
 - `settings` — asumsi overhead, target margin, titik dapur, radius layanan
-- `payments` — setiap notifikasi transaksi Midtrans (histori transaksi)
+- `payments` — setiap pelunasan, otomatis maupun manual (histori transaksi)
+- `qris_notifikasi` — log notifikasi pembayaran dari HP pemilik beserta hasil pencocokannya
 
 Catatan rancangan:
 
@@ -194,7 +198,7 @@ node scripts/buat-contoh-pesanan-sql.mjs
 setelah `03-seed.sql` saja halaman itu masih kosong — menu sudah ada, pesanan
 belum. Jalankan `05-contoh-pesanan.sql` untuk mengisinya dengan 23 pesanan
 contoh berkode `ASR-DEMO-`, atau buat pesanan sungguhan lewat `/pesan` lalu
-bayar di simulator sandbox Midtrans. Perinciannya ada di `docs/SETUP-BACKEND.md` bagian A3.
+bayar QRIS-nya. Perinciannya ada di `docs/SETUP-BACKEND.md` bagian A3.
 
 ---
 
@@ -219,8 +223,9 @@ untuk harga di bawah Rp 20.000, Rp 1.000 sampai Rp 100.000, dan Rp 5.000 di
 atasnya.
 
 Alur status pesanan: **Menunggu Pembayaran → Dibayar → Diproses → Dikirim →
-Selesai**, ditambah **Dibatalkan**. *Dibayar* diisi otomatis oleh notifikasi
-Midtrans; tahap berikutnya digeser admin. Laporan harian menghitung pesanan
+Selesai**, ditambah **Dibatalkan**. *Dibayar* diisi otomatis saat notifikasi
+QRIS cocok, atau oleh admin lewat konfirmasi manual; tahap berikutnya digeser
+admin. Laporan harian menghitung pesanan
 berstatus *Dibayar*, *Diproses*, *Dikirim*, dan *Selesai*; pesanan yang belum
 dibayar belum diakui sebagai pendapatan. Status lama *Menunggu Konfirmasi*
 masih dikenali untuk pesanan dari versi sebelumnya.
@@ -284,7 +289,7 @@ Foto sampul beranda dan foto pemilik diganti di kode: ganti
 ## 9. Hosting
 
 Aplikasi ini **membutuhkan Node.js di server** karena Gemini, pembuatan
-pesanan, dan webhook Midtrans berjalan di route `/api/*`. Shared hosting cPanel
+pesanan, dan penerima notifikasi QRIS berjalan di route `/api/*`. Shared hosting cPanel
 biasa tidak bisa menjalankannya. Saat ini dideploy di Vercel:
 <https://catering-six-psi.vercel.app>. Pilihan
 hosting dan langkah deploy ada di `docs/SETUP-BACKEND.md` bagian C.
