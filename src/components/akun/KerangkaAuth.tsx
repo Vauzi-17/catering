@@ -1,6 +1,14 @@
+"use client";
+
 import type { ReactNode } from "react";
 import { LogoMark } from "@/components/Logo";
 import { fotoDekorasi } from "@/lib/foto";
+import { useBahasa } from "@/store/BahasaProvider";
+
+function TeksSamping() {
+  const { t } = useBahasa();
+  return <>{t("Pesan katering, bayar online, pantau sampai diantar.", "Order catering, pay online, track it to your door.")}</>;
+}
 
 /** Kartu dua kolom untuk halaman masuk, daftar, dan kata sandi. */
 export function KerangkaAuth({
@@ -19,7 +27,7 @@ export function KerangkaAuth({
           <div>
             <LogoMark className="h-11 w-11" />
             <p className="mt-6 font-display text-[28px] font-medium leading-tight">
-              Pesan katering, bayar online, pantau sampai diantar.
+              <TeksSamping />
             </p>
           </div>
           <div className="relative mt-10 h-44" aria-hidden="true">
@@ -62,9 +70,13 @@ export function PesanForm({ jenis, children }: { jenis: "galat" | "info" | "suks
 
 /** Pemberitahuan untuk mode contoh tanpa Supabase. */
 export function TanpaSupabase() {
+  const { t } = useBahasa();
   return (
     <PesanForm jenis="info">
-      Pemesanan online sedang tidak tersedia. Silakan hubungi kami lewat WhatsApp untuk memesan.
+      {t(
+        "Pemesanan online sedang tidak tersedia. Silakan hubungi kami lewat WhatsApp untuk memesan.",
+        "Online ordering is currently unavailable. Please contact us on WhatsApp to order.",
+      )}
     </PesanForm>
   );
 }

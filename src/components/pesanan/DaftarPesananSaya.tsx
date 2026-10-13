@@ -7,16 +7,18 @@ import { PesanForm, TanpaSupabase } from "@/components/akun/KerangkaAuth";
 import { FotoMenu } from "@/components/Placeholder";
 import { LencanaBayar, LencanaStatus } from "@/components/pesanan/Lencana";
 import { ambilPesananSaya } from "@/lib/db";
-import { rupiah, tanggalPanjang } from "@/lib/format";
+import { rupiah } from "@/lib/format";
+import { tanggalPanjangB, teksMenu } from "@/lib/teks";
 import type { Pesanan } from "@/lib/types";
 import { useWajibMasuk } from "@/lib/useWajibMasuk";
+import { useBahasa } from "@/store/BahasaProvider";
 import { useData } from "@/store/DataProvider";
 
 const saringan = [
-  { nilai: "semua", label: "Semua" },
-  { nilai: "bayar", label: "Belum dibayar" },
-  { nilai: "berjalan", label: "Berjalan" },
-  { nilai: "selesai", label: "Selesai & batal" },
+  { nilai: "semua", label: ["Semua", "All"] },
+  { nilai: "bayar", label: ["Belum dibayar", "Unpaid"] },
+  { nilai: "berjalan", label: ["Berjalan", "In progress"] },
+  { nilai: "selesai", label: ["Selesai & batal", "Completed & cancelled"] },
 ] as const;
 
 type Saringan = (typeof saringan)[number]["nilai"];
@@ -31,6 +33,11 @@ function cocok(p: Pesanan, s: Saringan) {
 export function DaftarPesananSaya() {
   const auth = useWajibMasuk();
   const { menus } = useData();
+  const { bahasa, t, p: pilihTeks } = useBahasa();
+  const namaItem = (menuId: string, nama: string) => {
+    const m = menus.find((x) => x.id === menuId);
+    return m ? teksMenu(m, bahasa).nama : nama;
+  };
   const [daftar, setDaftar] = useState<Pesanan[] | null>(null);
   const [galat, setGalat] = useState("");
   const [pilih, setPilih] = useState<Saringan>("semua");
@@ -39,7 +46,7 @@ export function DaftarPesananSaya() {
     if (!auth.pengguna) return;
     ambilPesananSaya()
       .then(setDaftar)
-      .catch(() => setGalat("Daftar pesanan gagal dimuat. Muat ulang halaman."));
+      .catch(() => setGalat(t("Daftar pesanan gagal dimuat. Muat ulang halaman.", "Could not load your orders. Please reload the page.")));
   }, [auth.pengguna]);
 
   const tampil = useMemo(() => (daftar ?? []).filter((p) => cocok(p, pilih)), [daftar, pilih]);
@@ -66,7 +73,7 @@ export function DaftarPesananSaya() {
                 pilih === s.nilai ? "bg-zamrud-700 text-white" : "text-ink-soft hover:bg-kabut"
               }`}
             >
-              {s.label}
+              {pilihTeks(s.label)}
               {daftar && (
                 <span className={`ml-1.5 text-[11px] ${pilih === s.nilai ? "text-white/70" : "text-ink-muted"}`}>
                   {daftar.filter((p) => cocok(p, s.nilai)).length}
@@ -91,10 +98,10 @@ export function DaftarPesananSaya() {
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-kabut text-ink-muted">
               <Receipt size={22} strokeWidth={1.8} />
             </span>
-            <p className="mt-4 font-semibold">{daftar.length === 0 ? "Belum ada pesanan" : "Tidak ada pesanan di kategori ini"}</p>
+            <p className="mt-4 font-semibold">{daftar.length === 0 ? t("Belum ada pesanan", "No orders yet") : t("Tidak ada pesanan di kategori ini", "No orders in this category")}</p>
             {daftar.length === 0 && (
               <Link href="/menu/" className="tombol tombol-md tombol-jingga mt-5">
-                Lihat Menu
+                {t("Lihat Menu", "View Menu")}
               </Link>
             )}
           </div>
@@ -126,11 +133,11 @@ export function DaftarPesananSaya() {
                         {p.status === "Menunggu Pembayaran" && <LencanaBayar status={p.statusBayar} />}
                       </div>
                       <p className="mt-1 truncate text-[13px] text-ink-muted">
-                        {p.items.map((it) => it.nama).join(", ")} · {porsi} porsi
+                        {p.items.map((it) => namaItem(it.menuId, it.nama)).join(", ")} · {porsi} {t("porsi", "portions")}
                       </p>
                       <p className="mt-1 inline-flex items-center gap-1.5 text-[12px] text-ink-muted">
                         <CalendarDays size={13} />
-                        {tanggalPanjang(p.tanggalAcara)} · {p.waktuAntar.replace(":", ".")}
+                        {tanggalPanjangB(p.tanggalAcara, bahasa)} · {p.waktuAntar.replace(":", ".")}
                       </p>
                     </div>
                     <div className="hidden text-right sm:block">

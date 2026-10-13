@@ -38,17 +38,40 @@ interface KonteksAuth {
 const Konteks = createContext<KonteksAuth | null>(null);
 
 /** Menerjemahkan pesan galat Supabase Auth ke bahasa pelanggan. */
-export function pesanAuth(e: unknown): string {
+/** true bila galat login karena email belum diverifikasi. */
+export function belumVerifikasi(e: unknown): boolean {
   const m = e instanceof Error ? e.message : String((e as { message?: string })?.message ?? e);
-  if (/invalid login credentials/i.test(m)) return "Email atau kata sandi salah.";
-  if (/email not confirmed/i.test(m)) return "Email belum diverifikasi. Buka tautan verifikasi di kotak masuk Anda.";
-  if (/already registered|already exists/i.test(m)) return "Email ini sudah terdaftar. Silakan masuk.";
-  if (/password should be at least|weak password/i.test(m)) return "Kata sandi terlalu lemah. Gunakan minimal 8 karakter.";
-  if (/rate limit|too many|security purposes/i.test(m)) return "Terlalu banyak percobaan. Tunggu beberapa menit lalu coba lagi.";
-  if (/same password|different from the old/i.test(m)) return "Kata sandi baru harus berbeda dari yang lama.";
-  if (/invalid email|unable to validate email/i.test(m)) return "Format email tidak valid.";
-  if (/fetch|network/i.test(m)) return "Tidak dapat terhubung. Periksa koneksi internet Anda.";
-  return m || "Terjadi kesalahan. Coba lagi.";
+  return /email not confirmed/i.test(m);
+}
+
+export function pesanAuth(e: unknown, bahasa: "id" | "en" = "id"): string {
+  const m = e instanceof Error ? e.message : String((e as { message?: string })?.message ?? e);
+  const en = bahasa === "en";
+  if (/invalid login credentials/i.test(m)) return en ? "Incorrect email or password." : "Email atau kata sandi salah.";
+  if (/email not confirmed/i.test(m)) {
+    return en
+      ? "Your email is not verified yet. Open the verification link in your inbox."
+      : "Email belum diverifikasi. Buka tautan verifikasi di kotak masuk Anda.";
+  }
+  if (/already registered|already exists/i.test(m)) {
+    return en ? "This email is already registered. Please sign in." : "Email ini sudah terdaftar. Silakan masuk.";
+  }
+  if (/password should be at least|weak password/i.test(m)) {
+    return en ? "Password is too weak. Use at least 8 characters." : "Kata sandi terlalu lemah. Gunakan minimal 8 karakter.";
+  }
+  if (/rate limit|too many|security purposes/i.test(m)) {
+    return en
+      ? "Too many attempts. Wait a few minutes and try again."
+      : "Terlalu banyak percobaan. Tunggu beberapa menit lalu coba lagi.";
+  }
+  if (/same password|different from the old/i.test(m)) {
+    return en ? "The new password must differ from the old one." : "Kata sandi baru harus berbeda dari yang lama.";
+  }
+  if (/invalid email|unable to validate email/i.test(m)) return en ? "Invalid email format." : "Format email tidak valid.";
+  if (/fetch|network/i.test(m)) {
+    return en ? "Cannot connect. Check your internet connection." : "Tidak dapat terhubung. Periksa koneksi internet Anda.";
+  }
+  return m || (en ? "Something went wrong. Please try again." : "Terjadi kesalahan. Coba lagi.");
 }
 
 function wajib() {

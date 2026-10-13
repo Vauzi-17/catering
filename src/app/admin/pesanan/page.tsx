@@ -8,7 +8,7 @@ import { LencanaBayar } from "@/components/pesanan/Lencana";
 import { Kosong, StatusBadge } from "@/components/Ui";
 import { rupiah, tanggalPanjang, tanggalPendek, waktuRelatif } from "@/lib/format";
 import type { Pesanan, StatusPesanan } from "@/lib/types";
-import { panggilApi } from "@/lib/snap";
+import { panggilApi } from "@/lib/api-klien";
 import { STATUS_PERLU_PROSES } from "@/lib/status";
 import { useAuth } from "@/store/AuthProvider";
 import { useData } from "@/store/DataProvider";
@@ -23,8 +23,8 @@ const semuaStatus: StatusPesanan[] = [
   "Menunggu Konfirmasi",
 ];
 
-// Tombol lanjut per status. Pesanan online tidak dikonfirmasi manual:
-// statusnya menjadi "Dibayar" otomatis dari Midtrans.
+// Tombol lanjut per status. Pesanan online menjadi "Dibayar" otomatis saat
+// notifikasi QRIS cocok, atau lewat tombol "Konfirmasi lunas manual".
 const langkahBerikut: Partial<Record<StatusPesanan, { label: string; status: StatusPesanan }>> = {
   "Menunggu Konfirmasi": { label: "Konfirmasi & proses", status: "Diproses" },
   Dibayar: { label: "Mulai masak", status: "Diproses" },
@@ -88,7 +88,7 @@ export default function HalamanPesananAdmin() {
         <KartuStat
           label="Lunas, belum selesai"
           nilai={rupiah(nilaiLunas, true)}
-          catatan="Uang sudah masuk lewat Midtrans"
+          catatan="Uang sudah masuk lewat QRIS"
           nada="baik"
         />
       </div>
@@ -183,11 +183,21 @@ export default function HalamanPesananAdmin() {
                         </span>
                       ))}
                     </td>
-                    <td className="text-right font-semibold text-ink">{rupiah(p.total)}</td>
+                    <td className="text-right font-semibold text-ink">
+                      {rupiah(p.total)}
+                      {p.nominalBayar && p.statusBayar !== "Lunas" ? (
+                        <span className="mt-0.5 block text-[12px] font-normal text-ink-muted">QRIS {rupiah(p.nominalBayar)}</span>
+                      ) : null}
+                    </td>
                     <td>
                       <span className="flex flex-col items-start gap-1">
                         <StatusBadge status={p.status} />
-                        <LencanaBayar status={p.statusBayar} />
+                        <LencanaBayar status={p.statusBayar} bahasa="id" />
+                        {p.diklaimBayarPada && p.statusBayar === "Menunggu" && (
+                          <span className="rounded-md bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-900">
+                            Perlu dicek
+                          </span>
+                        )}
                       </span>
                     </td>
                     <td className="text-right">
@@ -228,20 +238,31 @@ function DialogPesanan({
   ubahStatus: (s: StatusPesanan) => void;
 }) {
   const auth = useAuth();
+  const { muatPesanan } = useData();
   const [cek, setCek] = useState("");
   const berikut = langkahBerikut[pesanan.status];
   const bisaBatal = pesanan.status !== "Selesai" && pesanan.status !== "Dibatalkan";
+  const bisaKonfirmasi =
+    (pesanan.statusBayar === "Menunggu" || pesanan.statusBayar === "Kedaluwarsa") &&
+    (pesanan.status === "Menunggu Pembayaran" || pesanan.status === "Dibatalkan");
+  const nominal = pesanan.nominalBayar ?? pesanan.total;
 
-  async function cekPembayaran() {
-    setCek("Memeriksa…");
+  async function konfirmasiLunas() {
+    const yakin = window.confirm(
+      `Pastikan dana ${rupiah(nominal)} untuk ${pesanan.kode} sudah masuk di GoBiz atau rekening. Tandai pesanan ini lunas?`,
+    );
+    if (!yakin) return;
+    setCek("Menyimpan…");
     try {
-      const { ok, data } = await panggilApi<{ diubah?: boolean }>(
-        `/api/pesanan/${pesanan.kode}/sinkron/`,
-        await auth.token(),
-      );
-      setCek(ok ? (data.diubah ? "Status diperbarui. Muat ulang daftar." : "Belum ada perubahan dari Midtrans.") : data.galat ?? "Gagal memeriksa.");
+      const { ok, data } = await panggilApi(`/api/pesanan/${pesanan.kode}/konfirmasi/`, await auth.token(), {});
+      if (!ok) {
+        setCek(data.galat ?? "Gagal mengonfirmasi.");
+        return;
+      }
+      setCek("Pembayaran dikonfirmasi.");
+      await muatPesanan(true);
     } catch {
-      setCek("Gagal memeriksa.");
+      setCek("Gagal mengonfirmasi.");
     }
   }
 
@@ -290,6 +311,9 @@ function DialogPesanan({
                   ? `${pesanan.statusBayar === "Menunggu" ? "Belum dibayar" : pesanan.statusBayar}${pesanan.metodeBayar ? ` · ${pesanan.metodeBayar}` : ""}`
                   : "Manual",
               },
+              ...(pesanan.nominalBayar
+                ? [{ l: "Nominal QRIS", v: `${rupiah(pesanan.nominalBayar)} (kode unik ${pesanan.kodeUnik ?? 0})` }]
+                : []),
               ...(pesanan.dibayarPada ? [{ l: "Dibayar", v: waktuRelatif(pesanan.dibayarPada) }] : []),
             ].map((d) => (
               <div key={d.l}>
@@ -299,6 +323,12 @@ function DialogPesanan({
                 <dd className="mt-1 text-sm font-medium text-ink">{d.v}</dd>
               </div>
             ))}
+            {pesanan.diklaimBayarPada && pesanan.statusBayar === "Menunggu" && (
+              <p className="sm:col-span-2 rounded-lg bg-amber-50 px-3.5 py-2.5 text-[13px] text-amber-900">
+                Pelanggan menyatakan sudah membayar {waktuRelatif(pesanan.diklaimBayarPada)}, tapi notifikasi
+                pembayaran belum cocok. Cek riwayat GoBiz atau rekening untuk nominal {rupiah(nominal)}.
+              </p>
+            )}
             <div className="sm:col-span-2">
               <dt className="text-[12px] font-semibold uppercase tracking-wide text-ink-muted">
                 Alamat
@@ -376,9 +406,9 @@ function DialogPesanan({
               {berikut.label}
             </button>
           )}
-          {pesanan.status === "Menunggu Pembayaran" && (
-            <button type="button" onClick={() => void cekPembayaran()} className="btn btn-sm btn-outline">
-              Cek status pembayaran
+          {bisaKonfirmasi && (
+            <button type="button" onClick={() => void konfirmasiLunas()} className="btn btn-sm btn-outline">
+              Konfirmasi lunas manual
             </button>
           )}
           {bisaBatal && (
@@ -387,7 +417,7 @@ function DialogPesanan({
               onClick={() => {
                 const pesanKonfirmasi =
                   pesanan.statusBayar === "Lunas"
-                    ? "Pesanan ini sudah dibayar. Membatalkan di sini TIDAK mengembalikan dana; lakukan refund dari dashboard Midtrans. Tetap batalkan?"
+                    ? "Pesanan ini sudah dibayar. Membatalkan di sini TIDAK mengembalikan dana; kembalikan dana ke pelanggan secara manual. Tetap batalkan?"
                     : "Batalkan pesanan ini?";
                 if (window.confirm(pesanKonfirmasi)) {
                   ubahStatus("Dibatalkan");

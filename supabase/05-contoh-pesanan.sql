@@ -35,7 +35,7 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-01', 'Rina Kusumawati', '0812-9087-1122',
-  'Kantor Dinas Pendidikan, Jl. Radjiman No. 6, Bandung',
+  'Kantor Dinas Pendidikan, Jl. Radjiman No. 6, Cilacap',
   current_date - 13, '07:30',
   'Ambil di Tempat', 'Mohon sambalnya dipisah ya.',
   (select sum(m.harga_jual * v.qty)
@@ -60,13 +60,13 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-02', 'Hendra Saputra', '0857-3311-2098',
-  'Jl. Cigadung Raya Timur No. 14, Bandung',
+  'Jl. Cigadung Raya Timur No. 14, Cilacap',
   current_date - 12, '09:00',
   'Antar ke Alamat', 'Tolong tambahkan sendok dan tisu ekstra.',
   (select sum(m.harga_jual * v.qty)
    from (values
     ('snack-box-isi-3'::text, 60),
-    ('paket-bento-ayam-kremes', 60)
+    ('paket-nasi-kuning-bento-royal', 60)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Selesai', current_date - 15 + time '08:00';
@@ -76,7 +76,7 @@ select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
   ('snack-box-isi-3'::text, 60),
-  ('paket-bento-ayam-kremes', 60)
+  ('paket-nasi-kuning-bento-royal', 60)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-02';
@@ -87,13 +87,13 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-03', 'Dewi Anggraeni', '0813-2277-8890',
-  'Perum Griya Asri Blok C2 No. 8, Cimahi',
+  'Perum Griya Asri Blok C2 No. 8, Jeruklegi',
   current_date - 11, '11:00',
   'Antar ke Alamat', 'Ada 3 porsi tanpa daging, untuk tamu vegetarian.',
   (select sum(m.harga_jual * v.qty)
    from (values
     ('tumpeng-mini'::text, 1),
-    ('snack-box-premium', 20)
+    ('snack-box-isi-3', 20)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Selesai', current_date - 14 + time '08:00';
@@ -103,7 +103,7 @@ select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
   ('tumpeng-mini'::text, 1),
-  ('snack-box-premium', 20)
+  ('snack-box-isi-3', 20)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-03';
@@ -114,7 +114,7 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-04', 'SMP Negeri 12', '022-7301-448',
-  'Jl. Setiabudi No. 112, Bandung',
+  'Jl. Setiabudi No. 112, Cilacap',
   current_date - 10, '11:30',
   'Antar ke Alamat', '',
   (select sum(m.harga_jual * v.qty)
@@ -139,12 +139,12 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-05', 'Bapak Yusuf Maulana', '0878-5512-4433',
-  'Jl. Cibaduyut Lama No. 45, Bandung',
+  'Jl. Cibaduyut Lama No. 45, Cilacap',
   current_date - 9, '15:00',
   'Antar ke Alamat', 'Pengantaran lewat pintu samping gedung.',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('prasmanan-paket-silver'::text, 80)
+    ('paket-nasi-kotak-acara-kantor'::text, 80)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Dibatalkan', current_date - 12 + time '08:00';
@@ -153,7 +153,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('prasmanan-paket-silver'::text, 80)
+  ('paket-nasi-kotak-acara-kantor'::text, 80)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-05';
@@ -164,13 +164,13 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-06', 'PT Sinar Mandiri', '0811-2299-3040',
-  'Gedung Pasifik Lt. 3, Jl. Asia Afrika, Bandung',
+  'Gedung Pasifik Lt. 3, Jl. Asia Afrika, Cilacap',
   current_date - 8, '07:30',
   'Ambil di Tempat', '',
   (select sum(m.harga_jual * v.qty)
    from (values
     ('paket-nasi-kotak-acara-kantor'::text, 25),
-    ('ayam-goreng-lengkuas', 25)
+    ('snack-box-isi-3', 25)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Selesai', current_date - 11 + time '08:00';
@@ -180,7 +180,7 @@ select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
   ('paket-nasi-kotak-acara-kantor'::text, 25),
-  ('ayam-goreng-lengkuas', 25)
+  ('snack-box-isi-3', 25)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-06';
@@ -191,7 +191,7 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-07', 'Ibu Siti Rahayu', '0819-4455-6677',
-  'Jl. Kopo Permai II No. 23, Bandung',
+  'Jl. Kopo Permai II No. 23, Cilacap',
   current_date - 7, '09:00',
   'Antar ke Alamat', 'Tolong nasi jangan terlalu pedas.',
   (select sum(m.harga_jual * v.qty)
@@ -216,12 +216,12 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-08', 'Panitia Pengajian RW 04', '0852-1188-7766',
-  'Masjid Al-Ikhlas, Jl. Melati Raya, Bandung',
+  'Masjid Al-Ikhlas, Jl. Nata Bangsa, Jeruklegi',
   current_date - 6, '11:00',
   'Antar ke Alamat', '',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('snack-box-premium'::text, 40)
+    ('snack-box-isi-3'::text, 40)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Selesai', current_date - 9 + time '08:00';
@@ -230,7 +230,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('snack-box-premium'::text, 40)
+  ('snack-box-isi-3'::text, 40)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-08';
@@ -241,12 +241,12 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-09', 'Klinik Sehat Bersama', '0821-3344-5566',
-  'Jl. Buah Batu No. 201, Bandung',
+  'Jl. Buah Batu No. 201, Cilacap',
   current_date - 5, '11:30',
   'Antar ke Alamat', 'Mohon sambalnya dipisah ya.',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('paket-bento-ayam-kremes'::text, 100)
+    ('paket-nasi-kuning-bento-royal'::text, 100)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Selesai', current_date - 8 + time '08:00';
@@ -255,7 +255,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('paket-bento-ayam-kremes'::text, 100)
+  ('paket-nasi-kuning-bento-royal'::text, 100)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-09';
@@ -266,12 +266,12 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-10', 'Bapak Agus Priyanto', '0896-2211-9900',
-  'Jl. Sukajadi No. 76, Bandung',
+  'Jl. Sukajadi No. 76, Cilacap',
   current_date - 4, '15:00',
   'Antar ke Alamat', 'Tolong tambahkan sendok dan tisu ekstra.',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('prasmanan-paket-gold'::text, 120)
+    ('paket-nasi-kotak-rendang-vip'::text, 120)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Selesai', current_date - 7 + time '08:00';
@@ -280,7 +280,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('prasmanan-paket-gold'::text, 120)
+  ('paket-nasi-kotak-rendang-vip'::text, 120)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-10';
@@ -291,13 +291,13 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-11', 'Rina Kusumawati', '0812-9087-1122',
-  'Kantor Dinas Pendidikan, Jl. Radjiman No. 6, Bandung',
+  'Kantor Dinas Pendidikan, Jl. Radjiman No. 6, Cilacap',
   current_date - 3, '07:30',
   'Ambil di Tempat', 'Ada 3 porsi tanpa daging, untuk tamu vegetarian.',
   (select sum(m.harga_jual * v.qty)
    from (values
     ('paket-nasi-kotak-nila-bakar'::text, 35),
-    ('gudeg-nangka', 35)
+    ('snack-box-isi-3', 35)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Selesai', current_date - 6 + time '08:00';
@@ -307,7 +307,7 @@ select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
   ('paket-nasi-kotak-nila-bakar'::text, 35),
-  ('gudeg-nangka', 35)
+  ('snack-box-isi-3', 35)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-11';
@@ -318,12 +318,12 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-12', 'Hendra Saputra', '0857-3311-2098',
-  'Jl. Cigadung Raya Timur No. 14, Bandung',
+  'Jl. Cigadung Raya Timur No. 14, Cilacap',
   current_date - 2, '09:00',
   'Antar ke Alamat', '',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('tumpeng-komplit-nampan'::text, 1)
+    ('tumpeng-mini'::text, 1)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Selesai', current_date - 5 + time '08:00';
@@ -332,7 +332,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('tumpeng-komplit-nampan'::text, 1)
+  ('tumpeng-mini'::text, 1)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-12';
@@ -343,7 +343,7 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-13', 'Dewi Anggraeni', '0813-2277-8890',
-  'Perum Griya Asri Blok C2 No. 8, Cimahi',
+  'Perum Griya Asri Blok C2 No. 8, Jeruklegi',
   current_date - 1, '11:00',
   'Antar ke Alamat', 'Pengantaran lewat pintu samping gedung.',
   (select sum(m.harga_jual * v.qty)
@@ -370,13 +370,13 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-14', 'SMP Negeri 12', '022-7301-448',
-  'Jl. Setiabudi No. 112, Bandung',
+  'Jl. Setiabudi No. 112, Cilacap',
   current_date, '11:30',
   'Antar ke Alamat', '',
   (select sum(m.harga_jual * v.qty)
    from (values
     ('paket-nasi-kuning-bento-royal'::text, 18),
-    ('tahu-tempe-bacem', 18)
+    ('snack-box-isi-3', 18)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Diproses', current_date - 3 + time '08:00';
@@ -386,7 +386,7 @@ select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
   ('paket-nasi-kuning-bento-royal'::text, 18),
-  ('tahu-tempe-bacem', 18)
+  ('snack-box-isi-3', 18)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-14';
@@ -397,7 +397,7 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-15', 'Bapak Yusuf Maulana', '0878-5512-4433',
-  'Jl. Cibaduyut Lama No. 45, Bandung',
+  'Jl. Cibaduyut Lama No. 45, Cilacap',
   current_date, '15:00',
   'Antar ke Alamat', 'Tolong nasi jangan terlalu pedas.',
   (select sum(m.harga_jual * v.qty)
@@ -422,12 +422,12 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-16', 'PT Sinar Mandiri', '0811-2299-3040',
-  'Gedung Pasifik Lt. 3, Jl. Asia Afrika, Bandung',
+  'Gedung Pasifik Lt. 3, Jl. Asia Afrika, Cilacap',
   current_date, '07:30',
   'Ambil di Tempat', '',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('paket-bento-ayam-kremes'::text, 70)
+    ('paket-nasi-kuning-bento-royal'::text, 70)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Diproses', current_date - 3 + time '08:00';
@@ -436,7 +436,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('paket-bento-ayam-kremes'::text, 70)
+  ('paket-nasi-kuning-bento-royal'::text, 70)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-16';
@@ -447,12 +447,12 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-17', 'Ibu Siti Rahayu', '0819-4455-6677',
-  'Jl. Kopo Permai II No. 23, Bandung',
+  'Jl. Kopo Permai II No. 23, Cilacap',
   current_date + 1, '09:00',
   'Antar ke Alamat', 'Mohon sambalnya dipisah ya.',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('prasmanan-paket-silver'::text, 60)
+    ('paket-nasi-kotak-acara-kantor'::text, 60)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Diproses', current_date - 2 + time '08:00';
@@ -461,7 +461,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('prasmanan-paket-silver'::text, 60)
+  ('paket-nasi-kotak-acara-kantor'::text, 60)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-17';
@@ -472,7 +472,7 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-18', 'Panitia Pengajian RW 04', '0852-1188-7766',
-  'Masjid Al-Ikhlas, Jl. Melati Raya, Bandung',
+  'Masjid Al-Ikhlas, Jl. Nata Bangsa, Jeruklegi',
   current_date + 1, '11:00',
   'Antar ke Alamat', 'Tolong tambahkan sendok dan tisu ekstra.',
   (select sum(m.harga_jual * v.qty)
@@ -497,7 +497,7 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-19', 'Klinik Sehat Bersama', '0821-3344-5566',
-  'Jl. Buah Batu No. 201, Bandung',
+  'Jl. Buah Batu No. 201, Cilacap',
   current_date + 2, '11:30',
   'Antar ke Alamat', 'Ada 3 porsi tanpa daging, untuk tamu vegetarian.',
   (select sum(m.harga_jual * v.qty)
@@ -522,13 +522,13 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-20', 'Bapak Agus Priyanto', '0896-2211-9900',
-  'Jl. Sukajadi No. 76, Bandung',
+  'Jl. Sukajadi No. 76, Cilacap',
   current_date + 3, '15:00',
   'Antar ke Alamat', '',
   (select sum(m.harga_jual * v.qty)
    from (values
     ('paket-nasi-kotak-rendang-vip'::text, 24),
-    ('snack-box-premium', 24)
+    ('snack-box-isi-3', 24)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Menunggu Konfirmasi', current_date + time '08:00';
@@ -538,7 +538,7 @@ select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
   ('paket-nasi-kotak-rendang-vip'::text, 24),
-  ('snack-box-premium', 24)
+  ('snack-box-isi-3', 24)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-20';
@@ -549,7 +549,7 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-21', 'Rina Kusumawati', '0812-9087-1122',
-  'Kantor Dinas Pendidikan, Jl. Radjiman No. 6, Bandung',
+  'Kantor Dinas Pendidikan, Jl. Radjiman No. 6, Cilacap',
   current_date + 4, '07:30',
   'Ambil di Tempat', 'Pengantaran lewat pintu samping gedung.',
   (select sum(m.harga_jual * v.qty)
@@ -574,12 +574,12 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-22', 'Hendra Saputra', '0857-3311-2098',
-  'Jl. Cigadung Raya Timur No. 14, Bandung',
+  'Jl. Cigadung Raya Timur No. 14, Cilacap',
   current_date + 6, '09:00',
   'Antar ke Alamat', '',
   (select sum(m.harga_jual * v.qty)
    from (values
-    ('snack-box-premium'::text, 50)
+    ('snack-box-isi-3'::text, 50)
    ) as v(slug, qty)
    join public.menus m on m.slug = v.slug),
   'Menunggu Konfirmasi', current_date + 3 + time '08:00';
@@ -588,7 +588,7 @@ insert into public.order_details (order_id, menu_id, nama_menu, qty, harga)
 select o.id, m.id, m.nama, v.qty, m.harga_jual
 from public.orders o
 cross join (values
-  ('snack-box-premium'::text, 50)
+  ('snack-box-isi-3'::text, 50)
 ) as v(slug, qty)
 join public.menus m on m.slug = v.slug
 where o.kode = 'ASR-DEMO-22';
@@ -599,7 +599,7 @@ insert into public.orders (
   metode, catatan, total, status, dibuat_pada)
 select
   'ASR-DEMO-23', 'Dewi Anggraeni', '0813-2277-8890',
-  'Perum Griya Asri Blok C2 No. 8, Cimahi',
+  'Perum Griya Asri Blok C2 No. 8, Jeruklegi',
   current_date + 8, '11:00',
   'Antar ke Alamat', 'Tolong nasi jangan terlalu pedas.',
   (select sum(m.harga_jual * v.qty)

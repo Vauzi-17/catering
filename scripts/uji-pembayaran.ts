@@ -4,18 +4,20 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
 import {
+  cocokkanNotifikasi,
+  crc16,
   hitungRincian,
   jarakKm,
-  kodeDariOrderId,
-  keIsoWib,
-  namaMetode,
-  orderIdMidtrans,
-  pembaruanDariMidtrans,
+  nominalDariTeks,
+  periksaQris,
+  qrisBernominal,
+  statusSesudahLunas,
   tanggalJakarta,
-  teksSignature,
+  tanggalPalingCepat,
   titikSah,
+  uraiTlv,
+  type CalonPesanan,
 } from "../src/lib/pembayaran.ts";
 
 const menus = [
@@ -58,98 +60,125 @@ test("tanggal memakai zona Asia/Jakarta", () => {
   const t = new Date("2026-09-30T20:00:00Z");
   assert.equal(tanggalJakarta(t), "2026-10-01");
   assert.equal(tanggalJakarta(t, 1), "2026-10-02");
+  assert.equal(tanggalPalingCepat(t), "2026-10-03");
 });
 
-test("order_id Midtrans bolak-balik ke kode pesanan", () => {
-  const id = orderIdMidtrans("ASR-261003-123", 2);
-  assert.equal(id, "ASR-261003-123-2");
-  assert.deepEqual(kodeDariOrderId(id), { kode: "ASR-261003-123", percobaan: 2 });
-  assert.equal(kodeDariOrderId("tanpa-angka-x"), null);
+// ------------------------------------------------------------------ QRIS
+
+/** QRIS statis tiruan dengan struktur seperti milik GoBiz/bank. */
+function buatStatis(tambahan = ""): string {
+  const tlv = (id: string, v: string) => id + String(v.length).padStart(2, "0") + v;
+  const isi =
+    tlv("00", "01") +
+    tlv("01", "11") +
+    tlv("26", tlv("00", "COM.GO-JEK.WWW") + tlv("01", "936009140123456789") + tlv("02", "G123456789") + tlv("03", "UMI")) +
+    tlv("51", tlv("00", "ID.CO.QRIS.WWW") + tlv("02", "ID1023456789012") + tlv("03", "UMI")) +
+    tlv("52", "5812") +
+    tlv("53", "360") +
+    tambahan +
+    tlv("58", "ID") +
+    tlv("59", "ASRI CATERING") +
+    tlv("60", "BANDUNG") +
+    tlv("61", "40115") +
+    tlv("62", tlv("07", "A01")) +
+    "6304";
+  return isi + crc16(isi);
+}
+
+test("CRC16 sesuai vektor uji CCITT-FALSE", () => {
+  assert.equal(crc16("123456789"), "29B1");
 });
 
-test("signature sesuai rumus Midtrans: sha512(order_id + status_code + gross_amount + server_key)", () => {
-  const teks = teksSignature("ASR-1-1", "200", "960000.00", "SB-Mid-server-rahasia");
-  assert.equal(teks, "ASR-1-1200960000.00SB-Mid-server-rahasia");
-  assert.equal(createHash("sha512").update(teks).digest("hex").length, 128);
+test("QRIS statis dikenali beserta nama toko", () => {
+  const info = periksaQris(buatStatis());
+  assert.deepEqual(info, { statis: true, nama: "ASRI CATERING", kota: "BANDUNG", nominal: null });
 });
 
-test("nama metode pembayaran", () => {
-  assert.equal(namaMetode({ payment_type: "bank_transfer", va_numbers: [{ bank: "bca" }] }), "BCA Virtual Account");
-  assert.equal(namaMetode({ payment_type: "bank_transfer", permata_va_number: "123" }), "PERMATA Virtual Account");
-  assert.equal(namaMetode({ payment_type: "qris", issuer: "gopay" }), "QRIS (gopay)");
-  assert.equal(namaMetode({ payment_type: "gopay" }), "GoPay");
-  assert.equal(namaMetode({ payment_type: "echannel" }), "Mandiri Bill Payment");
+test("QRIS rusak atau bukan QRIS ditolak", () => {
+  const sah = buatStatis();
+  assert.throws(() => periksaQris(sah.slice(0, -1) + (sah.endsWith("0") ? "1" : "0")), /CRC/);
+  assert.throws(() => periksaQris("https://contoh.id"), /bukan kode QRIS/);
+  assert.throws(() => periksaQris("000201010211"), /tidak lengkap|tidak dikenali/);
 });
 
-const menunggu = { status: "Menunggu Pembayaran", status_bayar: "Menunggu", midtrans_order_id: "K-1" };
-const sekarang = new Date("2026-10-01T03:00:00Z");
-
-test("settlement → Lunas dan status Dibayar", () => {
-  const p = pembaruanDariMidtrans(menunggu, {
-    order_id: "K-1",
-    transaction_status: "settlement",
-    payment_type: "qris",
-    settlement_time: "2026-10-01 10:15:00",
-  }, sekarang);
-  assert.deepEqual(p, {
-    status_bayar: "Lunas",
-    metode_bayar: "QRIS",
-    dibayar_pada: "2026-10-01T03:15:00.000Z",
-    status: "Dibayar",
-  });
+test("QRIS bernominal: tag 01 jadi 12, tag 54 disisipkan sebelum 58, CRC baru sah", () => {
+  const dinamis = qrisBernominal(buatStatis(), 150237);
+  const info = periksaQris(dinamis);
+  assert.equal(info.statis, false);
+  assert.equal(info.nominal, 150237);
+  assert.equal(info.nama, "ASRI CATERING");
+  const id = uraiTlv(dinamis).map((e) => e.id);
+  assert.ok(id.indexOf("54") === id.indexOf("58") - 1);
+  assert.equal(id.at(-1), "63");
 });
 
-test("capture kartu: accept lunas, deny gagal", () => {
-  assert.equal(pembaruanDariMidtrans(menunggu, { order_id: "K-1", transaction_status: "capture", fraud_status: "accept" })?.status_bayar, "Lunas");
-  assert.equal(pembaruanDariMidtrans(menunggu, { order_id: "K-1", transaction_status: "capture", fraud_status: "deny" })?.status_bayar, "Gagal");
+test("tip dan nominal lama dibuang supaya jumlah tidak bisa diubah", () => {
+  const denganTip = buatStatis("540550000" + "550202" + "57041000");
+  const dinamis = qrisBernominal(denganTip, 75500);
+  const id = uraiTlv(dinamis).map((e) => e.id);
+  assert.ok(!id.includes("55") && !id.includes("57"));
+  assert.equal(periksaQris(dinamis).nominal, 75500);
 });
 
-test("notifikasi lunas berulang tidak mengubah apa pun", () => {
-  const lunas = { status: "Dibayar", status_bayar: "Lunas", midtrans_order_id: "K-1" };
-  assert.equal(pembaruanDariMidtrans(lunas, { order_id: "K-1", transaction_status: "settlement" }), null);
+test("nominal QRIS harus bilangan bulat positif", () => {
+  assert.throws(() => qrisBernominal(buatStatis(), 0), /tidak sah/);
+  assert.throws(() => qrisBernominal(buatStatis(), 1500.5), /tidak sah/);
 });
 
-test("pesanan lunas tidak turun status karena expire yang terlambat", () => {
-  const lunas = { status: "Diproses", status_bayar: "Lunas", midtrans_order_id: "K-2" };
-  assert.equal(pembaruanDariMidtrans(lunas, { order_id: "K-1", transaction_status: "expire" }), null);
-  assert.equal(pembaruanDariMidtrans(lunas, { order_id: "K-2", transaction_status: "expire" }), null);
+test("nominal diambil dari berbagai format notifikasi", () => {
+  assert.deepEqual(nominalDariTeks("Pembayaran QRIS Rp150.237 berhasil diterima"), [150237]);
+  assert.deepEqual(nominalDariTeks("Kamu terima Rp 1.250.000,00 dari QRIS"), [1250000]);
+  assert.deepEqual(nominalDariTeks("IDR 150,237.00 masuk"), [150237]);
+  assert.deepEqual(nominalDariTeks("Rp150237 masuk ke GoPay Merchant"), [150237]);
+  assert.deepEqual(nominalDariTeks("Saldo Rp2.500.000 · masuk Rp45.120"), [2500000, 45120]);
+  assert.deepEqual(nominalDariTeks("Cashback Rp1.234,50"), []);
+  assert.deepEqual(nominalDariTeks("Pesanan baru masuk"), []);
 });
 
-test("expire dari percobaan lama diabaikan, dari percobaan aktif membatalkan", () => {
-  const aktif2 = { ...menunggu, midtrans_order_id: "K-2" };
-  assert.equal(pembaruanDariMidtrans(aktif2, { order_id: "K-1", transaction_status: "expire" }), null);
-  assert.deepEqual(pembaruanDariMidtrans(aktif2, { order_id: "K-2", transaction_status: "expire" }), {
-    status_bayar: "Kedaluwarsa",
-    status: "Dibatalkan",
-  });
+const jam = (n: number) => new Date(Date.parse("2026-10-13T05:00:00Z") + n * 3600_000).toISOString();
+const SEKARANG = new Date("2026-10-13T05:00:00Z");
+const calon = (c: Partial<CalonPesanan> & { id: string; nominal: number }): CalonPesanan => ({
+  status_bayar: "Menunggu",
+  batas_bayar: jam(5),
+  dibayar_pada: null,
+  ...c,
 });
 
-test("pembayaran telat setelah kedaluwarsa tetap tercatat lunas", () => {
-  const batal = { status: "Dibatalkan", status_bayar: "Kedaluwarsa", midtrans_order_id: "K-1" };
-  const p = pembaruanDariMidtrans(batal, { order_id: "K-1", transaction_status: "settlement" }, sekarang);
-  assert.equal(p?.status_bayar, "Lunas");
-  assert.equal(p?.status, "Dibayar");
+test("notifikasi cocok dengan tagihan aktif yang nominalnya persis", () => {
+  const r = cocokkanNotifikasi([150237], [calon({ id: "a", nominal: 150237 }), calon({ id: "b", nominal: 150238 })], SEKARANG);
+  assert.deepEqual(r, { hasil: "cocok", id: "a", telat: false });
 });
 
-test("lunas tidak mengubah alur yang sudah diproses admin", () => {
-  const diproses = { status: "Diproses", status_bayar: "Menunggu", midtrans_order_id: "K-1" };
-  const p = pembaruanDariMidtrans(diproses, { order_id: "K-1", transaction_status: "settlement" }, sekarang);
-  assert.equal(p?.status_bayar, "Lunas");
-  assert.equal(p?.status, undefined);
+test("notifikasi tanpa nominal atau tanpa pesanan cocok tidak mengubah apa pun", () => {
+  assert.deepEqual(cocokkanNotifikasi([], [calon({ id: "a", nominal: 1 })], SEKARANG), { hasil: "tanpa_nominal" });
+  assert.deepEqual(cocokkanNotifikasi([99], [calon({ id: "a", nominal: 150237 })], SEKARANG), { hasil: "tidak_cocok" });
 });
 
-test("cancel/deny menandai gagal tanpa membatalkan pesanan", () => {
-  assert.deepEqual(pembaruanDariMidtrans(menunggu, { order_id: "K-1", transaction_status: "cancel" }), { status_bayar: "Gagal" });
+test("pembayaran telat setelah kedaluwarsa tetap dicocokkan bila hanya satu calon", () => {
+  const lewat = calon({ id: "a", nominal: 150237, status_bayar: "Kedaluwarsa", batas_bayar: jam(-2) });
+  assert.deepEqual(cocokkanNotifikasi([150237], [lewat], SEKARANG), { hasil: "cocok", id: "a", telat: true });
+  const duaLewat = [lewat, calon({ id: "b", nominal: 150237, status_bayar: "Kedaluwarsa", batas_bayar: jam(-10) })];
+  assert.deepEqual(cocokkanNotifikasi([150237], duaLewat, SEKARANG), { hasil: "tidak_cocok" });
+  const terlaluLama = calon({ id: "c", nominal: 150237, status_bayar: "Kedaluwarsa", batas_bayar: jam(-24 * 4) });
+  assert.deepEqual(cocokkanNotifikasi([150237], [terlaluLama], SEKARANG), { hasil: "tidak_cocok" });
 });
 
-test("refund mengembalikan dana dan membatalkan pesanan", () => {
-  const lunas = { status: "Dibayar", status_bayar: "Lunas", midtrans_order_id: "K-1" };
-  assert.deepEqual(pembaruanDariMidtrans(lunas, { order_id: "K-1", transaction_status: "refund" }), {
-    status_bayar: "Dikembalikan",
-    status: "Dibatalkan",
-  });
+test("notifikasi kedua untuk pesanan yang baru lunas dianggap ganda", () => {
+  const lunas = calon({ id: "a", nominal: 150237, status_bayar: "Lunas", dibayar_pada: jam(-0.1) });
+  assert.deepEqual(cocokkanNotifikasi([150237], [lunas], SEKARANG), { hasil: "ganda", id: "a" });
 });
 
-test("waktu Midtrans (WIB) dikonversi ke UTC", () => {
-  assert.equal(keIsoWib("2026-10-01 00:30:00"), "2026-09-30T17:30:00.000Z");
+test("tagihan aktif didahulukan daripada yang sudah lunas lama dengan nominal sama", () => {
+  const r = cocokkanNotifikasi(
+    [150237],
+    [calon({ id: "lama", nominal: 150237, status_bayar: "Lunas", dibayar_pada: jam(-48) }), calon({ id: "baru", nominal: 150237 })],
+    SEKARANG,
+  );
+  assert.deepEqual(r, { hasil: "cocok", id: "baru", telat: false });
+});
+
+test("lunas hanya menggeser pesanan yang belum berjalan", () => {
+  assert.equal(statusSesudahLunas("Menunggu Pembayaran"), "Dibayar");
+  assert.equal(statusSesudahLunas("Dibatalkan"), "Dibayar");
+  assert.equal(statusSesudahLunas("Diproses"), "Diproses");
 });

@@ -1,6 +1,6 @@
 # Data Contoh yang Harus Diganti
 
-Seluruh data yang tampil sekarang — nama pemilik, alamat Bandung, nomor telepon,
+Seluruh data yang tampil sekarang — nama pemilik, nomor telepon,
 harga menu, resep, testimoni — masih **karangan untuk keperluan pengembangan**.
 Angkanya dibuat masuk akal supaya perhitungan HPP dan laporan bisa diuji, tetapi
 tidak satu pun berasal dari Asri Catering yang sebenarnya.
@@ -24,36 +24,37 @@ sumber untuk membuat ulang berkas seed — bukan lagi isi website.
 
 ---
 
-## 1. Profil usaha — `src/data/profil.ts`
+## 1. Profil usaha — `src/data/profil.ts` (versi Inggris: `src/data/profil-en.ts`)
 
 Tidak tersimpan di basis data, jadi selalu disunting di berkas ini.
 
-| Kolom | Isi sekarang (karangan) |
+| Kolom | Isi sekarang |
 | --- | --- |
-| `pemilik` | Ibu Asri Wulandari |
-| `berdiri` | 2016 |
-| `alamat` | Jl. Melati Raya No. 27, Sukamaju, Bandung |
-| `telepon` / `teleponRaw` | 0812-2345-6789 |
+| `pemilik` | Asri (sudah asli) |
+| `berdiri` | 28 Agustus 2026 — warung nasi rames dibuka (sudah asli) |
+| `alamat` | Jl. Nata Bangsa RT 01 RW 10, Jambusari, Jeruklegi, Cilacap (sudah alamat asli) |
+| `telepon` / `teleponRaw` | 0851-3375-0156 (sudah asli) |
 | `email` | halo@asricatering.id |
 | `instagram` | @asricatering.id |
-| `jamOperasional` | Senin–Jumat 07.00–18.00, dst. |
-| `areaLayanan` | Bandung, Cimahi, Bandung Barat |
-| `statistik` | 9 tahun, 1.200+ acara, 150 box/hari, ulasan 4,8 |
-| `sejarah` | Empat tonggak 2016 – 2025 |
+| `jamOperasional` | Setiap hari 07.00–18.00 — **jamnya perkiraan, pastikan ke pemilik**; pesanan katering paling lambat H-2 |
+| `areaLayanan` | Jeruklegi dan sekitarnya, Kota Cilacap, Kabupaten Cilacap — sesuaikan dengan jangkauan kurir |
+| `statistik` | Buka sejak 2026, 6 paket, terima pesanan setiap hari, batas H-2 |
+| `sejarah` | Agustus 2026 warung rames dibuka; kini merintis paket katering |
 | `keunggulan` | Empat poin |
-| `testimoni` | **Tiga testimoni fiktif — wajib diganti atau dihapus** |
+| `testimoni` | Kosong, seksi testimoni di beranda tersembunyi sampai ada ulasan asli |
 | `faq` | Tanya jawab, termasuk pengantaran gratis dan pembayaran online |
 
-> Testimoni paling perlu diperhatikan. Menampilkan ulasan karangan seolah dari
-> pelanggan nyata itu menyesatkan. Ganti dengan ulasan asli (seizin orangnya)
-> atau hapus seksinya dari halaman Tentang Kami.
+> Testimoni sengaja dikosongkan karena usaha katering baru dirintis. Tambahkan
+> ulasan asli (seizin orangnya) ke `testimoni` di `profil.ts` dan
+> `profil-en.ts`; seksi **Kata Pelanggan** di beranda muncul otomatis.
+> Jangan mengisi ulasan karangan.
 
 `teleponRaw` dipakai untuk tautan WhatsApp, formatnya tanpa tanda baca dan
 diawali 62 — contoh `6281223456789`.
 
 ## 2. Menu, harga, dan resep
 
-14 menu contoh beserta takaran resepnya. Harga dan takaran inilah yang
+6 menu contoh beserta takaran resepnya. Harga dan takaran inilah yang
 menentukan HPP, jadi **ini yang paling memengaruhi kebenaran laporan.**
 
 - Mode contoh: `src/data/menu.ts`
@@ -62,9 +63,13 @@ menentukan HPP, jadi **ini yang paling memengaruhi kebenaran laporan.**
 Yang perlu dipastikan bersama Ibu Asri: nama menu, harga jual, isi paket,
 minimal pemesanan, biaya kemasan, biaya tenaga kerja, dan takaran tiap bahan.
 
+Versi bahasa Inggris (nama, deskripsi, isi paket) diisi di bagian **Versi
+bahasa Inggris (opsional)** pada formulir menu yang sama. Bila dikosongkan,
+pengunjung yang memilih EN tetap melihat teks bahasa Indonesia.
+
 ## 3. Bahan baku dan harganya
 
-26 bahan contoh dengan harga pasaran perkiraan.
+31 bahan contoh dengan harga pasaran perkiraan.
 
 - Mode contoh: `src/data/bahan.ts`
 - Supabase: **Panel Admin → Bahan Baku**
@@ -106,20 +111,19 @@ sebagai admin mengikuti `SETUP-PEMBAYARAN.md` bagian 1.4, dan pastikan
 
 ## 8. Titik dapur dan radius layanan
 
-Titik dapur bawaan (`-6.917464, 107.619123`, pusat Kota Bandung) dan radius
-25 km adalah **karangan**. Keduanya menentukan alamat mana yang boleh memesan
+Titik dapur bawaan (`-7.560572, 109.01547`, Jl. Nata Bangsa, Jambusari, Jeruklegi — titik jalan dari OpenStreetMap, belum titik rumah persis) dan radius
+25 km perlu dicek ulang. Keduanya menentukan alamat mana yang boleh memesan
 dengan pengantaran gratis. Ganti lewat SQL mengikuti `SETUP-PEMBAYARAN.md`
 bagian 1.5. Nilai cadangan di `src/lib/useInfoPengantaran.ts` hanya dipakai
 bila Supabase belum tersambung.
 
 ## 9. Pembayaran
 
-Selama kunci Midtrans masih kunci **sandbox** dan `MIDTRANS_IS_PRODUCTION`
-belum `true`, tidak ada uang sungguhan yang masuk. Sebelum menerima pesanan
-nyata: selesaikan verifikasi usaha di Midtrans atas nama Asri Catering, ganti
-ke kunci produksi, isi `MIDTRANS_IS_PRODUCTION=true`, dan isi Notification URL
-produksi (`SETUP-PEMBAYARAN.md` bagian 2.4). Periksa juga tarif per transaksi Midtrans
-karena memengaruhi margin.
+Pembayaran memakai QRIS milik usaha. Sebelum menerima pesanan nyata: simpan
+QRIS **atas nama Asri Catering** (bukan milik pengembang) di panel admin,
+pasang penerus notifikasi di HP pemilik, dan uji satu pembayaran sungguhan
+(`SETUP-PEMBAYARAN.md` bagian 2). Periksa juga biaya QRIS (MDR) dari
+penyedia karena memengaruhi margin.
 
 ---
 
@@ -135,4 +139,4 @@ karena memengaruhi margin.
 - [ ] `06-akun-pembayaran.sql` dijalankan, akun Ibu Asri terdaftar sebagai admin
 - [ ] Titik dapur dan radius layanan diganti
 - [ ] Email verifikasi memakai SMTP sendiri dan teks Bahasa Indonesia
-- [ ] Midtrans pindah ke kunci produksi, Notification URL produksi diisi
+- [ ] QRIS atas nama usaha tersimpan, `QRIS_NOTIF_TOKEN` dan MacroDroid terpasang, satu pembayaran uji berhasil

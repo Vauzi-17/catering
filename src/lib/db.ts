@@ -38,6 +38,11 @@ interface BarisMenu {
   biaya_tenaga_kerja: number | string;
   categories: { nama: string } | { nama: string }[] | null;
   recipes: { ingredient_id: string; jumlah: number | string }[] | null;
+  // Kolom bahasa Inggris (10-menu-bahasa-inggris.sql); belum ada di basis data lama.
+  nama_en?: string | null;
+  deskripsi_en?: string | null;
+  deskripsi_panjang_en?: string | null;
+  isi_en?: string[] | null;
 }
 
 const angka = (v: number | string | null | undefined) => Number(v ?? 0);
@@ -67,11 +72,39 @@ function keMenu(baris: BarisMenu): Menu {
       bahanId: r.ingredient_id,
       jumlah: angka(r.jumlah),
     })),
+    namaEn: baris.nama_en ?? "",
+    deskripsiEn: baris.deskripsi_en ?? "",
+    deskripsiPanjangEn: baris.deskripsi_panjang_en ?? "",
+    isiEn: baris.isi_en ?? [],
   };
 }
 
-const KOLOM_MENU =
+const KOLOM_MENU_DASAR =
   "id, slug, nama, deskripsi, deskripsi_panjang, harga_jual, satuan_jual, foto, isi, populer, tersedia, minimal_pesan, biaya_kemasan, biaya_tenaga_kerja, categories(nama), recipes(ingredient_id, jumlah)";
+const KOLOM_MENU_EN = "nama_en, deskripsi_en, deskripsi_panjang_en, isi_en";
+
+/**
+ * Kolom bahasa Inggris baru ada setelah 10-menu-bahasa-inggris.sql dijalankan.
+ * Sebelum itu, baca dan tulis menu tanpa kolom tersebut supaya situs tetap
+ * berjalan (teks Inggris jatuh ke versi Indonesia).
+ */
+let kolomEnAda: boolean | null = null;
+
+function kolomTidakAda(error: { code?: string; message?: string } | null): boolean {
+  return Boolean(error && (error.code === "42703" || error.code === "PGRST204" || /_en\b/.test(error.message ?? "")));
+}
+
+async function bacaMenu<T>(jalankan: (kolom: string) => PromiseLike<{ data: T; error: { code?: string; message?: string } | null }>) {
+  if (kolomEnAda !== false) {
+    const hasil = await jalankan(`${KOLOM_MENU_DASAR}, ${KOLOM_MENU_EN}`);
+    if (!kolomTidakAda(hasil.error)) {
+      kolomEnAda = true;
+      return hasil;
+    }
+    kolomEnAda = false;
+  }
+  return jalankan(KOLOM_MENU_DASAR);
+}
 
 interface BarisBahan {
   id: string;
@@ -115,6 +148,10 @@ interface BarisPesanan {
   metode_bayar?: string | null;
   batas_bayar?: string | null;
   dibayar_pada?: string | null;
+  nominal_bayar?: number | string | null;
+  kode_unik?: number | null;
+  qris_dinamis?: string | null;
+  diklaim_bayar_pada?: string | null;
   payments?: BarisPembayaran[] | null;
   order_details:
     | { menu_id: string | null; nama_menu: string; qty: number; harga: number | string }[]
@@ -124,7 +161,6 @@ interface BarisPesanan {
 
 interface BarisPembayaran {
   id: string;
-  midtrans_order_id: string;
   transaction_id: string | null;
   status_transaksi: string;
   jenis_pembayaran: string;
@@ -137,7 +173,6 @@ interface BarisPembayaran {
 function kePembayaran(b: BarisPembayaran): Pembayaran {
   return {
     id: b.id,
-    midtransOrderId: b.midtrans_order_id,
     transactionId: b.transaction_id,
     statusTransaksi: b.status_transaksi,
     jenisPembayaran: b.jenis_pembayaran,
@@ -181,6 +216,10 @@ function kePesanan(baris: BarisPesanan): Pesanan {
     metodeBayar: baris.metode_bayar ?? "",
     batasBayar: baris.batas_bayar ?? null,
     dibayarPada: baris.dibayar_pada ?? null,
+    nominalBayar: angkaAtauNull(baris.nominal_bayar),
+    kodeUnik: baris.kode_unik ?? null,
+    qrisDinamis: baris.qris_dinamis ?? null,
+    diklaimBayarPada: baris.diklaim_bayar_pada ?? null,
     pembayaran: (baris.payments ?? [])
       .map(kePembayaran)
       .sort((a, b) => (a.dibuatPada < b.dibuatPada ? 1 : -1)),
@@ -188,28 +227,23 @@ function kePesanan(baris: BarisPesanan): Pesanan {
 }
 
 const KOLOM_PESANAN =
-  "id, kode, nama, telepon, alamat, tanggal_acara, waktu_antar, metode, catatan, total, status, dibuat_pada, patokan, lat, lng, status_bayar, metode_bayar, batas_bayar, dibayar_pada, order_details(menu_id, nama_menu, qty, harga), order_status_history(status, waktu)";
+  "id, kode, nama, telepon, alamat, tanggal_acara, waktu_antar, metode, catatan, total, status, dibuat_pada, patokan, lat, lng, status_bayar, metode_bayar, batas_bayar, dibayar_pada, nominal_bayar, kode_unik, diklaim_bayar_pada, order_details(menu_id, nama_menu, qty, harga), order_status_history(status, waktu)";
 
 const KOLOM_PEMBAYARAN =
-  "id, midtrans_order_id, transaction_id, status_transaksi, jenis_pembayaran, keterangan, jumlah, waktu_transaksi, dibuat_pada";
+  "id, transaction_id, status_transaksi, jenis_pembayaran, keterangan, jumlah, waktu_transaksi, dibuat_pada";
 
 // ------------------------------------------------------------------ baca
 
 export async function ambilMenus(): Promise<Menu[]> {
-  const { data, error } = await wajibSupabase()
-    .from("menus")
-    .select(KOLOM_MENU)
-    .order("nama");
+  const { data, error } = await bacaMenu((kolom) => wajibSupabase().from("menus").select(kolom).order("nama"));
   if (error) throw error;
   return (data as unknown as BarisMenu[]).map(keMenu);
 }
 
 export async function ambilMenuSlug(slug: string): Promise<Menu | null> {
-  const { data, error } = await wajibSupabase()
-    .from("menus")
-    .select(KOLOM_MENU)
-    .eq("slug", slug)
-    .maybeSingle();
+  const { data, error } = await bacaMenu((kolom) =>
+    wajibSupabase().from("menus").select(kolom).eq("slug", slug).maybeSingle(),
+  );
   if (error) throw error;
   return data ? keMenu(data as unknown as BarisMenu) : null;
 }
@@ -223,7 +257,21 @@ export async function ambilBahan(): Promise<Bahan[]> {
   return (data as BarisBahan[]).map(keBahan);
 }
 
+/**
+ * Menutup tagihan QRIS yang sudah lewat batas (fungsi di 09-qris.sql).
+ * Dipanggil sebelum membaca pesanan; galat diabaikan karena pembacaan
+ * tetap boleh jalan.
+ */
+async function kedaluwarsakanTagihan(): Promise<void> {
+  try {
+    await wajibSupabase().rpc("kedaluwarsakan_tagihan");
+  } catch {
+    /* abaikan */
+  }
+}
+
 export async function ambilPesanan(): Promise<Pesanan[]> {
+  await kedaluwarsakanTagihan();
   const { data, error } = await wajibSupabase()
     .from("orders")
     .select(KOLOM_PESANAN)
@@ -235,6 +283,7 @@ export async function ambilPesanan(): Promise<Pesanan[]> {
 
 /** Pesanan milik akun yang sedang login (dibatasi RLS), terbaru di atas. */
 export async function ambilPesananSaya(): Promise<Pesanan[]> {
+  await kedaluwarsakanTagihan();
   const { data, error } = await wajibSupabase()
     .from("orders")
     .select(KOLOM_PESANAN)
@@ -246,9 +295,10 @@ export async function ambilPesananSaya(): Promise<Pesanan[]> {
 
 /** Satu pesanan lengkap dengan histori pembayarannya. */
 export async function ambilPesananDenganKode(kode: string): Promise<Pesanan | null> {
+  await kedaluwarsakanTagihan();
   const { data, error } = await wajibSupabase()
     .from("orders")
-    .select(`${KOLOM_PESANAN}, payments(${KOLOM_PEMBAYARAN})`)
+    .select(`${KOLOM_PESANAN}, qris_dinamis, payments(${KOLOM_PEMBAYARAN})`)
     .eq("kode", kode)
     .maybeSingle();
   if (error) throw error;
@@ -275,6 +325,57 @@ export async function ambilTransaksi(): Promise<TransaksiAdmin[]> {
       namaPemesan: b.orders?.nama ?? "",
     }),
   );
+}
+
+export interface NotifikasiQris {
+  id: string;
+  teks: string;
+  aplikasi: string;
+  nominal: number | null;
+  hasil: "cocok" | "ganda" | "tidak_cocok" | "tanpa_nominal";
+  diterimaPada: string;
+  kodePesanan: string;
+}
+
+/** Log notifikasi pembayaran yang diteruskan dari HP pemilik (khusus admin). */
+export async function ambilNotifikasiQris(): Promise<NotifikasiQris[]> {
+  const { data, error } = await wajibSupabase()
+    .from("qris_notifikasi")
+    .select("id, teks, aplikasi, nominal, hasil, diterima_pada, orders(kode)")
+    .order("diterima_pada", { ascending: false })
+    .limit(200);
+  if (error) throw error;
+  return (
+    data as unknown as {
+      id: string;
+      teks: string;
+      aplikasi: string;
+      nominal: number | string | null;
+      hasil: NotifikasiQris["hasil"];
+      diterima_pada: string;
+      orders: { kode: string } | null;
+    }[]
+  ).map((b) => ({
+    id: b.id,
+    teks: b.teks,
+    aplikasi: b.aplikasi,
+    nominal: angkaAtauNull(b.nominal),
+    hasil: b.hasil,
+    diterimaPada: b.diterima_pada,
+    kodePesanan: b.orders?.kode ?? "",
+  }));
+}
+
+/** QRIS statis toko (khusus admin, dibatasi RLS settings). */
+export async function ambilQrisToko(): Promise<string> {
+  const { data, error } = await wajibSupabase().from("settings").select("qris_statis").eq("id", 1).maybeSingle();
+  if (error) throw error;
+  return (data?.qris_statis as string | undefined) ?? "";
+}
+
+export async function simpanQrisToko(qris: string): Promise<void> {
+  const { error } = await wajibSupabase().from("settings").upsert({ id: 1, qris_statis: qris });
+  if (error) throw error;
 }
 
 export interface InfoPengantaran {
@@ -353,13 +454,26 @@ export async function simpanMenuDb(menu: Menu): Promise<Menu> {
     biaya_tenaga_kerja: menu.biayaTenagaKerja,
     diubah_pada: new Date().toISOString(),
   };
+  const isiEn = {
+    nama_en: menu.namaEn?.trim() ?? "",
+    deskripsi_en: menu.deskripsiEn?.trim() ?? "",
+    deskripsi_panjang_en: menu.deskripsiPanjangEn?.trim() ?? "",
+    isi_en: (menu.isiEn ?? []).map((s) => s.trim()).filter(Boolean),
+  };
 
   // Menu baru dari panel admin memakai id sementara, biarkan basis data
   // yang memberi UUID-nya.
-  const { data, error } = apakahUuid(menu.id)
-    ? await db.from("menus").upsert({ id: menu.id, ...isi }).select("id").single()
-    : await db.from("menus").insert(isi).select("id").single();
+  const tulis = (baris: Record<string, unknown>) =>
+    apakahUuid(menu.id)
+      ? db.from("menus").upsert({ id: menu.id, ...baris }).select("id").single()
+      : db.from("menus").insert(baris).select("id").single();
+  let { data, error } = await tulis(kolomEnAda === false ? isi : { ...isi, ...isiEn });
+  if (kolomTidakAda(error)) {
+    kolomEnAda = false;
+    ({ data, error } = await tulis(isi));
+  }
   if (error) throw error;
+  if (!data) throw new Error("Menu gagal disimpan.");
 
   const menuId = data.id as string;
 

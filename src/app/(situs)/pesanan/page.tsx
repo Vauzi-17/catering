@@ -9,9 +9,12 @@ export default function Halaman() {
   return (
     <>
       <HeroHalaman
-        remah={[{ label: "Beranda", href: "/" }, { label: "Pesanan Saya" }]}
-        judul="Pesanan Saya"
-        deskripsi="Pantau pembayaran dan perjalanan pesanan Anda sampai tiba di lokasi."
+        remah={[{ label: ["Beranda", "Home"], href: "/" }, { label: ["Pesanan Saya", "My Orders"] }]}
+        judul={["Pesanan Saya", "My Orders"]}
+        deskripsi={[
+          "Pantau pembayaran dan perjalanan pesanan Anda sampai tiba di lokasi.",
+          "Follow your payment and your order all the way to your location.",
+        ]}
         foto={fotoDekorasi.slice(0, 3)}
       />
       <DaftarPesananSaya />

@@ -29,7 +29,7 @@ Tempel isinya, klik **Run**, tunggu sampai muncul "Success".
 | Urutan | Berkas | Isinya |
 | --- | --- | --- |
 | 1 | `supabase/01-schema.sql` | Tabel, indeks, trigger, fungsi bantu |
-| 2 | `supabase/03-seed.sql` | 5 kategori, 26 bahan baku, 14 menu beserta resepnya |
+| 2 | `supabase/03-seed.sql` | 5 kategori, 31 bahan baku, 6 menu beserta resepnya |
 | 3 | `supabase/06-akun-pembayaran.sql` | Akun pelanggan, pembayaran, keamanan baris produksi — lihat [`SETUP-PEMBAYARAN.md`](SETUP-PEMBAYARAN.md) |
 | 4 (opsional) | `supabase/05-contoh-pesanan.sql` | 23 pesanan contoh, supaya Dasbor dan Laporan ada isinya |
 
@@ -38,7 +38,7 @@ digandakan. Jadi bila sebuah berkas gagal di tengah jalan, cukup perbaiki
 penyebabnya lalu jalankan ulang dari awal; tidak perlu mengosongkan tabel.
 
 Di bagian paling bawah `03-seed.sql` ada perintah pemeriksa. Jalankan bagian itu
-untuk memastikan hasilnya: **5 kategori, 26 bahan baku, 14 menu, 109 baris
+untuk memastikan hasilnya: **5 kategori, 31 bahan baku, 6 menu, 57 baris
 resep.**
 
 > `02-rls.sql` dan `04-rls-produksi.sql` adalah aturan versi lama dan **tidak
@@ -82,8 +82,9 @@ Rincian dan riwayat statusnya ikut terhapus otomatis.
 **Cara sungguhan — pesan lewat website sendiri**
 
 1. Daftar dan masuk sebagai pelanggan, pilih menu, isi data acara, lalu bayar
-   lewat simulator sandbox Midtrans (lihat `SETUP-PEMBAYARAN.md` bagian 2.3).
-2. Pesanan otomatis berstatus **Dibayar** dan langsung terhitung di laporan.
+   QRIS yang muncul (lihat `SETUP-PEMBAYARAN.md` bagian 2.4).
+2. Begitu notifikasi cocok atau admin mengonfirmasi manual, pesanan berstatus
+   **Dibayar** dan langsung terhitung di laporan.
 
 Dua hal yang sering membingungkan di sini:
 
@@ -92,7 +93,7 @@ Dua hal yang sering membingungkan di sini:
   bisa kedaluwarsa. Pesanan lama berstatus *Menunggu Konfirmasi* diperlakukan
   sama.
 - **Laporan dikelompokkan menurut tanggal acara, bukan tanggal pesan.** Formulir
-  hanya menerima acara paling cepat besok (H-1), jadi pesanan yang Anda buat
+  hanya menerima acara paling cepat lusa (H-2), jadi pesanan yang Anda buat
   sekarang akan muncul di kolom tanggal acaranya — bukan hari ini. Karena grafik
   menampilkan tujuh hari ke belakang, pesanan untuk minggu depan belum akan
   terlihat di sana. Ini cara hitung yang lazim untuk katering: pendapatan diakui
@@ -243,7 +244,7 @@ Ubah alamat pada:
 
 ## Bagian D — Akun, pembayaran, dan keamanan produksi
 
-Login admin, akun pelanggan, dan pembayaran Midtrans sekarang memakai Supabase
+Login admin, akun pelanggan, dan pembayaran QRIS sekarang memakai Supabase
 Auth. Langkahnya — termasuk menjalankan `supabase/06-akun-pembayaran.sql` yang
 menggantikan `02-rls.sql` dan `04-rls-produksi.sql` — ada di
 [`SETUP-PEMBAYARAN.md`](SETUP-PEMBAYARAN.md).

@@ -1,13 +1,23 @@
-import { Check } from "lucide-react";
+"use client";
 
-const daftarLangkah = ["Keranjang", "Data Acara", "Pembayaran", "Selesai"];
+import { Check } from "lucide-react";
+import { useBahasa } from "@/store/BahasaProvider";
+
+const daftarLangkah = [
+  ["Keranjang", "Cart"],
+  ["Data Acara", "Event Details"],
+  ["Pembayaran", "Payment"],
+  ["Selesai", "Done"],
+] as const;
 
 /** Penanda posisi pada alur pesan: 0 keranjang, 1 data acara, 2 pembayaran, 3 selesai. */
 export function LangkahCheckout({ aktif }: { aktif: number }) {
+  const { p } = useBahasa();
   return (
     <div className="border-b border-kabut-line bg-white">
       <ol className="container-page flex items-center justify-center gap-2 py-4 sm:gap-4 sm:py-5">
-        {daftarLangkah.map((label, i) => {
+        {daftarLangkah.map((pasangan, i) => {
+          const label = p(pasangan);
           const lewat = i < aktif || aktif === daftarLangkah.length - 1;
           const sekarang = i === aktif && !lewat;
           return (

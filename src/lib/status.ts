@@ -47,17 +47,10 @@ export const WARNA_BAYAR: Record<StatusBayar, string> = {
   Dikembalikan: "bg-kabut-deep text-ink-soft",
 };
 
-/** Label status transaksi mentah Midtrans untuk histori pembayaran. */
+/** Sumber pelunasan pada histori pembayaran. */
 export const LABEL_TRANSAKSI: Record<string, string> = {
-  pending: "Menunggu dibayar",
-  settlement: "Lunas",
-  capture: "Lunas (kartu)",
-  expire: "Kedaluwarsa",
-  cancel: "Dibatalkan",
-  deny: "Ditolak",
-  failure: "Gagal",
-  refund: "Dikembalikan",
-  partial_refund: "Dikembalikan sebagian",
+  settlement: "Otomatis",
+  manual: "Konfirmasi admin",
 };
 
 /** Menunggu tindakan admin: pesanan manual lama dan pesanan yang baru dibayar. */

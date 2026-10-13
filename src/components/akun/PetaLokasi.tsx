@@ -5,6 +5,7 @@ import type { Circle, Map as PetaLeaflet, Marker } from "leaflet";
 import { useEffect, useRef, useState } from "react";
 import { Crosshair, LoaderCircle, Search } from "lucide-react";
 import { jarakKm, type Titik } from "@/lib/pembayaran";
+import { useBahasa } from "@/store/BahasaProvider";
 
 export interface Dapur extends Titik {
   radiusKm: number;
@@ -41,6 +42,7 @@ export function PetaLokasi({
   onUbah: (t: Titik) => void;
   dapur: Dapur;
 }) {
+  const { t: tr } = useBahasa();
   const wadah = useRef<HTMLDivElement>(null);
   const peta = useRef<PetaLeaflet | null>(null);
   const pin = useRef<Marker | null>(null);
@@ -91,6 +93,7 @@ export function PetaLokasi({
     });
     return () => {
       hidup = false;
+      peta.current?.stop();
       peta.current?.remove();
       peta.current = null;
     };
@@ -114,7 +117,9 @@ export function PetaLokasi({
 
   function pilih(t: Titik) {
     onUbah(t);
-    peta.current?.setView([t.lat, t.lng], 16);
+    // Tanpa animasi: bila halaman langsung berpindah (mis. formulir dikirim),
+    // animasi zoom yang belum selesai membuat Leaflet melempar galat.
+    peta.current?.setView([t.lat, t.lng], 16, { animate: false });
   }
 
   async function cari(e?: React.FormEvent) {
@@ -125,7 +130,7 @@ export function PetaLokasi({
     try {
       const r = await cariAlamat(kueri.trim());
       setHasil(r);
-      if (r.length === 0) setPesan("Alamat tidak ditemukan. Coba nama jalan atau gedung yang lebih umum, lalu geser pin.");
+      if (r.length === 0) setPesan(tr("Alamat tidak ditemukan. Coba nama jalan atau gedung yang lebih umum, lalu geser pin.", "Address not found. Try a more general street or building name, then drag the pin."));
     } catch (err) {
       setPesan((err as Error).message);
     } finally {
@@ -134,14 +139,14 @@ export function PetaLokasi({
   }
 
   function lokasiSaya() {
-    if (!navigator.geolocation) return setPesan("Browser tidak mendukung lokasi.");
-    setPesan("Mencari lokasi Anda…");
+    if (!navigator.geolocation) return setPesan(tr("Browser tidak mendukung lokasi.", "Your browser does not support location."));
+    setPesan(tr("Mencari lokasi Anda…", "Finding your location…"));
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setPesan("");
         pilih({ lat: pos.coords.latitude, lng: pos.coords.longitude });
       },
-      () => setPesan("Izin lokasi ditolak. Cari alamat atau ketuk peta untuk menandai lokasi."),
+      () => setPesan(tr("Izin lokasi ditolak. Cari alamat atau ketuk peta untuk menandai lokasi.", "Location permission denied. Search for an address or tap the map to pin it.")),
       { enableHighAccuracy: true, timeout: 10_000 },
     );
   }
@@ -164,18 +169,18 @@ export function PetaLokasi({
                 void cari();
               }
             }}
-            placeholder="Cari nama jalan, gedung, atau daerah"
+            placeholder={tr("Cari nama jalan, gedung, atau daerah", "Search street, building, or area")}
             className="isian h-11 pl-9"
-            aria-label="Cari alamat di peta"
+            aria-label={tr("Cari alamat di peta", "Search address on the map")}
           />
         </div>
         <div className="flex gap-2">
           <button type="button" onClick={() => void cari()} disabled={mencari} className="tombol tombol-md tombol-garis flex-1 sm:flex-none">
-            {mencari ? <LoaderCircle size={16} className="animate-spin" /> : "Cari"}
+            {mencari ? <LoaderCircle size={16} className="animate-spin" /> : tr("Cari", "Search")}
           </button>
           <button type="button" onClick={lokasiSaya} className="tombol tombol-md tombol-garis flex-1 sm:flex-none">
             <Crosshair size={16} />
-            Lokasi saya
+            {tr("Lokasi saya", "My location")}
           </button>
         </div>
       </div>
@@ -203,15 +208,21 @@ export function PetaLokasi({
       <div
         ref={wadah}
         className="relative z-0 mt-3 h-72 w-full overflow-hidden rounded-xl border border-kabut-line bg-kabut sm:h-80"
-        aria-label="Peta lokasi pengantaran. Ketuk peta atau geser pin untuk menandai lokasi."
+        aria-label={tr("Peta lokasi pengantaran. Ketuk peta atau geser pin untuk menandai lokasi.", "Delivery location map. Tap the map or drag the pin to mark the location.")}
       />
 
       <p className={`mt-2 text-[13px] ${diLuar ? "font-semibold text-red-700" : "text-ink-muted"}`}>
         {jarak === null
-          ? "Ketuk peta atau geser pin ke lokasi acara. Garis putus-putus menandai area layanan."
+          ? tr("Ketuk peta atau geser pin ke lokasi acara. Garis putus-putus menandai area layanan.", "Tap the map or drag the pin to the event location. The dashed line marks our service area.")
           : diLuar
-            ? `Lokasi berjarak ${jarak.toFixed(1)} km dari dapur, di luar area layanan (${dapur.radiusKm} km).`
-            : `Lokasi berjarak ${jarak.toFixed(1)} km dari dapur. Termasuk area layanan, ongkir gratis.`}
+            ? tr(
+                `Lokasi berjarak ${jarak.toFixed(1)} km dari dapur, di luar area layanan (${dapur.radiusKm} km).`,
+                `This location is ${jarak.toFixed(1)} km from our kitchen, outside the service area (${dapur.radiusKm} km).`,
+              )
+            : tr(
+                `Lokasi berjarak ${jarak.toFixed(1)} km dari dapur. Termasuk area layanan, ongkir gratis.`,
+                `This location is ${jarak.toFixed(1)} km from our kitchen. Within the service area, free delivery.`,
+              )}
       </p>
     </div>
   );

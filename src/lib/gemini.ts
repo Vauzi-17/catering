@@ -187,7 +187,7 @@ function rapikanCatatan(mentah: CatatanMentah[]) {
 
 const GAYA_BAHASA = `
 Kamu adalah asisten analisis usaha untuk Asri Catering, sebuah UMKM katering
-nasi kotak, bento, dan prasmanan di Bandung. Pembacanya adalah Ibu Asri, pemilik usaha, yang bukan
+nasi kotak, bento, dan tumpeng di Cilacap. Pembacanya adalah Asri, pemilik usaha, yang bukan
 orang keuangan maupun orang teknologi.
 
 Aturan menulis:

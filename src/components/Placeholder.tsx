@@ -1,4 +1,7 @@
+"use client";
+
 import { IconImage, IconMapArea } from "@/components/Icons";
+import { useBahasa } from "@/store/BahasaProvider";
 
 /**
  * Kotak abu-abu penampung gambar.
@@ -63,10 +66,11 @@ export function FotoMenu({
   /** Ukuran kecil (mis. daftar pesanan) — keterangan teks disembunyikan. */
   mini?: boolean;
 }) {
+  const { t } = useBahasa();
   if (!src) {
     return (
       <GambarPlaceholder
-        label={mini ? undefined : `Foto ${nama}`}
+        label={mini ? undefined : t(`Foto ${nama}`, `Photo of ${nama}`)}
         rasio={rasio}
         className={className}
       />

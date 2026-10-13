@@ -69,7 +69,7 @@ export function Remah({
 }) {
   return (
     <nav
-      aria-label="Remah roti"
+      aria-label="Breadcrumb"
       className={`flex flex-wrap items-center gap-1.5 text-[13px] ${terang ? "text-white/75" : "text-ink-muted"}`}
     >
       {jejak.map((j, i) => (

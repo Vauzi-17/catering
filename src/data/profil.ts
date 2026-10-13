@@ -1,55 +1,42 @@
 export const profil = {
   nama: "Asri Catering",
   tagline: "Katering nasi kotak & bento untuk setiap acara",
-  pemilik: "Ibu Asri Wulandari",
-  berdiri: 2016,
+  pemilik: "Asri",
+  berdiri: "28 Agustus 2026",
   deskripsiSingkat:
-    "Asri Catering melayani nasi kotak, bento, prasmanan, tumpeng, dan snack box untuk acara kantor, sekolah, pengajian, dan keluarga. Semua masakan diolah pada hari pengantaran di dapur sendiri.",
+    "Asri Catering menerima pesanan nasi kotak, bento, tumpeng mini, dan snack box untuk acara kantor, sekolah, pengajian, dan keluarga. Semua masakan diolah pada hari pengantaran di dapur sendiri.",
   sejarah: [
     {
-      tahun: "2016",
-      judul: "Berawal dari dapur rumah",
-      isi: "Ibu Asri mulai menerima pesanan nasi rames dari tetangga dan kantor kelurahan sekitar. Dalam sehari rata-rata hanya 20 sampai 30 box yang dimasak sendiri bersama satu orang pembantu dapur.",
+      tahun: "Agt 2026",
+      judul: "Membuka warung nasi rames",
+      isi: "Pada 28 Agustus 2026 Asri membuka warung nasi rames di Jambusari, Jeruklegi. Sampai sekarang warung ini tetap buka untuk pembeli yang datang langsung.",
     },
     {
-      tahun: "2019",
-      judul: "Melayani pesanan kantor",
-      isi: "Pesanan mulai datang dari instansi dan sekolah. Dapur diperluas, peralatan prasmanan ditambah, dan jumlah pegawai bertambah menjadi empat orang.",
-    },
-    {
-      tahun: "2022",
-      judul: "Menambah layanan tumpeng & prasmanan",
-      isi: "Permintaan acara syukuran dan pernikahan meningkat. Asri Catering mulai menyediakan paket tumpeng lengkap dan layanan prasmanan dengan petugas penyaji.",
-    },
-    {
-      tahun: "2025",
-      judul: "Pencatatan pesanan digital",
-      isi: "Pencatatan pesanan yang semula ditulis di buku tulis dipindahkan ke sistem digital, lengkap dengan perhitungan harga pokok produksi dan laporan pendapatan harian.",
+      tahun: "Kini",
+      judul: "Merintis paket katering",
+      isi: "Dari dapur yang sama, Asri mulai menerima pesanan katering untuk acara: nasi kotak, bento, tumpeng mini, dan snack box. Pilihan menunya masih sedikit karena baru dirintis, dan akan bertambah seiring pesanan yang masuk.",
     },
   ],
-  alamat: "Jl. Melati Raya No. 27, Kelurahan Sukamaju, Kota Bandung, Jawa Barat 40285",
-  alamatSingkat: "Jl. Melati Raya No. 27, Sukamaju, Bandung",
-  telepon: "0812-2345-6789",
-  teleponRaw: "6281223456789",
+  alamat: "Jl. Nata Bangsa RT 01 RW 10, Desa Jambusari, Kecamatan Jeruklegi, Kabupaten Cilacap, Jawa Tengah",
+  alamatSingkat: "Jl. Nata Bangsa, Jambusari, Jeruklegi, Cilacap",
+  telepon: "0851-3375-0156",
+  teleponRaw: "6285133750156",
   email: "halo@asricatering.id",
   instagram: "@asricatering.id",
   jamOperasional: [
-    { hari: "Senin - Jumat", jam: "07.00 - 18.00" },
-    { hari: "Sabtu", jam: "07.00 - 16.00" },
-    { hari: "Minggu", jam: "08.00 - 14.00" },
-    { hari: "Hari Besar", jam: "Dengan perjanjian" },
+    { hari: "Setiap hari", jam: "07.00 - 18.00" },
+    { hari: "Pesanan katering", jam: "Paling lambat H-2" },
   ],
   areaLayanan: [
-    "Kota Bandung",
-    "Kabupaten Bandung",
-    "Cimahi",
-    "Bandung Barat (min. 50 porsi)",
+    "Jeruklegi dan sekitarnya",
+    "Kota Cilacap",
+    "Kabupaten Cilacap",
   ],
   statistik: [
-    { angka: "9", label: "Tahun melayani" },
-    { angka: "1.200+", label: "Acara tertangani" },
-    { angka: "150", label: "Box per hari" },
-    { angka: "4,8", label: "Rata-rata ulasan" },
+    { angka: "2026", label: "Warung rames buka sejak 28 Agustus" },
+    { angka: "6", label: "Paket katering" },
+    { angka: "7 hari", label: "Terima pesanan setiap hari" },
+    { angka: "H-2", label: "Batas paling lambat memesan" },
   ],
   keunggulan: [
     {
@@ -69,23 +56,9 @@ export const profil = {
       isi: "Tiap pesanan punya kode untuk memantau statusnya.",
     },
   ],
-  testimoni: [
-    {
-      nama: "Rina Kusumawati",
-      peran: "Staf Umum, Dinas Pendidikan",
-      isi: "Sudah tiga tahun kami pesan nasi box untuk rapat bulanan. Datang selalu tepat waktu dan rasanya konsisten. Paket nasi kotak acara kantornya paling disukai peserta.",
-    },
-    {
-      nama: "Bapak Hendra",
-      peran: "Panitia Syukuran Warga",
-      isi: "Pesan prasmanan 150 porsi dadakan H-2, masih dilayani dengan baik. Petugas penyajinya rapi dan sigap membereskan setelah acara.",
-    },
-    {
-      nama: "Dewi Anggraeni",
-      peran: "Pelanggan Perorangan",
-      isi: "Tumpeng mininya cantik dan porsinya pas untuk keluarga kecil. Lauknya lengkap, bumbunya terasa masakan rumah bukan katering pabrikan.",
-    },
-  ],
+  // Usaha katering baru dirintis, belum ada ulasan pelanggan. Isi dengan
+  // ulasan asli (nama, peran, isi); seksi testimoni muncul begitu ada isinya.
+  testimoni: [] as { nama: string; peran: string; isi: string }[],
   langkahPesan: [
     {
       judul: "Pilih menu",
@@ -94,13 +67,13 @@ export const profil = {
     },
     {
       judul: "Isi jadwal & lokasi",
-      ringkas: "Masuk, pilih tanggal, tandai lokasi.",
-      isi: "Masuk ke akun Anda, pilih tanggal dan jam acara, lalu tandai lokasi pengantaran di peta.",
+      ringkas: "Masuk, pilih tanggal (min. H-2), tandai lokasi.",
+      isi: "Masuk ke akun Anda, pilih tanggal acara paling cepat lusa (H-2) beserta jamnya, lalu tandai lokasi pengantaran di peta.",
     },
     {
       judul: "Bayar online",
-      ringkas: "QRIS, virtual account, atau e-wallet.",
-      isi: "Bayar lewat Midtrans dengan QRIS, virtual account bank, atau e-wallet. Pembayaran terkonfirmasi otomatis tanpa perlu kirim bukti transfer.",
+      ringkas: "QRIS dari m-banking atau e-wallet apa pun.",
+      isi: "Bayar dengan QRIS dari aplikasi m-banking atau e-wallet apa pun. Nominal sudah terisi, dan pembayaran terkonfirmasi tanpa perlu kirim bukti transfer.",
     },
     {
       judul: "Pantau & terima",
@@ -112,12 +85,12 @@ export const profil = {
     {
       tanya: "Berapa minimal pemesanan?",
       jawab:
-        "Minimal pemesanan berbeda tiap paket. Nasi box mulai 10 box, snack box mulai 20 box, prasmanan mulai 50 porsi, sedangkan tumpeng bisa dipesan satuan.",
+        "Minimal pemesanan berbeda tiap paket. Nasi box mulai 10 box, snack box mulai 20 box, sedangkan tumpeng bisa dipesan satuan.",
     },
     {
       tanya: "Berapa hari sebelumnya pesanan harus dibuat?",
       jawab:
-        "Untuk pesanan di bawah 100 porsi kami menerima pesanan H-1. Untuk pesanan di atas 100 porsi atau paket prasmanan, sebaiknya dipesan minimal tiga hari sebelum acara.",
+        "Paling lambat H-2, artinya dua hari sebelum acara. Pesanan untuk hari ini dan besok tidak bisa dibuat. Pesanan diterima setiap hari, dan untuk jumlah besar sebaiknya dipesan lebih awal.",
     },
     {
       tanya: "Apakah ada biaya antar?",
@@ -127,12 +100,12 @@ export const profil = {
     {
       tanya: "Bagaimana cara pembayaran?",
       jawab:
-        "Pembayaran penuh dilakukan online saat checkout melalui Midtrans: QRIS, virtual account bank, atau e-wallet. Begitu pembayaran masuk, status pesanan berubah otomatis tanpa perlu mengirim bukti transfer.",
+        "Pembayaran penuh dilakukan saat checkout dengan QRIS: scan dari aplikasi m-banking atau e-wallet apa pun, nominal sudah terisi. Begitu pembayaran masuk, status pesanan berubah tanpa perlu mengirim bukti transfer.",
     },
     {
       tanya: "Apakah menu bisa disesuaikan?",
       jawab:
-        "Bisa. Isi lauk pada paket prasmanan dan tumpeng dapat diganti sesuai permintaan. Silakan tuliskan permintaan Anda pada kolom catatan saat memesan.",
+        "Bisa. Isi lauk pada paket nasi kotak dan tumpeng dapat diganti sesuai permintaan. Silakan tuliskan permintaan Anda pada kolom catatan saat memesan.",
     },
   ],
 };

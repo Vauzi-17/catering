@@ -5,9 +5,11 @@ import { useEffect, useMemo, useRef } from "react";
 import { ArrowRight, Minus, Plus, ShieldCheck, ShoppingBag, Trash2, Truck, X } from "lucide-react";
 import { FotoMenu } from "@/components/Placeholder";
 import { SaranPaket } from "@/components/pesan/SaranPaket";
-import { rupiah, satuanMenu } from "@/lib/format";
+import { rupiah } from "@/lib/format";
+import { satuan, teksMenu } from "@/lib/teks";
 import type { Menu } from "@/lib/types";
 import { useAuth } from "@/store/AuthProvider";
+import { useBahasa } from "@/store/BahasaProvider";
 import { useData } from "@/store/DataProvider";
 
 export function KeranjangLaci() {
@@ -21,6 +23,8 @@ export function KeranjangLaci() {
     tambahKeranjang,
   } = useData();
   const auth = useAuth();
+  const { bahasa, t } = useBahasa();
+  const nama = (m: Menu) => teksMenu(m, bahasa).nama;
   const tombolTutup = useRef<HTMLButtonElement>(null);
 
   const baris = useMemo(
@@ -69,16 +73,18 @@ export function KeranjangLaci() {
       <aside
         role="dialog"
         aria-modal="true"
-        aria-label="Keranjang"
+        aria-label={t("Keranjang", "Cart")}
         className={`absolute inset-y-0 right-0 flex w-full max-w-[440px] flex-col bg-kabut shadow-2xl transition-transform duration-300 ease-out ${
           buka ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <header className="flex items-center justify-between border-b border-kabut-line bg-white px-5 py-4">
           <div>
-            <h2 className="text-[22px] font-semibold leading-none">Keranjang</h2>
+            <h2 className="text-[22px] font-semibold leading-none">{t("Keranjang", "Cart")}</h2>
             <p className="mt-1 text-[13px] text-ink-muted">
-              {baris.length ? `${baris.length} paket · ${porsi} porsi` : "Belum ada paket"}
+              {baris.length
+                ? t(`${baris.length} paket · ${porsi} porsi`, `${baris.length} ${baris.length === 1 ? "package" : "packages"} · ${porsi} portions`)
+                : t("Belum ada paket", "No packages yet")}
             </p>
           </div>
           <button
@@ -86,7 +92,7 @@ export function KeranjangLaci() {
             type="button"
             onClick={tutupKeranjang}
             className="flex h-10 w-10 items-center justify-center rounded-full text-ink-soft hover:bg-kabut-deep"
-            aria-label="Tutup keranjang"
+            aria-label={t("Tutup keranjang", "Close cart")}
           >
             <X size={20} />
           </button>
@@ -98,34 +104,36 @@ export function KeranjangLaci() {
               <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-ink-muted">
                 <ShoppingBag size={24} strokeWidth={1.8} />
               </span>
-              <p className="mt-4 font-semibold">Keranjang masih kosong</p>
-              <p className="mt-1 text-[13px] text-ink-muted">Tambahkan paket dari menu, atau mulai dari pilihan di bawah.</p>
+              <p className="mt-4 font-semibold">{t("Keranjang masih kosong", "Your cart is empty")}</p>
+              <p className="mt-1 text-[13px] text-ink-muted">
+                {t("Tambahkan paket dari menu, atau mulai dari pilihan di bawah.", "Add packages from the menu, or start with the picks below.")}
+              </p>
             </div>
           ) : (
             <ul className="space-y-3">
               {baris.map(({ menu, qty }) => (
                 <li key={menu.id} className="flex gap-3 rounded-2xl bg-white p-3">
                   <div className="w-20 shrink-0 overflow-hidden rounded-xl">
-                    <FotoMenu src={menu.foto} nama={menu.nama} rasio="aspect-square" mini />
+                    <FotoMenu src={menu.foto} nama={nama(menu)} rasio="aspect-square" mini />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
-                      <p className="line-clamp-2 text-[14px] font-semibold leading-snug">{menu.nama}</p>
+                      <p className="line-clamp-2 text-[14px] font-semibold leading-snug">{nama(menu)}</p>
                       <button
                         type="button"
                         onClick={() => hapusKeranjang(menu.id)}
                         className="-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink-muted hover:bg-red-50 hover:text-red-700"
-                        aria-label={`Hapus ${menu.nama}`}
+                        aria-label={t(`Hapus ${menu.nama}`, `Remove ${nama(menu)}`)}
                       >
                         <Trash2 size={15} />
                       </button>
                     </div>
                     <p className="text-[12px] text-ink-muted">
-                      {rupiah(menu.hargaJual)} / {satuanMenu(menu)}
+                      {rupiah(menu.hargaJual)} / {satuan(menu, bahasa)}
                     </p>
                     <div className="mt-2 flex items-center justify-between gap-2">
                       <div className="inline-flex h-8 items-center rounded-lg border border-kabut-line bg-kabut">
-                        <button type="button" onClick={() => ubahQtyKeranjang(menu.id, qty - 5)} className="flex h-full w-8 items-center justify-center text-ink-soft" aria-label={`Kurangi ${menu.nama}`}>
+                        <button type="button" onClick={() => ubahQtyKeranjang(menu.id, qty - 5)} className="flex h-full w-8 items-center justify-center text-ink-soft" aria-label={t(`Kurangi ${menu.nama}`, `Decrease ${nama(menu)}`)}>
                           <Minus size={14} />
                         </button>
                         <input
@@ -135,9 +143,9 @@ export function KeranjangLaci() {
                           min={0}
                           onChange={(e) => ubahQtyKeranjang(menu.id, Number(e.target.value) || 0)}
                           className="h-full w-11 border-x border-kabut-line bg-white text-center text-[13px] font-semibold tabular-nums focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
-                          aria-label={`Jumlah ${menu.nama}`}
+                          aria-label={t(`Jumlah ${menu.nama}`, `Quantity of ${nama(menu)}`)}
                         />
-                        <button type="button" onClick={() => ubahQtyKeranjang(menu.id, qty + 5)} className="flex h-full w-8 items-center justify-center text-ink-soft" aria-label={`Tambah ${menu.nama}`}>
+                        <button type="button" onClick={() => ubahQtyKeranjang(menu.id, qty + 5)} className="flex h-full w-8 items-center justify-center text-ink-soft" aria-label={t(`Tambah ${menu.nama}`, `Increase ${nama(menu)}`)}>
                           <Plus size={14} />
                         </button>
                       </div>
@@ -145,7 +153,7 @@ export function KeranjangLaci() {
                     </div>
                     {qty < menu.minimalPesan && (
                       <p className="mt-1 text-[12px] font-semibold text-red-700">
-                        Minimal {menu.minimalPesan} {satuanMenu(menu)}
+                        {t("Minimal", "Minimum")} {menu.minimalPesan} {satuan(menu, bahasa)}
                       </p>
                     )}
                   </div>
@@ -157,7 +165,7 @@ export function KeranjangLaci() {
           {saran.length > 0 && (
             <div className="mt-2">
               <SaranPaket
-                judul={baris.length ? "Tambah paket lain" : "Paket favorit"}
+                judul={baris.length ? t("Tambah paket lain", "Add another package") : t("Paket favorit", "Favourite packages")}
                 daftar={saran}
                 onTambah={(m) => tambahKeranjang(m.id, m.minimalPesan)}
               />
@@ -174,16 +182,19 @@ export function KeranjangLaci() {
               </div>
               <div className="flex justify-between">
                 <dt className="inline-flex items-center gap-1.5 text-ink-soft">
-                  Ongkir <Truck size={14} className="text-ink-muted" />
+                  {t("Ongkir", "Delivery")} <Truck size={14} className="text-ink-muted" />
                 </dt>
                 <dd>
-                  <span className="rounded-md bg-zamrud-50 px-2 py-0.5 text-[12px] font-bold text-zamrud-700">GRATIS</span>
+                  <span className="rounded-md bg-zamrud-50 px-2 py-0.5 text-[12px] font-bold text-zamrud-700">{t("GRATIS", "FREE")}</span>
                 </dd>
               </div>
             </dl>
             {kurang ? (
               <p className="mt-3 text-[13px] font-semibold text-red-700">
-                {kurang.menu.nama} minimal {kurang.menu.minimalPesan} {satuanMenu(kurang.menu)}.
+                {t(
+                  `${kurang.menu.nama} minimal ${kurang.menu.minimalPesan} ${satuan(kurang.menu, "id")}.`,
+                  `${nama(kurang.menu)}: minimum ${kurang.menu.minimalPesan} ${satuan(kurang.menu, "en")}.`,
+                )}
               </p>
             ) : null}
             <Link
@@ -195,12 +206,12 @@ export function KeranjangLaci() {
               aria-disabled={Boolean(kurang)}
               className={`tombol tombol-blok tombol-jingga mt-4 ${kurang ? "pointer-events-none opacity-50" : ""}`}
             >
-              {auth.aktif && !auth.pengguna ? "Masuk untuk checkout" : "Lanjut ke checkout"}
+              {auth.aktif && !auth.pengguna ? t("Masuk untuk checkout", "Sign in to check out") : t("Lanjut ke checkout", "Continue to checkout")}
               <ArrowRight size={18} />
             </Link>
             <p className="mt-3 flex items-center justify-center gap-1.5 text-[12px] text-ink-muted">
               <ShieldCheck size={14} className="text-zamrud-600" />
-              Pembayaran online aman lewat Midtrans
+              {t("Bayar mudah dengan QRIS", "Easy payment with QRIS")}
             </p>
           </footer>
         )}

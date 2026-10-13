@@ -47,6 +47,11 @@ export interface Menu {
   // Biaya operasional per porsi (di luar bahan baku)
   biayaKemasan: number;
   biayaTenagaKerja: number;
+  // Versi bahasa Inggris (opsional; kosong = pakai teks Indonesia).
+  namaEn?: string;
+  deskripsiEn?: string;
+  deskripsiPanjangEn?: string;
+  isiEn?: string[];
 }
 
 export type StatusPesanan =
@@ -63,7 +68,6 @@ export type StatusBayar = "Menunggu" | "Lunas" | "Kedaluwarsa" | "Gagal" | "Dike
 
 export interface Pembayaran {
   id: string;
-  midtransOrderId: string;
   transactionId: string | null;
   statusTransaksi: string;
   jenisPembayaran: string;
@@ -113,6 +117,11 @@ export interface Pesanan {
   metodeBayar?: string;
   batasBayar?: string | null;
   dibayarPada?: string | null;
+  // Tagihan QRIS: nominal = total + kode unik.
+  nominalBayar?: number | null;
+  kodeUnik?: number | null;
+  qrisDinamis?: string | null;
+  diklaimBayarPada?: string | null;
   pembayaran?: Pembayaran[];
 }
 
