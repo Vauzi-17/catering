@@ -6,10 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   CircleAlert,
-  Clock,
   MapPin,
-  QrCode,
-  ScanLine,
   ShieldCheck,
   ShoppingBag,
   Store,
@@ -320,24 +317,6 @@ export function FormPesanan() {
               </div>
             </Bagian>
 
-            <Bagian
-              nomor="03"
-              judul="Pembayaran"
-              deskripsi="Bayar penuh di muka dengan QRIS. Pesanan langsung kami siapkan begitu pembayaran diterima."
-            >
-              <ul className="grid gap-2.5 sm:grid-cols-3">
-                {[
-                  { ikon: QrCode, teks: "QRIS dengan nominal terisi" },
-                  { ikon: ScanLine, teks: "Semua m-banking & e-wallet" },
-                  { ikon: Clock, teks: "Bayar dalam 24 jam" },
-                ].map(({ ikon: Ikon, teks }) => (
-                  <li key={teks} className="flex items-center gap-2.5 rounded-xl border border-kabut-line bg-kabut px-3.5 py-3 text-[13px] font-semibold text-ink-soft">
-                    <Ikon size={17} strokeWidth={1.8} className="shrink-0 text-zamrud-700" />
-                    {teks}
-                  </li>
-                ))}
-              </ul>
-            </Bagian>
           </div>
 
           <div className="min-w-0 lg:col-span-5 xl:col-span-4">
