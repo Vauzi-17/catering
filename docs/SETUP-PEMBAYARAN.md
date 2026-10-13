@@ -94,14 +94,14 @@ walaupun email dan sandinya benar.
 
 ### 1.5 Titik dapur dan radius layanan
 
-Nilai bawaan: titik di pusat Kota Bandung, radius 25 km. **Titik ini karangan**
-— ganti dengan lokasi dapur sebenarnya. Ambil koordinat dari Google Maps (klik
-kanan pada lokasi → angka pertama lintang, kedua bujur), lalu:
+Nilai bawaan `06-akun-pembayaran.sql`: titik di pusat Kota Bandung, radius 25 km — **wajib diganti**. Lokasi dapur Asri Catering di Jl. Nata Bangsa, Jambusari, Jeruklegi, Cilacap; titik jalannya menurut OpenStreetMap adalah `-7.560572, 109.01547`. Untuk titik rumah
+persis, ambil koordinat dari Google Maps (klik kanan pada lokasi → angka
+pertama lintang, kedua bujur), lalu:
 
 ```sql
 update public.settings
-set dapur_lat = -6.917464,   -- lintang dapur
-    dapur_lng = 107.619123,  -- bujur dapur
+set dapur_lat = -7.560572,   -- lintang dapur (Jl. Nata Bangsa, Jambusari)
+    dapur_lng = 109.01547,   -- bujur dapur
     radius_km = 25           -- jarak maksimal pengantaran gratis
 where id = 1;
 ```

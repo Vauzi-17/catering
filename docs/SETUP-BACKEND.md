@@ -29,7 +29,7 @@ Tempel isinya, klik **Run**, tunggu sampai muncul "Success".
 | Urutan | Berkas | Isinya |
 | --- | --- | --- |
 | 1 | `supabase/01-schema.sql` | Tabel, indeks, trigger, fungsi bantu |
-| 2 | `supabase/03-seed.sql` | 5 kategori, 26 bahan baku, 14 menu beserta resepnya |
+| 2 | `supabase/03-seed.sql` | 5 kategori, 31 bahan baku, 6 menu beserta resepnya |
 | 3 | `supabase/06-akun-pembayaran.sql` | Akun pelanggan, pembayaran, keamanan baris produksi — lihat [`SETUP-PEMBAYARAN.md`](SETUP-PEMBAYARAN.md) |
 | 4 (opsional) | `supabase/05-contoh-pesanan.sql` | 23 pesanan contoh, supaya Dasbor dan Laporan ada isinya |
 
@@ -38,7 +38,7 @@ digandakan. Jadi bila sebuah berkas gagal di tengah jalan, cukup perbaiki
 penyebabnya lalu jalankan ulang dari awal; tidak perlu mengosongkan tabel.
 
 Di bagian paling bawah `03-seed.sql` ada perintah pemeriksa. Jalankan bagian itu
-untuk memastikan hasilnya: **5 kategori, 26 bahan baku, 14 menu, 109 baris
+untuk memastikan hasilnya: **5 kategori, 31 bahan baku, 6 menu, 57 baris
 resep.**
 
 > `02-rls.sql` dan `04-rls-produksi.sql` adalah aturan versi lama dan **tidak

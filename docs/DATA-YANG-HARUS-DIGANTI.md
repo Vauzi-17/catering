@@ -1,6 +1,6 @@
 # Data Contoh yang Harus Diganti
 
-Seluruh data yang tampil sekarang — nama pemilik, alamat Bandung, nomor telepon,
+Seluruh data yang tampil sekarang — nama pemilik, nomor telepon,
 harga menu, resep, testimoni — masih **karangan untuk keperluan pengembangan**.
 Angkanya dibuat masuk akal supaya perhitungan HPP dan laporan bisa diuji, tetapi
 tidak satu pun berasal dari Asri Catering yang sebenarnya.
@@ -32,12 +32,12 @@ Tidak tersimpan di basis data, jadi selalu disunting di berkas ini.
 | --- | --- |
 | `pemilik` | Ibu Asri Wulandari |
 | `berdiri` | 2016 |
-| `alamat` | Jl. Melati Raya No. 27, Sukamaju, Bandung |
+| `alamat` | Jl. Nata Bangsa RT 01 RW 10, Jambusari, Jeruklegi, Cilacap (sudah alamat asli) |
 | `telepon` / `teleponRaw` | 0812-2345-6789 |
 | `email` | halo@asricatering.id |
 | `instagram` | @asricatering.id |
 | `jamOperasional` | Senin–Jumat 07.00–18.00, dst. |
-| `areaLayanan` | Bandung, Cimahi, Bandung Barat |
+| `areaLayanan` | Jeruklegi dan sekitarnya, Kota Cilacap, Kabupaten Cilacap — sesuaikan dengan jangkauan kurir |
 | `statistik` | 9 tahun, 1.200+ acara, 150 box/hari, ulasan 4,8 |
 | `sejarah` | Empat tonggak 2016 – 2025 |
 | `keunggulan` | Empat poin |
@@ -53,7 +53,7 @@ diawali 62 — contoh `6281223456789`.
 
 ## 2. Menu, harga, dan resep
 
-14 menu contoh beserta takaran resepnya. Harga dan takaran inilah yang
+6 menu contoh beserta takaran resepnya. Harga dan takaran inilah yang
 menentukan HPP, jadi **ini yang paling memengaruhi kebenaran laporan.**
 
 - Mode contoh: `src/data/menu.ts`
@@ -64,7 +64,7 @@ minimal pemesanan, biaya kemasan, biaya tenaga kerja, dan takaran tiap bahan.
 
 ## 3. Bahan baku dan harganya
 
-26 bahan contoh dengan harga pasaran perkiraan.
+31 bahan contoh dengan harga pasaran perkiraan.
 
 - Mode contoh: `src/data/bahan.ts`
 - Supabase: **Panel Admin → Bahan Baku**
@@ -106,8 +106,8 @@ sebagai admin mengikuti `SETUP-PEMBAYARAN.md` bagian 1.4, dan pastikan
 
 ## 8. Titik dapur dan radius layanan
 
-Titik dapur bawaan (`-6.917464, 107.619123`, pusat Kota Bandung) dan radius
-25 km adalah **karangan**. Keduanya menentukan alamat mana yang boleh memesan
+Titik dapur bawaan (`-7.560572, 109.01547`, Jl. Nata Bangsa, Jambusari, Jeruklegi — titik jalan dari OpenStreetMap, belum titik rumah persis) dan radius
+25 km perlu dicek ulang. Keduanya menentukan alamat mana yang boleh memesan
 dengan pengantaran gratis. Ganti lewat SQL mengikuti `SETUP-PEMBAYARAN.md`
 bagian 1.5. Nilai cadangan di `src/lib/useInfoPengantaran.ts` hanya dipakai
 bila Supabase belum tersambung.
