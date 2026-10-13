@@ -91,6 +91,7 @@ export function PetaLokasi({
     });
     return () => {
       hidup = false;
+      peta.current?.stop();
       peta.current?.remove();
       peta.current = null;
     };
@@ -114,7 +115,9 @@ export function PetaLokasi({
 
   function pilih(t: Titik) {
     onUbah(t);
-    peta.current?.setView([t.lat, t.lng], 16);
+    // Tanpa animasi: bila halaman langsung berpindah (mis. formulir dikirim),
+    // animasi zoom yang belum selesai membuat Leaflet melempar galat.
+    peta.current?.setView([t.lat, t.lng], 16, { animate: false });
   }
 
   async function cari(e?: React.FormEvent) {
