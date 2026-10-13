@@ -283,6 +283,7 @@ function FormulirMenu({
   const { bahan, pengaturan, sibuk } = useData();
   const [form, setForm] = useState<Menu>({ ...awal });
   const [isiTeks, setIsiTeks] = useState(awal.isi.join("\n"));
+  const [isiEnTeks, setIsiEnTeks] = useState((awal.isiEn ?? []).join("\n"));
   const [galat, setGalat] = useState<Record<string, string>>({});
   const [unggahFoto, setUnggahFoto] = useState(false);
 
@@ -322,6 +323,10 @@ function FormulirMenu({
         .map((s) => s.trim())
         .filter(Boolean),
       deskripsiPanjang: form.deskripsiPanjang.trim() || form.deskripsi.trim(),
+      isiEn: isiEnTeks
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean),
       resep: form.resep.filter((r) => r.bahanId && r.jumlah > 0),
     });
   }
@@ -514,6 +519,56 @@ function FormulirMenu({
                 placeholder={"Nasi putih\nAyam ungkep\nSambal & kerupuk"}
               />
             </div>
+
+            <details className="rounded-card border border-line p-4 sm:col-span-2" open={Boolean(awal.namaEn)}>
+              <summary className="cursor-pointer text-sm font-bold">Versi bahasa Inggris (opsional)</summary>
+              <p className="mt-1 text-[13px] text-ink-muted">
+                Tampil saat pengunjung memilih EN di situs. Kolom yang kosong memakai teks bahasa Indonesia.
+              </p>
+              <div className="mt-4 grid gap-4">
+                <div>
+                  <label className="field-label" htmlFor="namaEn">Nama menu (EN)</label>
+                  <input
+                    id="namaEn"
+                    className="field"
+                    value={form.namaEn ?? ""}
+                    onChange={(e) => ubah("namaEn", e.target.value)}
+                    placeholder="Royal Yellow Rice Bento"
+                  />
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="deskripsiEn">Deskripsi singkat (EN)</label>
+                  <textarea
+                    id="deskripsiEn"
+                    rows={2}
+                    className="field resize-y"
+                    value={form.deskripsiEn ?? ""}
+                    onChange={(e) => ubah("deskripsiEn", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="deskripsiPanjangEn">Deskripsi lengkap (EN)</label>
+                  <textarea
+                    id="deskripsiPanjangEn"
+                    rows={3}
+                    className="field resize-y"
+                    value={form.deskripsiPanjangEn ?? ""}
+                    onChange={(e) => ubah("deskripsiPanjangEn", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="field-label" htmlFor="isiEn">Isi paket (EN, satu baris satu item)</label>
+                  <textarea
+                    id="isiEn"
+                    rows={4}
+                    className="field resize-y"
+                    value={isiEnTeks}
+                    onChange={(e) => setIsiEnTeks(e.target.value)}
+                    placeholder={"White rice\nBraised chicken\nChilli sauce & crackers"}
+                  />
+                </div>
+              </div>
+            </details>
           </div>
 
           {/* Biaya & resep */}

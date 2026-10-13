@@ -26,6 +26,12 @@ export const menuAwal: Menu[] = [
     minimalPesan: 10,
     biayaKemasan: 3200,
     biayaTenagaKerja: 3000,
+    namaEn: "Royal Yellow Rice Bento",
+    deskripsiEn:
+      "Savoury yellow rice, honey grilled chicken, fried noodles, spicy potato, and sliced omelette in a compartment bento box.",
+    deskripsiPanjangEn:
+      "Our signature for thanksgivings, office birthdays, and hosting guests. Yellow rice is cooked with coconut milk and fresh turmeric, served with chicken grilled in honey-soy glaze, Javanese fried noodles, spicy fried potato, sliced omelette, chilli sauce, and crackers. Packed in a compartment bento box so the dishes stay separate on the way.",
+    isiEn: ["Coconut yellow rice", "Honey-soy grilled chicken", "Javanese fried noodles", "Spicy fried potato", "Sliced omelette", "Chilli sauce & crackers"],
     resep: [
       { bahanId: "bh-01", jumlah: 0.15 },
       { bahanId: "bh-15", jumlah: 0.25 },
@@ -65,6 +71,12 @@ export const menuAwal: Menu[] = [
     minimalPesan: 20,
     biayaKemasan: 1800,
     biayaTenagaKerja: 2000,
+    namaEn: "Office Event Rice Box",
+    deskripsiEn:
+      "Fluffy rice, galangal fried chicken, sweet braised tofu and tempeh, stir-fried green beans and carrots, chilli sauce, and fresh vegetables.",
+    deskripsiPanjangEn:
+      "Our most ordered package for meetings, trainings, and office events. Fragrant pandan rice is served with galangal fried chicken, sweet braised tofu and tempeh, stir-fried green beans and carrots, fresh vegetables, chilli sauce, and crackers. Portion and taste stay the same from the first box to the last.",
+    isiEn: ["Fragrant pandan rice", "Galangal fried chicken", "Sweet braised tofu & tempeh", "Stir-fried green beans & carrots", "Fresh vegetables & chilli sauce", "Crackers"],
     resep: [
       { bahanId: "bh-01", jumlah: 0.15 },
       { bahanId: "bh-02", jumlah: 0.12 },
@@ -103,6 +115,12 @@ export const menuAwal: Menu[] = [
     minimalPesan: 10,
     biayaKemasan: 3200,
     biayaTenagaKerja: 3500,
+    namaEn: "VIP Beef Rendang Rice Box",
+    deskripsiEn:
+      "Beef rendang slow-cooked for four hours, spicy balado prawns, sautéed vegetables, banana, and bottled water.",
+    deskripsiPanjangEn:
+      "A premium package for formal dinners, weddings, and important guests. Beef rendang is slow-cooked for about four hours until the spices soak in and the meat is tender, served with white rice, spicy balado prawns, sautéed vegetables, a banana, and a cup of mineral water. One box is complete with no extra drinks needed.",
+    isiEn: ["Fragrant pandan rice", "Beef rendang", "Balado prawns", "Sautéed vegetables", "Banana", "Cup of mineral water"],
     resep: [
       { bahanId: "bh-01", jumlah: 0.15 },
       { bahanId: "bh-03", jumlah: 0.1 },
@@ -142,6 +160,12 @@ export const menuAwal: Menu[] = [
     minimalPesan: 10,
     biayaKemasan: 1800,
     biayaTenagaKerja: 2500,
+    namaEn: "Grilled Tilapia Rica Rice Box",
+    deskripsiEn:
+      "Tilapia grilled with spicy rica seasoning, fried tempeh, lettuce and cucumber, and sambal matah.",
+    deskripsiPanjangEn:
+      "Fresh medium-sized tilapia grilled with rica spices until fragrant, served with white rice, fried tempeh, lettuce and cucumber, and Balinese sambal matah. A good choice for guests who avoid red meat.",
+    isiEn: ["Fragrant pandan rice", "Rica grilled tilapia", "Fried tempeh", "Lettuce & cucumber", "Sambal matah"],
     resep: [
       { bahanId: "bh-01", jumlah: 0.15 },
       { bahanId: "bh-07", jumlah: 0.18 },
@@ -178,6 +202,12 @@ export const menuAwal: Menu[] = [
     minimalPesan: 1,
     biayaKemasan: 22000,
     biayaTenagaKerja: 35000,
+    namaEn: "Mini Tumpeng",
+    deskripsiEn:
+      "A small yellow rice tumpeng for 5–7 people. Perfect for a simple thanksgiving.",
+    deskripsiPanjangEn:
+      "A yellow rice cone about 20 cm tall on a bamboo tray lined with banana leaves. Comes with seven side dishes: braised chicken, balado egg, sweet tempeh, fried noodles, vegetable urap, potato fritters, and spicy sambal goreng. Enough for 5 to 7 people.",
+    isiEn: ["Yellow rice on a bamboo tray", "Braised chicken", "Balado egg", "Sweet tempeh", "Fried noodles", "Vegetable urap", "Potato fritters"],
     resep: [
       { bahanId: "bh-01", jumlah: 1.2 },
       { bahanId: "bh-02", jumlah: 0.8 },
@@ -210,6 +240,12 @@ export const menuAwal: Menu[] = [
     minimalPesan: 20,
     biayaKemasan: 1500,
     biayaTenagaKerja: 1500,
+    namaEn: "Snack Box (3 Treats)",
+    deskripsiEn:
+      "Three homemade traditional snacks in one box, plus a cup of mineral water.",
+    deskripsiPanjangEn:
+      "Contains three of the day's snacks, such as risoles, lemper, and steamed sponge cake, plus a cup of mineral water. Everything is made in the morning before delivery so the texture stays soft.",
+    isiEn: ["3 assorted snacks", "Cup of mineral water", "Snack box + tissue"],
     resep: [
       { bahanId: "bh-23", jumlah: 0.12 },
       { bahanId: "bh-04", jumlah: 0.5 },

@@ -38,6 +38,11 @@ interface BarisMenu {
   biaya_tenaga_kerja: number | string;
   categories: { nama: string } | { nama: string }[] | null;
   recipes: { ingredient_id: string; jumlah: number | string }[] | null;
+  // Kolom bahasa Inggris (10-menu-bahasa-inggris.sql); belum ada di basis data lama.
+  nama_en?: string | null;
+  deskripsi_en?: string | null;
+  deskripsi_panjang_en?: string | null;
+  isi_en?: string[] | null;
 }
 
 const angka = (v: number | string | null | undefined) => Number(v ?? 0);
@@ -67,11 +72,39 @@ function keMenu(baris: BarisMenu): Menu {
       bahanId: r.ingredient_id,
       jumlah: angka(r.jumlah),
     })),
+    namaEn: baris.nama_en ?? "",
+    deskripsiEn: baris.deskripsi_en ?? "",
+    deskripsiPanjangEn: baris.deskripsi_panjang_en ?? "",
+    isiEn: baris.isi_en ?? [],
   };
 }
 
-const KOLOM_MENU =
+const KOLOM_MENU_DASAR =
   "id, slug, nama, deskripsi, deskripsi_panjang, harga_jual, satuan_jual, foto, isi, populer, tersedia, minimal_pesan, biaya_kemasan, biaya_tenaga_kerja, categories(nama), recipes(ingredient_id, jumlah)";
+const KOLOM_MENU_EN = "nama_en, deskripsi_en, deskripsi_panjang_en, isi_en";
+
+/**
+ * Kolom bahasa Inggris baru ada setelah 10-menu-bahasa-inggris.sql dijalankan.
+ * Sebelum itu, baca dan tulis menu tanpa kolom tersebut supaya situs tetap
+ * berjalan (teks Inggris jatuh ke versi Indonesia).
+ */
+let kolomEnAda: boolean | null = null;
+
+function kolomTidakAda(error: { code?: string; message?: string } | null): boolean {
+  return Boolean(error && (error.code === "42703" || error.code === "PGRST204" || /_en\b/.test(error.message ?? "")));
+}
+
+async function bacaMenu<T>(jalankan: (kolom: string) => PromiseLike<{ data: T; error: { code?: string; message?: string } | null }>) {
+  if (kolomEnAda !== false) {
+    const hasil = await jalankan(`${KOLOM_MENU_DASAR}, ${KOLOM_MENU_EN}`);
+    if (!kolomTidakAda(hasil.error)) {
+      kolomEnAda = true;
+      return hasil;
+    }
+    kolomEnAda = false;
+  }
+  return jalankan(KOLOM_MENU_DASAR);
+}
 
 interface BarisBahan {
   id: string;
@@ -202,20 +235,15 @@ const KOLOM_PEMBAYARAN =
 // ------------------------------------------------------------------ baca
 
 export async function ambilMenus(): Promise<Menu[]> {
-  const { data, error } = await wajibSupabase()
-    .from("menus")
-    .select(KOLOM_MENU)
-    .order("nama");
+  const { data, error } = await bacaMenu((kolom) => wajibSupabase().from("menus").select(kolom).order("nama"));
   if (error) throw error;
   return (data as unknown as BarisMenu[]).map(keMenu);
 }
 
 export async function ambilMenuSlug(slug: string): Promise<Menu | null> {
-  const { data, error } = await wajibSupabase()
-    .from("menus")
-    .select(KOLOM_MENU)
-    .eq("slug", slug)
-    .maybeSingle();
+  const { data, error } = await bacaMenu((kolom) =>
+    wajibSupabase().from("menus").select(kolom).eq("slug", slug).maybeSingle(),
+  );
   if (error) throw error;
   return data ? keMenu(data as unknown as BarisMenu) : null;
 }
@@ -426,13 +454,26 @@ export async function simpanMenuDb(menu: Menu): Promise<Menu> {
     biaya_tenaga_kerja: menu.biayaTenagaKerja,
     diubah_pada: new Date().toISOString(),
   };
+  const isiEn = {
+    nama_en: menu.namaEn?.trim() ?? "",
+    deskripsi_en: menu.deskripsiEn?.trim() ?? "",
+    deskripsi_panjang_en: menu.deskripsiPanjangEn?.trim() ?? "",
+    isi_en: (menu.isiEn ?? []).map((s) => s.trim()).filter(Boolean),
+  };
 
   // Menu baru dari panel admin memakai id sementara, biarkan basis data
   // yang memberi UUID-nya.
-  const { data, error } = apakahUuid(menu.id)
-    ? await db.from("menus").upsert({ id: menu.id, ...isi }).select("id").single()
-    : await db.from("menus").insert(isi).select("id").single();
+  const tulis = (baris: Record<string, unknown>) =>
+    apakahUuid(menu.id)
+      ? db.from("menus").upsert({ id: menu.id, ...baris }).select("id").single()
+      : db.from("menus").insert(baris).select("id").single();
+  let { data, error } = await tulis(kolomEnAda === false ? isi : { ...isi, ...isiEn });
+  if (kolomTidakAda(error)) {
+    kolomEnAda = false;
+    ({ data, error } = await tulis(isi));
+  }
   if (error) throw error;
+  if (!data) throw new Error("Menu gagal disimpan.");
 
   const menuId = data.id as string;
 

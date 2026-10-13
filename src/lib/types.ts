@@ -47,6 +47,11 @@ export interface Menu {
   // Biaya operasional per porsi (di luar bahan baku)
   biayaKemasan: number;
   biayaTenagaKerja: number;
+  // Versi bahasa Inggris (opsional; kosong = pakai teks Indonesia).
+  namaEn?: string;
+  deskripsiEn?: string;
+  deskripsiPanjangEn?: string;
+  isiEn?: string[];
 }
 
 export type StatusPesanan =
