@@ -99,8 +99,8 @@ export const profil = {
     },
     {
       judul: "Bayar online",
-      ringkas: "QRIS, virtual account, atau e-wallet.",
-      isi: "Bayar lewat Midtrans dengan QRIS, virtual account bank, atau e-wallet. Pembayaran terkonfirmasi otomatis tanpa perlu kirim bukti transfer.",
+      ringkas: "QRIS dari m-banking atau e-wallet apa pun.",
+      isi: "Bayar dengan QRIS dari aplikasi m-banking atau e-wallet apa pun. Nominal sudah terisi, dan pembayaran terkonfirmasi tanpa perlu kirim bukti transfer.",
     },
     {
       judul: "Pantau & terima",
@@ -127,7 +127,7 @@ export const profil = {
     {
       tanya: "Bagaimana cara pembayaran?",
       jawab:
-        "Pembayaran penuh dilakukan online saat checkout melalui Midtrans: QRIS, virtual account bank, atau e-wallet. Begitu pembayaran masuk, status pesanan berubah otomatis tanpa perlu mengirim bukti transfer.",
+        "Pembayaran penuh dilakukan saat checkout dengan QRIS: scan dari aplikasi m-banking atau e-wallet apa pun, nominal sudah terisi. Begitu pembayaran masuk, status pesanan berubah tanpa perlu mengirim bukti transfer.",
     },
     {
       tanya: "Apakah menu bisa disesuaikan?",

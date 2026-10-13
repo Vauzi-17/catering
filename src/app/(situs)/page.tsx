@@ -24,7 +24,7 @@ const pitaPromo = [
   "Porsi cicip gratis untuk pesanan 100+ porsi",
   "Dimasak pagi di hari pengantaran",
   "Isi paket bisa disesuaikan",
-  "Bayar online: QRIS, virtual account, e-wallet",
+  "Bayar dengan QRIS, nominal langsung terisi",
   "Status pesanan terpantau sampai diantar",
 ];
 

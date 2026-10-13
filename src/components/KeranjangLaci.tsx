@@ -200,7 +200,7 @@ export function KeranjangLaci() {
             </Link>
             <p className="mt-3 flex items-center justify-center gap-1.5 text-[12px] text-ink-muted">
               <ShieldCheck size={14} className="text-zamrud-600" />
-              Pembayaran online aman lewat Midtrans
+              Bayar mudah dengan QRIS
             </p>
           </footer>
         )}

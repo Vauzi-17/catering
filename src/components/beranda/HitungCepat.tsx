@@ -156,7 +156,7 @@ export function HitungCepat() {
 
       <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[12px] text-ink-muted">
         <ShieldCheck size={14} className="shrink-0 text-zamrud-600" />
-        Bayar online saat checkout: QRIS, virtual account, e-wallet
+        Bayar saat checkout dengan QRIS dari aplikasi apa pun
       </p>
     </div>
   );
