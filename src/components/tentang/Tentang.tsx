@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ChevronDown, Clock, Mail, MapPin, Phone } from "lucide-react";
+import { ArrowRight, ChevronDown, Clock, ExternalLink, Mail, MapPin, Phone } from "lucide-react";
 import { DaftarKeunggulan } from "@/components/DaftarKeunggulan";
 import { HeroHalaman } from "@/components/HeroHalaman";
 import { IconInstagram, IconWhatsapp } from "@/components/Icons";
-import { GambarPlaceholder, PetaPlaceholder } from "@/components/Placeholder";
+import { GambarPlaceholder } from "@/components/Placeholder";
 import { SectionHeading } from "@/components/Ui";
 import { useProfil } from "@/lib/useProfil";
 import { useBahasa } from "@/store/BahasaProvider";
@@ -13,7 +13,9 @@ import { fotoDekorasi } from "@/lib/foto";
 
 export function Tentang() {
   const profil = useProfil();
-  const { t } = useBahasa();
+  const { bahasa, t } = useBahasa();
+  const { lat, lng } = profil.koordinat;
+  const titik = `${lat},${lng}`;
   return (
     <>
       <HeroHalaman
@@ -191,11 +193,29 @@ export function Tentang() {
             </div>
           </div>
 
-          <div className="mt-5 overflow-hidden rounded-2xl">
-            <PetaPlaceholder
-              label={t("Peta lokasi — sematkan Google Maps di sini", "Location map — embed Google Maps here")}
-              rasio="aspect-[4/3] sm:aspect-[3/1]"
+          <div className="mt-5 overflow-hidden rounded-2xl border border-kabut-line bg-kabut">
+            <iframe
+              title={t(`Peta lokasi ${profil.nama}`, `${profil.nama} location map`)}
+              src={`https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1s${titik}!6i16!3m1!1s${bahasa}!5m1!1s${bahasa}`}
+              className="block aspect-[4/3] w-full sm:aspect-[3/1]"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
             />
+          </div>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-[13px]">
+            <p className="flex items-center gap-2 text-ink-muted">
+              <MapPin size={15} strokeWidth={1.8} className="shrink-0" />
+              {profil.alamatSingkat}
+            </p>
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${titik}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 font-semibold text-zamrud-700 hover:text-zamrud-800"
+            >
+              {t("Buka di Google Maps", "Open in Google Maps")}
+              <ExternalLink size={14} />
+            </a>
           </div>
         </div>
       </section>

@@ -19,9 +19,12 @@ export const profil = {
   ],
   alamat: "Jl. Nata Bangsa RT 01 RW 10, Desa Jambusari, Kecamatan Jeruklegi, Kabupaten Cilacap, Jawa Tengah",
   alamatSingkat: "Jl. Nata Bangsa, Jambusari, Jeruklegi, Cilacap",
+  // Titik Jl. Nata Bangsa, Jambusari menurut OpenStreetMap — untuk peta di
+  // halaman Tentang. Ganti dengan titik rumah persis bila sudah diketahui.
+  koordinat: { lat: -7.560572, lng: 109.01547 },
   telepon: "0851-3375-0156",
   teleponRaw: "6285133750156",
-  email: "halo@asricatering.id",
+  email: "asri1968@gmail.com",
   instagram: "@asricatering.id",
   jamOperasional: [
     { hari: "Setiap hari", jam: "07.00 - 18.00" },

@@ -34,8 +34,9 @@ Tidak tersimpan di basis data, jadi selalu disunting di berkas ini.
 | `berdiri` | 28 Agustus 2026 — warung nasi rames dibuka (sudah asli) |
 | `alamat` | Jl. Nata Bangsa RT 01 RW 10, Jambusari, Jeruklegi, Cilacap (sudah alamat asli) |
 | `telepon` / `teleponRaw` | 0851-3375-0156 (sudah asli) |
-| `email` | halo@asricatering.id |
-| `instagram` | @asricatering.id |
+| `email` | asri1968@gmail.com (sudah asli) |
+| `instagram` | @asricatering.id — **belum dipastikan** |
+| `koordinat` | Titik peta halaman Tentang (Jl. Nata Bangsa dari OpenStreetMap) |
 | `jamOperasional` | Setiap hari 07.00–18.00 — **jamnya perkiraan, pastikan ke pemilik**; pesanan katering paling lambat H-2 |
 | `areaLayanan` | Jeruklegi dan sekitarnya, Kota Cilacap, Kabupaten Cilacap — sesuaikan dengan jangkauan kurir |
 | `statistik` | Buka sejak 2026, ongkir gratis, terima pesanan setiap hari, batas H-2 |
