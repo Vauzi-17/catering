@@ -7,21 +7,20 @@ import {
   ArrowLeft,
   CalendarDays,
   Check,
-  Clock,
-  CreditCard,
   ExternalLink,
   MapPin,
-  RefreshCw,
+  QrCode,
   StickyNote,
 } from "lucide-react";
 import { PesanForm, TanpaSupabase } from "@/components/akun/KerangkaAuth";
 import { IconWhatsapp } from "@/components/Icons";
 import { FotoMenu } from "@/components/Placeholder";
+import { KartuQris } from "@/components/pesanan/KartuQris";
 import { LencanaBayar, LencanaStatus } from "@/components/pesanan/Lencana";
 import { profil } from "@/data/profil";
 import { ambilPesananDenganKode } from "@/lib/db";
 import { rupiah, tanggalPanjang } from "@/lib/format";
-import { bayarDenganSnap, panggilApi } from "@/lib/snap";
+import { panggilApi } from "@/lib/api-klien";
 import { ALUR_PESANAN, KETERANGAN_STATUS, LABEL_TAHAP, LABEL_TRANSAKSI } from "@/lib/status";
 import type { Pesanan } from "@/lib/types";
 import { useWajibMasuk } from "@/lib/useWajibMasuk";
@@ -37,14 +36,6 @@ function waktuPendek(iso: string) {
   });
 }
 
-function sisaWaktu(iso: string, sekarang: number) {
-  const ms = new Date(iso).getTime() - sekarang;
-  if (ms <= 0) return "lewat batas";
-  const jam = Math.floor(ms / 3600_000);
-  const menit = Math.floor((ms % 3600_000) / 60_000);
-  return jam > 0 ? `${jam} jam ${menit} menit lagi` : `${menit} menit lagi`;
-}
-
 export function DetailPesananSaya({ kode }: { kode: string }) {
   const auth = useWajibMasuk();
   const { menus } = useData();
@@ -53,11 +44,10 @@ export function DetailPesananSaya({ kode }: { kode: string }) {
   const galatAwal = params.get("galat") ?? "";
 
   const [p, setP] = useState<Pesanan | null | undefined>(undefined);
-  const [sibuk, setSibuk] = useState<"" | "bayar" | "cek">("");
+  const [sibuk, setSibuk] = useState<"" | "bayar" | "klaim">("");
   const [pesan, setPesan] = useState<{ jenis: "galat" | "sukses" | "info"; teks: string } | null>(
     galatAwal ? { jenis: "galat", teks: galatAwal } : null,
   );
-  const [sekarang, setSekarang] = useState(() => Date.now());
 
   const muat = useCallback(async () => {
     try {
@@ -73,31 +63,24 @@ export function DetailPesananSaya({ kode }: { kode: string }) {
 
   const menungguBayar = p?.status === "Menunggu Pembayaran";
 
-  // Selama menunggu pembayaran, baca ulang status setiap 8 detik (webhook
-  // Midtrans memperbarui basis data di belakang layar).
+  // Selama menunggu pembayaran, baca ulang status setiap 8 detik: notifikasi
+  // pembayaran dari HP pemilik memperbarui basis data di belakang layar.
   useEffect(() => {
     if (!menungguBayar) return;
     const t = window.setInterval(() => {
-      setSekarang(Date.now());
       if (document.visibilityState === "visible") void muat();
     }, 8000);
     return () => window.clearInterval(t);
   }, [menungguBayar, muat]);
 
+  /** Menampilkan QRIS yang masih berlaku, atau membuat QRIS baru bila sudah kedaluwarsa. */
   async function bayar() {
     setSibuk("bayar");
     setPesan(null);
     try {
-      const { ok, data } = await panggilApi<{ token?: string; redirectUrl?: string }>(
-        `/api/pesanan/${kode}/bayar/`,
-        await auth.token(),
-      );
-      if (!ok || !data.token || !data.redirectUrl) {
-        setPesan({ jenis: "galat", teks: data.galat ?? "Tagihan gagal dibuat. Coba lagi." });
-        return;
-      }
-      await bayarDenganSnap(data.token, data.redirectUrl);
-      await cek(true);
+      const { ok, data } = await panggilApi(`/api/pesanan/${kode}/bayar/`, await auth.token());
+      if (!ok) setPesan({ jenis: "galat", teks: data.galat ?? "QRIS gagal dibuat. Coba lagi." });
+      await muat();
     } catch {
       setPesan({ jenis: "galat", teks: "Tidak dapat terhubung ke server." });
     } finally {
@@ -105,16 +88,15 @@ export function DetailPesananSaya({ kode }: { kode: string }) {
     }
   }
 
-  async function cek(diam = false) {
-    if (!diam) setSibuk("cek");
+  async function klaim() {
+    setSibuk("klaim");
     try {
-      await panggilApi(`/api/pesanan/${kode}/sinkron/`, await auth.token());
+      await panggilApi(`/api/pesanan/${kode}/klaim/`, await auth.token());
       await muat();
-      if (!diam) setPesan({ jenis: "info", teks: "Status pembayaran sudah diperbarui." });
     } catch {
-      if (!diam) setPesan({ jenis: "galat", teks: "Gagal memeriksa status pembayaran." });
+      setPesan({ jenis: "galat", teks: "Tidak dapat terhubung ke server." });
     } finally {
-      if (!diam) setSibuk("");
+      setSibuk("");
     }
   }
 
@@ -176,43 +158,35 @@ export function DetailPesananSaya({ kode }: { kode: string }) {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_380px]">
         <div className="min-w-0 space-y-6">
-          {menungguBayar && (
-            <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-jingga-700 to-jingga-500 p-6 text-white sm:p-7">
-              <p className="text-[14px] font-medium text-white/85">Total yang harus dibayar</p>
-              <p className="mt-1 font-display text-[38px] font-semibold leading-none tabular-nums">{rupiah(p.total)}</p>
-              {p.batasBayar && (
-                <p className="mt-3 inline-flex items-center gap-1.5 text-[13px] text-white/85">
-                  <Clock size={14} />
-                  Bayar sebelum {waktuPendek(p.batasBayar)} ({sisaWaktu(p.batasBayar, sekarang)})
-                </p>
-              )}
-              {p.statusBayar === "Gagal" && (
-                <p className="mt-2 text-[13px] font-semibold">Pembayaran sebelumnya gagal. Silakan coba lagi.</p>
-              )}
-              <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
-                <button type="button" onClick={bayar} disabled={sibuk !== ""} className="tombol tombol-lg bg-white text-jingga-800 hover:bg-jingga-50">
-                  <CreditCard size={18} />
-                  {sibuk === "bayar" ? "Membuka pembayaran…" : "Bayar Sekarang"}
-                </button>
-                <button type="button" onClick={() => void cek()} disabled={sibuk !== ""} className="tombol tombol-lg border border-white/40 text-white hover:bg-white/10">
-                  <RefreshCw size={17} className={sibuk === "cek" ? "animate-spin" : ""} />
-                  Sudah bayar? Cek status
-                </button>
-              </div>
-            </section>
-          )}
+          {menungguBayar && p.qrisDinamis && p.nominalBayar ? (
+            <KartuQris
+              kode={p.kode}
+              payload={p.qrisDinamis}
+              nominal={p.nominalBayar}
+              kodeUnik={p.kodeUnik ?? 0}
+              batasBayar={p.batasBayar ?? null}
+              diklaim={Boolean(p.diklaimBayarPada)}
+              onKlaim={() => void klaim()}
+              sibuk={sibuk !== ""}
+            />
+          ) : menungguBayar ? (
+            <button type="button" onClick={() => void bayar()} disabled={sibuk !== ""} className="tombol tombol-lg tombol-jingga">
+              <QrCode size={18} />
+              {sibuk === "bayar" ? "Menyiapkan QRIS…" : "Tampilkan QRIS pembayaran"}
+            </button>
+          ) : null}
 
           {batal && (
             <PesanForm jenis="info">
               {p.statusBayar === "Kedaluwarsa"
-                ? "Pesanan dibatalkan karena pembayaran melewati batas waktu. Selama jadwal acara masih paling cepat besok, Anda bisa membayar ulang."
+                ? "Pesanan dibatalkan karena pembayaran melewati batas waktu. Selama jadwal acara masih paling cepat besok, Anda bisa membuat QRIS baru."
                 : KETERANGAN_STATUS.Dibatalkan}
             </PesanForm>
           )}
           {batal && p.statusBayar === "Kedaluwarsa" && (
-            <button type="button" onClick={bayar} disabled={sibuk !== ""} className="tombol tombol-md tombol-jingga">
-              <CreditCard size={17} />
-              Bayar ulang
+            <button type="button" onClick={() => void bayar()} disabled={sibuk !== ""} className="tombol tombol-md tombol-jingga">
+              <QrCode size={17} />
+              {sibuk === "bayar" ? "Menyiapkan QRIS…" : "Buat QRIS baru"}
             </button>
           )}
 
@@ -280,6 +254,12 @@ export function DetailPesananSaya({ kode }: { kode: string }) {
               <span className="text-[14px] text-ink-soft">Total (ongkir gratis)</span>
               <span className="text-[22px] font-bold tabular-nums text-zamrud-800">{rupiah(p.total)}</span>
             </div>
+            {p.kodeUnik ? (
+              <p className="mt-1 flex justify-between text-[13px] text-ink-muted">
+                <span>Kode unik pembayaran</span>
+                <span className="tabular-nums">+ {rupiah(p.kodeUnik)}</span>
+              </p>
+            ) : null}
           </section>
         </div>
 
@@ -331,6 +311,12 @@ export function DetailPesananSaya({ kode }: { kode: string }) {
                   <dd className="text-right font-semibold">{p.metodeBayar}</dd>
                 </div>
               )}
+              {p.nominalBayar ? (
+                <div className="flex justify-between gap-3">
+                  <dt className="text-ink-muted">Nominal</dt>
+                  <dd className="text-right font-semibold tabular-nums">{rupiah(p.nominalBayar)}</dd>
+                </div>
+              ) : null}
               {p.dibayarPada && (
                 <div className="flex justify-between gap-3">
                   <dt className="text-ink-muted">Dibayar</dt>

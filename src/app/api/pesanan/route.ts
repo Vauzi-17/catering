@@ -1,5 +1,5 @@
 import { hitungRincian, jarakKm, tanggalJakarta, titikSah, type BarisDipesan } from "@/lib/pembayaran";
-import { ambilPesananKode, infoPengantaran, siapkanTagihan } from "@/lib/pesanan-server";
+import { ambilPesananKode, buatTagihan, infoPengantaran, qrisToko } from "@/lib/pesanan-server";
 import { GalatApi, jawabGalat, penggunaDariRequest, supabaseServer } from "@/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +22,7 @@ const teks = (v: unknown, maks: number) => (typeof v === "string" ? v.trim().sli
 
 /**
  * Membuat pesanan baru milik pengguna yang sedang login, lalu membuat
- * tagihan Midtrans Snap. Harga selalu diambil dari tabel menus.
+ * tagihan QRIS bernominal unik. Harga selalu diambil dari tabel menus.
  */
 export async function POST(req: Request) {
   try {
@@ -58,6 +58,9 @@ export async function POST(req: Request) {
         );
       }
     }
+
+    // Pastikan QRIS toko sudah disiapkan sebelum pesanan disimpan.
+    const statis = await qrisToko();
 
     const db = supabaseServer();
     const ids = (m.items ?? []).map((it) => String(it.menuId));
@@ -103,6 +106,7 @@ export async function POST(req: Request) {
         total: rincian.total,
         status: "Menunggu Pembayaran",
         status_bayar: "Menunggu",
+        metode_bayar: "QRIS",
       })
       .select("id, kode")
       .single();
@@ -122,11 +126,9 @@ export async function POST(req: Request) {
       throw galatRincian;
     }
 
-    const asal = process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
     const pesanan = await ambilPesananKode(baru.kode as string);
     try {
-      const tagihan = await siapkanTagihan(pesanan, asal);
-      return Response.json({ kode: pesanan.kode, ...tagihan });
+      return Response.json(await buatTagihan(pesanan, statis));
     } catch (e) {
       // Pesanan tetap tersimpan; pelanggan bisa mencoba bayar lagi dari
       // halaman pesanannya.

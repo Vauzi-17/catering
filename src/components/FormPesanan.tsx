@@ -6,15 +6,14 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   CircleAlert,
-  CreditCard,
-  Landmark,
+  Clock,
   MapPin,
   QrCode,
+  ScanLine,
   ShieldCheck,
   ShoppingBag,
   Store,
   Truck,
-  Wallet,
 } from "lucide-react";
 import { IsianAlamat, type NilaiAlamat } from "@/components/akun/IsianAlamat";
 import { PesanForm, TanpaSupabase } from "@/components/akun/KerangkaAuth";
@@ -23,7 +22,7 @@ import { LangkahCheckout } from "@/components/pesan/LangkahCheckout";
 import { profil as profilUsaha } from "@/data/profil";
 import { rupiah, satuanMenu } from "@/lib/format";
 import { jarakKm, tanggalJakarta } from "@/lib/pembayaran";
-import { bayarDenganSnap, panggilApi } from "@/lib/snap";
+import { panggilApi } from "@/lib/api-klien";
 import type { Menu } from "@/lib/types";
 import { useInfoPengantaran } from "@/lib/useInfoPengantaran";
 import { useWajibMasuk } from "@/lib/useWajibMasuk";
@@ -171,7 +170,7 @@ export function FormPesanan() {
     setTahap("bayar");
     setBarisBeku(baris);
     try {
-      const { ok, data } = await panggilApi<{ kode?: string; token?: string; redirectUrl?: string }>(
+      const { ok, data } = await panggilApi<{ kode?: string; nominal?: number }>(
         "/api/pesanan/",
         await auth.token(),
         {
@@ -212,15 +211,7 @@ export function FormPesanan() {
       }
 
       const tujuan = `/pesanan/${data.kode}/`;
-      if (!data.token || !data.redirectUrl) {
-        router.push(`${tujuan}?galat=${encodeURIComponent(data.galat ?? "")}`);
-        return;
-      }
-
-      await bayarDenganSnap(data.token, data.redirectUrl);
-      // Apa pun hasil popup, status sebenarnya dibaca ulang di halaman pesanan.
-      await panggilApi(`/api/pesanan/${data.kode}/sinkron/`, await auth.token()).catch(() => null);
-      router.push(`${tujuan}?baru=1`);
+      router.push(ok ? `${tujuan}?baru=1` : `${tujuan}?galat=${encodeURIComponent(data.galat ?? "")}`);
     } catch {
       setGalatKirim("Tidak dapat terhubung ke server. Periksa koneksi lalu coba lagi.");
       setTahap("isi");
@@ -332,14 +323,13 @@ export function FormPesanan() {
             <Bagian
               nomor="03"
               judul="Pembayaran"
-              deskripsi="Bayar penuh di muka. Pesanan langsung kami siapkan begitu pembayaran diterima."
+              deskripsi="Bayar penuh di muka dengan QRIS. Pesanan langsung kami siapkan begitu pembayaran diterima."
             >
-              <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+              <ul className="grid gap-2.5 sm:grid-cols-3">
                 {[
-                  { ikon: QrCode, teks: "QRIS" },
-                  { ikon: Landmark, teks: "Virtual Account" },
-                  { ikon: Wallet, teks: "GoPay / ShopeePay" },
-                  { ikon: CreditCard, teks: "Kartu" },
+                  { ikon: QrCode, teks: "QRIS dengan nominal terisi" },
+                  { ikon: ScanLine, teks: "Semua m-banking & e-wallet" },
+                  { ikon: Clock, teks: "Bayar dalam 24 jam" },
                 ].map(({ ikon: Ikon, teks }) => (
                   <li key={teks} className="flex items-center gap-2.5 rounded-xl border border-kabut-line bg-kabut px-3.5 py-3 text-[13px] font-semibold text-ink-soft">
                     <Ikon size={17} strokeWidth={1.8} className="shrink-0 text-zamrud-700" />
@@ -397,6 +387,9 @@ export function FormPesanan() {
                 <p className="mt-1 font-display text-[32px] font-semibold leading-none tabular-nums text-zamrud-800">
                   {rupiah(total)}
                 </p>
+                <p className="mt-2 text-[12px] text-ink-muted">
+                  Ditambah kode unik Rp 1–999 sebagai penanda pembayaran Anda.
+                </p>
               </div>
 
               {galatKirim && (
@@ -409,12 +402,12 @@ export function FormPesanan() {
               )}
 
               <button type="submit" disabled={tahap === "bayar"} className="tombol tombol-blok tombol-jingga mt-5">
-                {tahap === "bayar" ? "Menyiapkan pembayaran…" : "Bayar Sekarang"}
+                {tahap === "bayar" ? "Menyiapkan QRIS…" : "Buat Pesanan & Bayar"}
                 {tahap === "isi" && <ArrowRight size={18} />}
               </button>
               <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[12px] text-ink-muted">
                 <ShieldCheck size={14} className="shrink-0 text-zamrud-600" />
-                Pembayaran diproses aman oleh Midtrans
+                Pembayaran QRIS langsung ke rekening Asri Catering
               </p>
             </div>
           </div>
