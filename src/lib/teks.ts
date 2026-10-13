@@ -1,4 +1,5 @@
 import type { Bahasa } from "@/store/BahasaProvider";
+import { menuAwal } from "@/data/menu";
 import type { KategoriMenu, Menu, StatusBayar, StatusPesanan } from "@/lib/types";
 
 /**
@@ -39,16 +40,40 @@ export interface TeksMenu {
   isi: string[];
 }
 
-/** Nama, deskripsi, dan isi menu sesuai bahasa; kosong → versi Indonesia. */
+// Terjemahan bawaan untuk menu dari src/data/menu.ts. Dipakai bila kolom *_en
+// di basis data masih kosong, dan hanya selama teks Indonesianya belum
+// disunting, supaya versi Inggris tidak menggambarkan isi yang berbeda.
+const bawaanEn = new Map(menuAwal.map((m) => [m.slug, m]));
+const isiBawaanEn = new Map(
+  menuAwal.flatMap((m) => (m.isiEn ? m.isi.map((item, i) => [item, m.isiEn![i]] as const) : [])),
+);
+
+function sama(a: string, b: string) {
+  return a.trim().replace(/\s+/g, " ") === b.trim().replace(/\s+/g, " ");
+}
+
+/** Nama, deskripsi, dan isi menu sesuai bahasa; tanpa terjemahan → versi Indonesia. */
 export function teksMenu(menu: Menu, bahasa: Bahasa): TeksMenu {
   if (bahasa !== "en") {
     return { nama: menu.nama, deskripsi: menu.deskripsi, deskripsiPanjang: menu.deskripsiPanjang, isi: menu.isi };
   }
+  const asal = bawaanEn.get(menu.slug);
+  const dariBawaan = (idDb: string, idAsal?: string, en?: string) =>
+    asal && en && idAsal !== undefined && sama(idDb, idAsal) ? en : "";
+  const deskripsi =
+    menu.deskripsiEn?.trim() || dariBawaan(menu.deskripsi, asal?.deskripsi, asal?.deskripsiEn) || menu.deskripsi;
   return {
-    nama: menu.namaEn?.trim() || menu.nama,
-    deskripsi: menu.deskripsiEn?.trim() || menu.deskripsi,
-    deskripsiPanjang: menu.deskripsiPanjangEn?.trim() || menu.deskripsiEn?.trim() || menu.deskripsiPanjang,
-    isi: menu.isiEn && menu.isiEn.length > 0 ? menu.isiEn : menu.isi,
+    nama: menu.namaEn?.trim() || dariBawaan(menu.nama, asal?.nama, asal?.namaEn) || menu.nama,
+    deskripsi,
+    deskripsiPanjang:
+      menu.deskripsiPanjangEn?.trim() ||
+      dariBawaan(menu.deskripsiPanjang, asal?.deskripsiPanjang, asal?.deskripsiPanjangEn) ||
+      menu.deskripsiEn?.trim() ||
+      menu.deskripsiPanjang,
+    isi:
+      menu.isiEn && menu.isiEn.length > 0
+        ? menu.isiEn
+        : menu.isi.map((item) => isiBawaanEn.get(item.trim()) ?? item),
   };
 }
 
