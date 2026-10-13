@@ -34,7 +34,7 @@ export const profil = {
   ],
   statistik: [
     { angka: "2026", label: "Warung rames buka sejak 28 Agustus" },
-    { angka: "6", label: "Paket katering" },
+    { angka: "Gratis", label: "Ongkir dalam area layanan" },
     { angka: "7 hari", label: "Terima pesanan setiap hari" },
     { angka: "H-2", label: "Batas paling lambat memesan" },
   ],

@@ -30,7 +30,7 @@ export const profilEn: typeof profil = {
   areaLayanan: ["Jeruklegi and surroundings", "Cilacap city", "Cilacap Regency"],
   statistik: [
     { angka: "2026", label: "Rice stall open since 28 August" },
-    { angka: "6", label: "Catering packages" },
+    { angka: "Free", label: "Delivery within our service area" },
     { angka: "7 days", label: "Orders taken every day" },
     { angka: "2 days", label: "Minimum order notice" },
   ],
