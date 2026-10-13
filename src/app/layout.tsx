@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/store/AuthProvider";
+import { BahasaProvider } from "@/store/BahasaProvider";
 import { DataProvider } from "@/store/DataProvider";
 
 const sans = Plus_Jakarta_Sans({
@@ -71,9 +72,11 @@ export default function RootLayout({
         <Script id="pengaman-dom" strategy="beforeInteractive">
           {PENGAMAN_DOM}
         </Script>
-        <AuthProvider>
-          <DataProvider>{children}</DataProvider>
-        </AuthProvider>
+        <BahasaProvider>
+          <AuthProvider>
+            <DataProvider>{children}</DataProvider>
+          </AuthProvider>
+        </BahasaProvider>
       </body>
     </html>
   );

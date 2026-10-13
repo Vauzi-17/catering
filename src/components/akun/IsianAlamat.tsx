@@ -5,6 +5,7 @@ import { useState } from "react";
 import { MapPinned } from "lucide-react";
 import type { Titik } from "@/lib/pembayaran";
 import { useInfoPengantaran } from "@/lib/useInfoPengantaran";
+import { useBahasa } from "@/store/BahasaProvider";
 
 // Peta hanya dirender di browser (Leaflet membutuhkan window).
 const PetaLokasi = dynamic(() => import("@/components/akun/PetaLokasi").then((m) => m.PetaLokasi), {
@@ -28,6 +29,7 @@ export function IsianAlamat({
   galat?: { alamat?: string; titik?: string };
 }) {
   const dapur = useInfoPengantaran();
+  const { t } = useBahasa();
   const [mengisi, setMengisi] = useState(false);
 
   async function isiDariPeta() {
@@ -45,18 +47,18 @@ export function IsianAlamat({
   return (
     <div className="space-y-4">
       <div data-galat={Boolean(galat?.titik)}>
-        <p className="isian-label">Titik lokasi di peta</p>
+        <p className="isian-label">{t("Titik lokasi di peta", "Location pin on the map")}</p>
         <PetaLokasi nilai={nilai.titik} onUbah={(titik) => onUbah({ ...nilai, titik })} dapur={dapur} />
         {galat?.titik && <p className="mt-1.5 text-[12.5px] font-semibold text-red-700">{galat.titik}</p>}
       </div>
 
       <div data-galat={Boolean(galat?.alamat)}>
         <div className="flex items-center justify-between gap-3">
-          <label className="isian-label" htmlFor="alamat">Alamat lengkap</label>
+          <label className="isian-label" htmlFor="alamat">{t("Alamat lengkap", "Full address")}</label>
           {nilai.titik && (
             <button type="button" onClick={isiDariPeta} disabled={mengisi} className="mb-1.5 inline-flex items-center gap-1 text-[12px] font-semibold text-zamrud-700 hover:underline disabled:opacity-50">
               <MapPinned size={14} />
-              {mengisi ? "Mengambil…" : "Isi dari peta"}
+              {mengisi ? t("Mengambil…", "Fetching…") : t("Isi dari peta", "Fill from map")}
             </button>
           )}
         </div>
@@ -66,21 +68,21 @@ export function IsianAlamat({
           className="isian resize-y"
           value={nilai.alamat}
           onChange={(e) => onUbah({ ...nilai, alamat: e.target.value })}
-          placeholder="Nama gedung, jalan, nomor, lantai atau ruang, kelurahan"
+          placeholder={t("Nama gedung, jalan, nomor, lantai atau ruang, kelurahan", "Building, street, number, floor or room, village")}
         />
         {galat?.alamat && <p className="mt-1.5 text-[12.5px] font-semibold text-red-700">{galat.alamat}</p>}
       </div>
 
       <div>
         <label className="isian-label" htmlFor="patokan">
-          Patokan <span className="font-normal text-ink-muted">(opsional)</span>
+          {t("Patokan", "Landmark")} <span className="font-normal text-ink-muted">({t("opsional", "optional")})</span>
         </label>
         <input
           id="patokan"
           className="isian"
           value={nilai.patokan}
           onChange={(e) => onUbah({ ...nilai, patokan: e.target.value })}
-          placeholder="Contoh: pagar hijau depan masjid, masuk lewat pintu samping"
+          placeholder={t("Contoh: pagar hijau depan masjid, masuk lewat pintu samping", "e.g. green gate opposite the mosque, use the side door")}
         />
       </div>
     </div>

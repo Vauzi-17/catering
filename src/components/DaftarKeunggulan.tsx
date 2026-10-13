@@ -1,5 +1,7 @@
+"use client";
+
 import { ChefHat, ClipboardList, Receipt, Soup } from "lucide-react";
-import { profil } from "@/data/profil";
+import { useProfil } from "@/lib/useProfil";
 
 // Urutan ikon mengikuti urutan profil.keunggulan.
 const ikonKeunggulan = [ChefHat, Receipt, Soup, ClipboardList];
@@ -10,6 +12,7 @@ const ikonKeunggulan = [ChefHat, Receipt, Soup, ClipboardList];
  */
 export function DaftarKeunggulan({ susunan = "baris" }: { susunan?: "baris" | "kolom" }) {
   const kolom = susunan === "kolom";
+  const profil = useProfil();
   return (
     <ul
       className={

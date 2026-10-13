@@ -14,14 +14,14 @@ export default function HalamanMenu() {
   return (
     <>
       <HeroHalaman
-        remah={[{ label: "Beranda", href: "/" }, { label: "Menu" }]}
-        judul="Menu & Harga"
-        deskripsi="Harga sudah termasuk kemasan dan alat makan."
+        remah={[{ label: ["Beranda", "Home"], href: "/" }, { label: "Menu" }]}
+        judul={["Menu & Harga", "Menu & Prices"]}
+        deskripsi={["Harga sudah termasuk kemasan dan alat makan.", "Prices include packaging and cutlery."]}
         foto={fotoDekorasi}
       />
       <Suspense
         fallback={
-          <div className="container-page py-14 text-sm text-ink-muted">Memuat menu…</div>
+          <div className="container-page min-h-[40vh] py-14" aria-busy="true" />
         }
       >
         <KatalogMenu />

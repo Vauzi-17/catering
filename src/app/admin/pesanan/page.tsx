@@ -192,7 +192,7 @@ export default function HalamanPesananAdmin() {
                     <td>
                       <span className="flex flex-col items-start gap-1">
                         <StatusBadge status={p.status} />
-                        <LencanaBayar status={p.statusBayar} />
+                        <LencanaBayar status={p.statusBayar} bahasa="id" />
                         {p.diklaimBayarPada && p.statusBayar === "Menunggu" && (
                           <span className="rounded-md bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-900">
                             Perlu dicek

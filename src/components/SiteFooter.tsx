@@ -5,19 +5,22 @@ import { usePathname } from "next/navigation";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { LogoMark } from "@/components/Logo";
 import { IconInstagram, IconWhatsapp } from "@/components/Icons";
-import { profil } from "@/data/profil";
+import { useProfil } from "@/lib/useProfil";
+import { useBahasa } from "@/store/BahasaProvider";
 
 const jelajahi = [
-  { label: "Beranda", href: "/" },
-  { label: "Menu & Harga", href: "/menu" },
-  { label: "Tentang Kami", href: "/tentang" },
-  { label: "Pesanan Saya", href: "/pesanan" },
-  { label: "Akun Saya", href: "/akun" },
-];
+  { label: ["Beranda", "Home"], href: "/" },
+  { label: ["Menu & Harga", "Menu & Prices"], href: "/menu" },
+  { label: ["Tentang Kami", "About Us"], href: "/tentang" },
+  { label: ["Pesanan Saya", "My Orders"], href: "/pesanan" },
+  { label: ["Akun Saya", "My Account"], href: "/akun" },
+] as const;
 
 export function SiteFooter() {
   // Beranda ditutup oleh blok ajakan penuh, jadi footer langsung menempel.
   const beranda = usePathname() === "/";
+  const profil = useProfil();
+  const { bahasa, t } = useBahasa();
 
   return (
     <footer className={`border-t border-kabut-line bg-kabut-deep ${beranda ? "" : "mt-20"}`}>
@@ -53,12 +56,12 @@ export function SiteFooter() {
         </div>
 
         <div className="md:col-span-2">
-          <h3 className="font-sans text-sm font-bold text-ink">Jelajahi</h3>
+          <h3 className="font-sans text-sm font-bold text-ink">{t("Jelajahi", "Explore")}</h3>
           <ul className="mt-4 space-y-2.5 text-sm text-ink-soft">
             {jelajahi.map((l) => (
               <li key={l.href}>
                 <Link href={l.href} className="hover:text-zamrud-700">
-                  {l.label}
+                  {bahasa === "en" ? l.label[1] : l.label[0]}
                 </Link>
               </li>
             ))}
@@ -66,7 +69,7 @@ export function SiteFooter() {
         </div>
 
         <div className="md:col-span-3">
-          <h3 className="font-sans text-sm font-bold text-ink">Kontak &amp; Reservasi</h3>
+          <h3 className="font-sans text-sm font-bold text-ink">{t("Kontak & Reservasi", "Contact & Booking")}</h3>
           <ul className="mt-4 space-y-3 text-sm text-ink-soft">
             <li className="flex gap-2.5">
               <MapPin className="mt-0.5 shrink-0 text-zamrud-700" size={16} strokeWidth={1.8} />
@@ -88,7 +91,7 @@ export function SiteFooter() {
         </div>
 
         <div className="md:col-span-3">
-          <h3 className="font-sans text-sm font-bold text-ink">Jam Layanan</h3>
+          <h3 className="font-sans text-sm font-bold text-ink">{t("Jam Layanan", "Opening Hours")}</h3>
           <dl className="mt-4 space-y-2 text-sm">
             {profil.jamOperasional.map((j) => (
               <div key={j.hari} className="flex justify-between gap-4">
@@ -102,12 +105,12 @@ export function SiteFooter() {
 
       <div className="border-t border-kabut-line">
         <div className="container-page flex flex-col items-start justify-between gap-3 py-5 text-[12px] font-medium text-ink-muted sm:flex-row sm:items-center">
-          <p>&copy; {new Date().getFullYear()} Asri Catering. Hak cipta dilindungi.</p>
+          <p>&copy; {new Date().getFullYear()} Asri Catering. {t("Hak cipta dilindungi.", "All rights reserved.")}</p>
           <div className="flex items-center gap-4">
-            <span>Dimasak di dapur sendiri, {profil.alamatSingkat.split(", ").pop()}</span>
+            <span>{t("Dimasak di dapur sendiri", "Cooked in our own kitchen")}, {profil.alamatSingkat.split(", ").pop()}</span>
             <span className="h-1 w-1 rounded-full bg-ink-muted/60" aria-hidden="true" />
             <Link href="/admin/login" className="hover:text-zamrud-700">
-              Masuk Admin
+              {t("Masuk Admin", "Admin sign in")}
             </Link>
           </div>
         </div>

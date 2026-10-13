@@ -2,13 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Minus, Plus, ShieldCheck, Truck } from "lucide-react";
-import { rupiah, satuanMenu } from "@/lib/format";
+import { rupiah } from "@/lib/format";
+import { satuan as satuanB, satuanJual, teksMenu } from "@/lib/teks";
+import { useBahasa } from "@/store/BahasaProvider";
 import { useData } from "@/store/DataProvider";
 
 const MAKS_PORSI = 1000;
 
 export function HitungCepat() {
   const { menus, tambahKeranjang, bukaKeranjang } = useData();
+  const { bahasa, t } = useBahasa();
   const tersedia = useMemo(() => menus.filter((m) => m.tersedia), [menus]);
 
   const [menuId, setMenuId] = useState("");
@@ -16,7 +19,7 @@ export function HitungCepat() {
 
   const menu = tersedia.find((m) => m.id === menuId) ?? tersedia[0];
   const minimal = menu?.minimalPesan ?? 1;
-  const satuan = menu ? satuanMenu(menu) : "porsi";
+  const satuan = menu ? satuanB(menu, bahasa) : t("porsi", "portion");
 
   // Porsi mengikuti batas minimal paket yang sedang dipilih.
   useEffect(() => {
@@ -40,9 +43,9 @@ export function HitungCepat() {
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h3 className="text-[24px] font-semibold leading-tight">Estimasi Cepat</h3>
+          <h3 className="text-[24px] font-semibold leading-tight">{t("Estimasi Cepat", "Quick Estimate")}</h3>
           <p className="mt-1 text-[13px] text-ink-muted">
-            Perkiraan biaya sebelum mengisi formulir pesanan.
+            {t("Perkiraan biaya sebelum mengisi formulir pesanan.", "An estimate before you fill in the order form.")}
           </p>
         </div>
         <span className="shrink-0 rounded-full bg-zamrud-50 px-3 py-1 text-[12px] font-semibold tabular-nums text-zamrud-700">
@@ -53,7 +56,7 @@ export function HitungCepat() {
       <div className="mt-6 space-y-5">
         <div>
           <label htmlFor="hitung-paket" className="mb-1.5 block text-[13px] font-semibold text-ink-soft">
-            Paket
+            {t("Paket", "Package")}
           </label>
           <select
             id="hitung-paket"
@@ -63,7 +66,7 @@ export function HitungCepat() {
           >
             {tersedia.map((m) => (
               <option key={m.id} value={m.id}>
-                {m.nama}
+                {teksMenu(m, bahasa).nama}
               </option>
             ))}
           </select>
@@ -71,7 +74,7 @@ export function HitungCepat() {
 
         <div>
           <label htmlFor="hitung-qty" className="mb-1.5 block text-[13px] font-semibold text-ink-soft">
-            Jumlah {satuan}
+            {t("Jumlah", "Number of")} {satuan}
           </label>
           <div className="flex items-center gap-3">
             <div className="inline-flex h-11 items-center rounded-lg border border-kabut-line bg-kabut">
@@ -80,7 +83,7 @@ export function HitungCepat() {
                 onClick={() => setQty(Math.max(minimal, jumlah - 5))}
                 disabled={jumlah <= minimal}
                 className="flex h-full w-11 items-center justify-center text-ink-soft transition-colors hover:text-ink disabled:opacity-40"
-                aria-label="Kurangi 5"
+                aria-label={t("Kurangi 5", "Decrease by 5")}
               >
                 <Minus size={16} />
               </button>
@@ -99,13 +102,13 @@ export function HitungCepat() {
                 type="button"
                 onClick={() => setQty(Math.min(MAKS_PORSI, jumlah + 5))}
                 className="flex h-full w-11 items-center justify-center text-ink-soft transition-colors hover:text-ink"
-                aria-label="Tambah 5"
+                aria-label={t("Tambah 5", "Increase by 5")}
               >
                 <Plus size={16} />
               </button>
             </div>
             <p className="text-[12px] leading-snug text-ink-muted">
-              Minimal {minimal} {satuan}
+              {t("Minimal", "Minimum")} {minimal} {satuan}
             </p>
           </div>
         </div>
@@ -113,7 +116,7 @@ export function HitungCepat() {
 
       <dl className="mt-6 space-y-2.5 border-t border-kabut-line pt-5 text-[14px]">
         <div className="flex justify-between gap-4">
-          <dt className="text-ink-soft">Harga {menu.satuanJual}</dt>
+          <dt className="text-ink-soft">{t("Harga", "Price")} {satuanJual(menu, bahasa)}</dt>
           <dd className="tabular-nums text-ink">{rupiah(menu.hargaJual)}</dd>
         </div>
         <div className="flex justify-between gap-4">
@@ -124,12 +127,12 @@ export function HitungCepat() {
         </div>
         <div className="flex justify-between gap-4">
           <dt className="inline-flex items-center gap-1.5 text-ink-soft">
-            Ongkir
+            {t("Ongkir", "Delivery")}
             <Truck size={15} strokeWidth={1.8} className="text-ink-muted" />
           </dt>
           <dd>
             <span className="rounded-md bg-zamrud-50 px-2 py-0.5 text-[12px] font-bold text-zamrud-700">
-              GRATIS
+              {t("GRATIS", "FREE")}
             </span>
           </dd>
         </div>
@@ -137,12 +140,12 @@ export function HitungCepat() {
 
       <div className="mt-5 rounded-xl bg-kabut px-4 py-4">
         <p className="text-[13px] font-medium text-ink-muted">
-          Perkiraan total
+          {t("Perkiraan total", "Estimated total")}
         </p>
         <p className="mt-1 font-display text-[30px] font-semibold leading-none tabular-nums text-zamrud-800">
           {rupiah(subtotal)}
         </p>
-        <p className="mt-2 text-[12px] text-ink-muted">Ongkir gratis dalam area layanan.</p>
+        <p className="mt-2 text-[12px] text-ink-muted">{t("Ongkir gratis dalam area layanan.", "Free delivery within our service area.")}</p>
       </div>
 
       <button
@@ -150,13 +153,13 @@ export function HitungCepat() {
         onClick={lanjut}
         className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-jingga-600 text-[15px] font-semibold text-white transition-colors hover:bg-jingga-700"
       >
-        Masukkan ke Keranjang
+        {t("Masukkan ke Keranjang", "Add to Cart")}
         <ArrowRight size={18} />
       </button>
 
       <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[12px] text-ink-muted">
         <ShieldCheck size={14} className="shrink-0 text-zamrud-600" />
-        Bayar saat checkout dengan QRIS dari aplikasi apa pun
+        {t("Bayar saat checkout dengan QRIS dari aplikasi apa pun", "Pay at checkout with QRIS from any app")}
       </p>
     </div>
   );

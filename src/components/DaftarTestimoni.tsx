@@ -1,4 +1,6 @@
-import { profil } from "@/data/profil";
+"use client";
+
+import { useProfil } from "@/lib/useProfil";
 
 function inisial(nama: string) {
   return nama
@@ -11,6 +13,7 @@ function inisial(nama: string) {
 }
 
 export function DaftarTestimoni() {
+  const profil = useProfil();
   return (
     <div className="grid gap-5 md:grid-cols-3">
       {profil.testimoni.map((t) => (

@@ -16,12 +16,14 @@ export function LogoMark({ className = "h-9 w-9" }: { className?: string }) {
 
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
-    <span className="inline-flex items-center gap-2.5">
-      <LogoMark className={compact ? "h-8 w-8" : "h-10 w-10"} />
+    <span className="inline-flex items-center gap-2 sm:gap-2.5">
+      <LogoMark className={compact ? "h-8 w-8" : "h-9 w-9 sm:h-10 sm:w-10"} />
       <span className="flex flex-col leading-none">
-        <span className="font-display text-[19px] font-semibold text-ink">Asri Catering</span>
+        <span className="whitespace-nowrap font-display text-[16px] font-semibold text-ink sm:text-[19px]">
+          Asri Catering
+        </span>
         {!compact && (
-          <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-muted">
+          <span className="mt-1 hidden whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-muted sm:block">
             Nasi Kotak &amp; Bento
           </span>
         )}

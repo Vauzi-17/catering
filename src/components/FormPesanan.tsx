@@ -17,27 +17,31 @@ import { PesanForm, TanpaSupabase } from "@/components/akun/KerangkaAuth";
 import { FotoMenu } from "@/components/Placeholder";
 import { LangkahCheckout } from "@/components/pesan/LangkahCheckout";
 import { profil as profilUsaha } from "@/data/profil";
-import { rupiah, satuanMenu } from "@/lib/format";
+import { rupiah } from "@/lib/format";
+import { satuan, teksMenu } from "@/lib/teks";
 import { jarakKm, tanggalJakarta } from "@/lib/pembayaran";
 import { panggilApi } from "@/lib/api-klien";
 import type { Menu } from "@/lib/types";
 import { useInfoPengantaran } from "@/lib/useInfoPengantaran";
 import { useWajibMasuk } from "@/lib/useWajibMasuk";
+import { useBahasa } from "@/store/BahasaProvider";
 import { useData } from "@/store/DataProvider";
 
 type Metode = "Antar ke Alamat" | "Ambil di Tempat";
 
 const pilihanJam = [
-  { label: "Pagi", jam: "09:30" },
-  { label: "Siang", jam: "11:30" },
-  { label: "Sore", jam: "16:30" },
-];
+  { label: ["Pagi", "Morning"], jam: "09:30" },
+  { label: ["Siang", "Midday"], jam: "11:30" },
+  { label: ["Sore", "Afternoon"], jam: "16:30" },
+] as const;
 
 export function FormPesanan() {
   const auth = useWajibMasuk();
   const router = useRouter();
   const dapur = useInfoPengantaran();
   const { menus, keranjang, kosongkanKeranjang, bukaKeranjang, siap } = useData();
+  const { bahasa, t, p: pilih } = useBahasa();
+  const namaMenu = (m: Menu) => teksMenu(m, bahasa).nama;
 
   const [nama, setNama] = useState("");
   const [telepon, setTelepon] = useState("");
@@ -103,7 +107,7 @@ export function FormPesanan() {
     );
   }
   if (!auth.siap || !auth.pengguna || !siap) {
-    return <div className="container-page py-14 text-sm text-ink-muted">Memuat…</div>;
+    return <div className="container-page py-14 text-sm text-ink-muted">{t("Memuat…", "Loading…")}</div>;
   }
 
   if (baris.length === 0) {
@@ -115,15 +119,15 @@ export function FormPesanan() {
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-kabut text-ink-muted">
               <ShoppingBag size={24} strokeWidth={1.8} />
             </span>
-            <h1 className="mt-4 text-[26px] font-semibold">Keranjang masih kosong</h1>
-            <p className="mt-2 text-sm text-ink-muted">Pilih paket dulu, lalu kembali ke halaman ini.</p>
+            <h1 className="mt-4 text-[26px] font-semibold">{t("Keranjang masih kosong", "Your cart is empty")}</h1>
+            <p className="mt-2 text-sm text-ink-muted">{t("Pilih paket dulu, lalu kembali ke halaman ini.", "Choose a package first, then come back here.")}</p>
             <div className="mt-6 flex gap-2">
               <Link href="/menu/" className="tombol tombol-md tombol-jingga">
-                Lihat Menu
+                {t("Lihat Menu", "View Menu")}
                 <ArrowRight size={17} />
               </Link>
               <button type="button" onClick={bukaKeranjang} className="tombol tombol-md tombol-garis">
-                Buka keranjang
+                {t("Buka keranjang", "Open cart")}
               </button>
             </div>
           </div>
@@ -134,20 +138,28 @@ export function FormPesanan() {
 
   function validasi() {
     const g: Record<string, string> = {};
-    if (nama.trim().length < 3) g.nama = "Nama pemesan minimal 3 huruf.";
-    if (!/^[0-9+\-\s()]{9,}$/.test(telepon.trim())) g.telepon = "Masukkan nomor WhatsApp yang aktif.";
-    if (!tanggal) g.tanggal = "Pilih tanggal acara.";
-    else if (tanggal < tanggalJakarta(new Date(), 1)) g.tanggal = "Tanggal acara paling cepat besok (H-1).";
-    if (!/^\d{2}:\d{2}$/.test(jam)) g.jam = "Pilih jam pengantaran.";
+    if (nama.trim().length < 3) g.nama = t("Nama pemesan minimal 3 huruf.", "Name must be at least 3 characters.");
+    if (!/^[0-9+\-\s()]{9,}$/.test(telepon.trim())) g.telepon = t("Masukkan nomor WhatsApp yang aktif.", "Enter an active WhatsApp number.");
+    if (!tanggal) g.tanggal = t("Pilih tanggal acara.", "Choose the event date.");
+    else if (tanggal < tanggalJakarta(new Date(), 1)) g.tanggal = t("Tanggal acara paling cepat besok (H-1).", "The event date must be tomorrow or later.");
+    if (!/^\d{2}:\d{2}$/.test(jam)) g.jam = t("Pilih jam pengantaran.", "Choose a delivery time.");
     if (diantar) {
-      if (!alamat.titik) g.titik = "Tandai lokasi acara di peta.";
+      if (!alamat.titik) g.titik = t("Tandai lokasi acara di peta.", "Pin the event location on the map.");
       else if (jarakKm(dapur, alamat.titik) > dapur.radiusKm) {
-        g.titik = "Lokasi di luar area layanan. Pilih lokasi lain atau ambil di tempat.";
+        g.titik = t(
+          "Lokasi di luar area layanan. Pilih lokasi lain atau ambil di tempat.",
+          "This location is outside our service area. Choose another location or pick up.",
+        );
       }
-      if (alamat.alamat.trim().length < 10) g.alamat = "Tuliskan alamat lengkap lokasi acara.";
+      if (alamat.alamat.trim().length < 10) g.alamat = t("Tuliskan alamat lengkap lokasi acara.", "Write the full address of the event.");
     }
     const kurang = baris.find((b) => b.qty < b.menu.minimalPesan);
-    if (kurang) g.menu = `${kurang.menu.nama} minimal ${kurang.menu.minimalPesan} ${satuanMenu(kurang.menu)}.`;
+    if (kurang) {
+      g.menu = t(
+        `${kurang.menu.nama} minimal ${kurang.menu.minimalPesan} ${satuan(kurang.menu, "id")}.`,
+        `${namaMenu(kurang.menu)}: minimum ${kurang.menu.minimalPesan} ${satuan(kurang.menu, "en")}.`,
+      );
+    }
     setGalat(g);
     if (Object.keys(g).length) {
       window.setTimeout(() => {
@@ -186,7 +198,7 @@ export function FormPesanan() {
       );
 
       if (!ok && !data.kode) {
-        setGalatKirim(data.galat ?? "Pesanan gagal dibuat. Coba lagi.");
+        setGalatKirim(data.galat ?? t("Pesanan gagal dibuat. Coba lagi.", "The order could not be created. Please try again."));
         setTahap("isi");
         setBarisBeku(null);
         return;
@@ -210,7 +222,7 @@ export function FormPesanan() {
       const tujuan = `/pesanan/${data.kode}/`;
       router.push(ok ? `${tujuan}?baru=1` : `${tujuan}?galat=${encodeURIComponent(data.galat ?? "")}`);
     } catch {
-      setGalatKirim("Tidak dapat terhubung ke server. Periksa koneksi lalu coba lagi.");
+      setGalatKirim(t("Tidak dapat terhubung ke server. Periksa koneksi lalu coba lagi.", "Cannot reach the server. Check your connection and try again."));
       setTahap("isi");
       setBarisBeku(null);
     }
@@ -223,23 +235,27 @@ export function FormPesanan() {
       <form onSubmit={kirim} noValidate className="container-page py-10 sm:py-12">
         <div className="grid gap-8 lg:grid-cols-12 lg:gap-10">
           <div className="min-w-0 space-y-5 lg:col-span-7 xl:col-span-8">
-            <h1 className="text-[32px] font-semibold leading-tight sm:text-[40px]">Data Acara</h1>
+            <h1 className="text-[32px] font-semibold leading-tight sm:text-[40px]">{t("Data Acara", "Event Details")}</h1>
 
-            <Bagian nomor="01" judul="Pemesan & jadwal" deskripsi="Untuk konfirmasi pesanan dan koordinasi di lokasi.">
+            <Bagian
+              nomor="01"
+              judul={t("Pemesan & jadwal", "Contact & schedule")}
+              deskripsi={t("Untuk konfirmasi pesanan dan koordinasi di lokasi.", "For order confirmation and on-site coordination.")}
+            >
               <div className="grid gap-4 sm:grid-cols-2">
-                <Isian id="nama" label="Nama pemesan / instansi" galat={galat.nama}>
+                <Isian id="nama" label={t("Nama pemesan / instansi", "Name / organisation")} galat={galat.nama}>
                   <input id="nama" className="isian" value={nama} onChange={(e) => { setNama(e.target.value); hapusGalat("nama"); }} autoComplete="name" />
                 </Isian>
-                <Isian id="telepon" label="Nomor WhatsApp" galat={galat.telepon}>
+                <Isian id="telepon" label={t("Nomor WhatsApp", "WhatsApp number")} galat={galat.telepon}>
                   <input id="telepon" inputMode="tel" className="isian" value={telepon} onChange={(e) => { setTelepon(e.target.value); hapusGalat("telepon"); }} autoComplete="tel" />
                 </Isian>
-                <Isian id="tanggal" label="Tanggal acara" galat={galat.tanggal}>
+                <Isian id="tanggal" label={t("Tanggal acara", "Event date")} galat={galat.tanggal}>
                   <input id="tanggal" type="date" min={tanggalJakarta(new Date(), 1)} className="isian" value={tanggal} onChange={(e) => { setTanggal(e.target.value); hapusGalat("tanggal"); }} />
                 </Isian>
               </div>
 
               <fieldset className="mt-5" data-galat={Boolean(galat.jam)}>
-                <legend className="isian-label">Jam pengantaran</legend>
+                <legend className="isian-label">{t("Jam pengantaran", "Delivery time")}</legend>
                 <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
                   {pilihanJam.map((p) => (
                     <PilihanRadio
@@ -251,28 +267,42 @@ export function FormPesanan() {
                         setJam(p.jam);
                       }}
                     >
-                      {p.label} <span className="tabular-nums text-ink-muted">{p.jam.replace(":", ".")}</span>
+                      {pilih(p.label)} <span className="tabular-nums text-ink-muted">{p.jam.replace(":", ".")}</span>
                     </PilihanRadio>
                   ))}
                   <PilihanRadio nama="jam" dipilih={jamLain} onPilih={() => setJamLain(true)}>
-                    Jam lain
+                    {t("Jam lain", "Other time")}
                   </PilihanRadio>
                 </div>
                 {jamLain && (
-                  <input type="time" aria-label="Jam pengantaran lain" className="isian mt-2.5 sm:w-48" value={jam} onChange={(e) => setJam(e.target.value)} />
+                  <input type="time" aria-label={t("Jam pengantaran lain", "Other delivery time")} className="isian mt-2.5 sm:w-48" value={jam} onChange={(e) => setJam(e.target.value)} />
                 )}
                 {galat.jam && <p className="mt-1.5 text-[12.5px] font-semibold text-red-700">{galat.jam}</p>}
               </fieldset>
             </Bagian>
 
-            <Bagian nomor="02" judul="Pengantaran" deskripsi="Ongkir gratis untuk lokasi di dalam area layanan.">
+            <Bagian
+              nomor="02"
+              judul={t("Pengantaran", "Delivery")}
+              deskripsi={t("Ongkir gratis untuk lokasi di dalam area layanan.", "Free delivery to locations within our service area.")}
+            >
               <div className="grid gap-3 sm:grid-cols-2">
                 {(
                   [
-                    { nilai: "Antar ke Alamat", ikon: MapPin, isi: "Diantar kurir ke lokasi acara." },
-                    { nilai: "Ambil di Tempat", ikon: Store, isi: `Diambil di ${profilUsaha.alamatSingkat}.` },
+                    {
+                      nilai: "Antar ke Alamat",
+                      label: t("Antar ke Alamat", "Deliver to Address"),
+                      ikon: MapPin,
+                      isi: t("Diantar kurir ke lokasi acara.", "Delivered by courier to the event location."),
+                    },
+                    {
+                      nilai: "Ambil di Tempat",
+                      label: t("Ambil di Tempat", "Pick Up"),
+                      ikon: Store,
+                      isi: t(`Diambil di ${profilUsaha.alamatSingkat}.`, `Pick up at ${profilUsaha.alamatSingkat}.`),
+                    },
                   ] as const
-                ).map(({ nilai, ikon: Ikon, isi }) => (
+                ).map(({ nilai, label, ikon: Ikon, isi }) => (
                   <label
                     key={nilai}
                     className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors ${
@@ -283,7 +313,7 @@ export function FormPesanan() {
                     <span>
                       <span className="flex items-center gap-2 text-[15px] font-semibold text-ink">
                         <Ikon size={16} strokeWidth={1.8} className="text-zamrud-700" />
-                        {nilai}
+                        {label}
                       </span>
                       <span className="mt-1 block text-[13px] leading-relaxed text-ink-muted">{isi}</span>
                     </span>
@@ -304,16 +334,16 @@ export function FormPesanan() {
                   />
                   <label className="mt-4 flex items-center gap-2.5 text-[14px] text-ink-soft">
                     <input type="checkbox" checked={simpanAlamat} onChange={(e) => setSimpanAlamat(e.target.checked)} className="h-4 w-4 accent-zamrud-700" />
-                    Simpan sebagai alamat utama di akun saya
+                    {t("Simpan sebagai alamat utama di akun saya", "Save as my main address")}
                   </label>
                 </div>
               )}
 
               <div className="mt-5">
                 <label className="isian-label" htmlFor="catatan">
-                  Catatan <span className="font-normal text-ink-muted">(opsional)</span>
+                  {t("Catatan", "Notes")} <span className="font-normal text-ink-muted">({t("opsional", "optional")})</span>
                 </label>
-                <textarea id="catatan" rows={3} className="isian resize-y" value={catatan} onChange={(e) => setCatatan(e.target.value)} placeholder="Contoh: sambal dipisah, 3 porsi tanpa daging" />
+                <textarea id="catatan" rows={3} className="isian resize-y" value={catatan} onChange={(e) => setCatatan(e.target.value)} placeholder={t("Contoh: sambal dipisah, 3 porsi tanpa daging", "e.g. chilli sauce on the side, 3 portions without meat")} />
               </div>
             </Bagian>
 
@@ -322,9 +352,9 @@ export function FormPesanan() {
           <div className="min-w-0 lg:col-span-5 xl:col-span-4">
             <div className="kartu p-5 sm:p-6 lg:sticky lg:top-24">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-[22px] font-semibold">Ringkasan</h2>
+                <h2 className="text-[22px] font-semibold">{t("Ringkasan", "Summary")}</h2>
                 <button type="button" onClick={bukaKeranjang} className="text-[13px] font-semibold text-zamrud-700 hover:underline">
-                  Ubah keranjang
+                  {t("Ubah keranjang", "Edit cart")}
                 </button>
               </div>
 
@@ -332,12 +362,12 @@ export function FormPesanan() {
                 {baris.map(({ menu, qty }) => (
                   <li key={menu.id} className="flex items-center gap-3 py-3 first:pt-0">
                     <div className="w-14 shrink-0 overflow-hidden rounded-lg">
-                      <FotoMenu src={menu.foto} nama={menu.nama} rasio="aspect-square" mini />
+                      <FotoMenu src={menu.foto} nama={namaMenu(menu)} rasio="aspect-square" mini />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[14px] font-semibold">{menu.nama}</p>
+                      <p className="truncate text-[14px] font-semibold">{namaMenu(menu)}</p>
                       <p className="text-[12px] text-ink-muted">
-                        {qty} {satuanMenu(menu)} × {rupiah(menu.hargaJual)}
+                        {qty} {satuan(menu, bahasa)} × {rupiah(menu.hargaJual)}
                       </p>
                     </div>
                     <p className="shrink-0 text-[14px] font-semibold tabular-nums">{rupiah(menu.hargaJual * qty)}</p>
@@ -348,26 +378,29 @@ export function FormPesanan() {
 
               <dl className="mt-4 space-y-2 text-[14px]">
                 <div className="flex justify-between">
-                  <dt className="text-ink-soft">Subtotal ({porsi} porsi)</dt>
+                  <dt className="text-ink-soft">Subtotal ({porsi} {t("porsi", "portions")})</dt>
                   <dd className="tabular-nums">{rupiah(total)}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="inline-flex items-center gap-1.5 text-ink-soft">
-                    Ongkir <Truck size={14} className="text-ink-muted" />
+                    {t("Ongkir", "Delivery")} <Truck size={14} className="text-ink-muted" />
                   </dt>
                   <dd>
-                    <span className="rounded-md bg-zamrud-50 px-2 py-0.5 text-[12px] font-bold text-zamrud-700">GRATIS</span>
+                    <span className="rounded-md bg-zamrud-50 px-2 py-0.5 text-[12px] font-bold text-zamrud-700">{t("GRATIS", "FREE")}</span>
                   </dd>
                 </div>
               </dl>
 
               <div className="mt-4 rounded-xl bg-kabut px-4 py-4">
-                <p className="text-[13px] font-medium text-ink-muted">Total bayar</p>
+                <p className="text-[13px] font-medium text-ink-muted">{t("Total bayar", "Total to pay")}</p>
                 <p className="mt-1 font-display text-[32px] font-semibold leading-none tabular-nums text-zamrud-800">
                   {rupiah(total)}
                 </p>
                 <p className="mt-2 text-[12px] text-ink-muted">
-                  Ditambah kode unik Rp 1–999 sebagai penanda pembayaran Anda.
+                  {t(
+                    "Ditambah kode unik Rp 1–999 sebagai penanda pembayaran Anda.",
+                    "Plus a unique code of Rp 1–999 to identify your payment.",
+                  )}
                 </p>
               </div>
 
@@ -381,12 +414,12 @@ export function FormPesanan() {
               )}
 
               <button type="submit" disabled={tahap === "bayar"} className="tombol tombol-blok tombol-jingga mt-5">
-                {tahap === "bayar" ? "Menyiapkan QRIS…" : "Buat Pesanan & Bayar"}
+                {tahap === "bayar" ? t("Menyiapkan QRIS…", "Preparing QRIS…") : t("Buat Pesanan & Bayar", "Place Order & Pay")}
                 {tahap === "isi" && <ArrowRight size={18} />}
               </button>
               <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[12px] text-ink-muted">
                 <ShieldCheck size={14} className="shrink-0 text-zamrud-600" />
-                Pembayaran QRIS langsung ke rekening Asri Catering
+                {t("Pembayaran QRIS langsung ke rekening Asri Catering", "QRIS payment goes straight to Asri Catering")}
               </p>
             </div>
           </div>

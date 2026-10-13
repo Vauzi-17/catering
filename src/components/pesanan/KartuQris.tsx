@@ -5,27 +5,27 @@ import { CheckCircle2, Clock, Download, LoaderCircle } from "lucide-react";
 import QRCode from "qrcode";
 import { rupiah } from "@/lib/format";
 import { periksaQris } from "@/lib/pembayaran";
+import { waktuPendekB } from "@/lib/teks";
+import { useBahasa, type Bahasa } from "@/store/BahasaProvider";
 
-function sisaWaktu(iso: string, sekarang: number) {
+function sisaWaktu(iso: string, sekarang: number, bahasa: Bahasa) {
   const ms = new Date(iso).getTime() - sekarang;
-  if (ms <= 0) return "lewat batas";
+  const en = bahasa === "en";
+  if (ms <= 0) return en ? "past the deadline" : "lewat batas";
   const jam = Math.floor(ms / 3600_000);
   const menit = Math.floor((ms % 3600_000) / 60_000);
+  if (en) return jam > 0 ? `${jam} h ${menit} min left` : `${menit} min left`;
   return jam > 0 ? `${jam} jam ${menit} menit lagi` : `${menit} menit lagi`;
 }
 
-function waktuPendek(iso: string) {
-  return new Date(iso).toLocaleString("id-ID", {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Asia/Jakarta",
-  });
-}
-
 /** Gambar PNG berisi QR, nama toko, nominal, dan kode pesanan untuk disimpan ke galeri. */
-async function gambarUntukDisimpan(payload: string, nama: string, nominal: string, kode: string): Promise<string> {
+async function gambarUntukDisimpan(
+  payload: string,
+  nama: string,
+  nominal: string,
+  kode: string,
+  catatan: string,
+): Promise<string> {
   const qr = new Image();
   qr.src = await QRCode.toDataURL(payload, { width: 640, margin: 2, errorCorrectionLevel: "M" });
   await new Promise((selesai) => (qr.onload = selesai));
@@ -44,7 +44,7 @@ async function gambarUntukDisimpan(payload: string, nama: string, nominal: strin
   ctx.fillText(nominal, 360, 815);
   ctx.fillStyle = "#5b6660";
   ctx.font = "26px sans-serif";
-  ctx.fillText(`Pesanan ${kode} · bayar persis sesuai nominal`, 360, 870);
+  ctx.fillText(catatan, 360, 870);
   return kanvas.toDataURL("image/png");
 }
 
@@ -67,6 +67,7 @@ export function KartuQris({
   onKlaim: () => void;
   sibuk: boolean;
 }) {
+  const { bahasa, t } = useBahasa();
   const [svg, setSvg] = useState("");
   const [sekarang, setSekarang] = useState(() => Date.now());
   const [menyimpan, setMenyimpan] = useState(false);
@@ -101,7 +102,13 @@ export function KartuQris({
     setMenyimpan(true);
     try {
       const a = document.createElement("a");
-      a.href = await gambarUntukDisimpan(payload, nama, teksNominal, kode);
+      a.href = await gambarUntukDisimpan(
+        payload,
+        nama,
+        teksNominal,
+        kode,
+        t(`Pesanan ${kode} · bayar persis sesuai nominal`, `Order ${kode} · pay the exact amount`),
+      );
       a.download = `QRIS-${kode}.png`;
       a.click();
     } finally {
@@ -110,20 +117,23 @@ export function KartuQris({
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-kabut-line bg-white" aria-label="Pembayaran QRIS">
+    <section className="overflow-hidden rounded-2xl border border-kabut-line bg-white" aria-label={t("Pembayaran QRIS", "QRIS payment")}>
       <div className="bg-gradient-to-br from-jingga-700 to-jingga-500 px-6 py-5 text-white sm:px-7">
-        <p className="text-[14px] font-medium text-white/85">Total yang harus dibayar</p>
+        <p className="text-[14px] font-medium text-white/85">{t("Total yang harus dibayar", "Total to pay")}</p>
         <p className="mt-1 font-display text-[38px] font-semibold leading-none tabular-nums" data-nominal={nominal}>
           {depan}
           <span className="rounded-md bg-white/20 px-1">{belakang}</span>
         </p>
         <p className="mt-2 text-[13px] text-white/85">
-          Termasuk kode unik {rupiah(kodeUnik)}. Bayar persis sampai tiga digit terakhir supaya pembayaran terdeteksi otomatis.
+          {t(
+            `Termasuk kode unik ${rupiah(kodeUnik)}. Bayar persis sampai tiga digit terakhir supaya pembayaran terdeteksi otomatis.`,
+            `Includes a unique code of ${rupiah(kodeUnik)}. Pay the exact amount, down to the last three digits, so your payment is detected automatically.`,
+          )}
         </p>
         {batasBayar && (
           <p className="mt-3 inline-flex items-center gap-1.5 text-[13px] text-white/85">
             <Clock size={14} />
-            Bayar sebelum {waktuPendek(batasBayar)} ({sisaWaktu(batasBayar, sekarang)})
+            {t("Bayar sebelum", "Pay before")} {waktuPendekB(batasBayar, bahasa)} ({sisaWaktu(batasBayar, sekarang, bahasa)})
           </p>
         )}
       </div>
@@ -146,15 +156,24 @@ export function KartuQris({
         <div className="min-w-0">
           <ol className="space-y-3 text-[14px] text-ink-soft">
             {[
-              "Buka aplikasi m-banking atau e-wallet apa pun, lalu pilih Scan / QRIS.",
-              "Membuka halaman ini di HP? Simpan gambar QR, lalu pilih dari galeri di menu scan aplikasi pembayaran.",
-              "Nominal sudah terisi otomatis. Status pesanan berubah sendiri begitu pembayaran kami terima.",
-            ].map((t, i) => (
-              <li key={t} className="flex gap-3">
+              t(
+                "Buka aplikasi m-banking atau e-wallet apa pun, lalu pilih Scan / QRIS.",
+                "Open any mobile banking or e-wallet app, then choose Scan / QRIS.",
+              ),
+              t(
+                "Membuka halaman ini di HP? Simpan gambar QR, lalu pilih dari galeri di menu scan aplikasi pembayaran.",
+                "On your phone? Save the QR image, then pick it from the gallery in your payment app’s scan menu.",
+              ),
+              t(
+                "Nominal sudah terisi otomatis. Status pesanan berubah sendiri begitu pembayaran kami terima.",
+                "The amount is filled in for you. Your order status updates on its own once we receive the payment.",
+              ),
+            ].map((langkah, i) => (
+              <li key={langkah} className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zamrud-50 text-[12px] font-bold text-zamrud-700">
                   {i + 1}
                 </span>
-                {t}
+                {langkah}
               </li>
             ))}
           </ol>
@@ -162,18 +181,21 @@ export function KartuQris({
           <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap [&>button]:whitespace-nowrap">
             <button type="button" onClick={() => void simpan()} disabled={menyimpan} className="tombol tombol-md tombol-jingga">
               <Download size={17} />
-              {menyimpan ? "Menyiapkan…" : "Simpan gambar QR"}
+              {menyimpan ? t("Menyiapkan…", "Preparing…") : t("Simpan gambar QR", "Save QR image")}
             </button>
             {!diklaim && (
               <button type="button" onClick={onKlaim} disabled={sibuk} className="tombol tombol-md tombol-garis">
                 <CheckCircle2 size={17} />
-                Saya sudah bayar
+                {t("Saya sudah bayar", "I have paid")}
               </button>
             )}
           </div>
           {diklaim && (
             <p className="mt-4 rounded-xl bg-zamrud-50 px-4 py-3 text-[13px] text-zamrud-800">
-              Terima kasih. Kami sedang memastikan pembayaran Anda; halaman ini akan berubah sendiri begitu terkonfirmasi.
+              {t(
+                "Terima kasih. Kami sedang memastikan pembayaran Anda; halaman ini akan berubah sendiri begitu terkonfirmasi.",
+                "Thank you. We are confirming your payment; this page will update on its own once it is confirmed.",
+              )}
             </p>
           )}
         </div>
