@@ -24,7 +24,7 @@ sumber untuk membuat ulang berkas seed — bukan lagi isi website.
 
 ---
 
-## 1. Profil usaha — `src/data/profil.ts`
+## 1. Profil usaha — `src/data/profil.ts` (versi Inggris: `src/data/profil-en.ts`)
 
 Tidak tersimpan di basis data, jadi selalu disunting di berkas ini.
 
@@ -61,6 +61,10 @@ menentukan HPP, jadi **ini yang paling memengaruhi kebenaran laporan.**
 
 Yang perlu dipastikan bersama Ibu Asri: nama menu, harga jual, isi paket,
 minimal pemesanan, biaya kemasan, biaya tenaga kerja, dan takaran tiap bahan.
+
+Versi bahasa Inggris (nama, deskripsi, isi paket) diisi di bagian **Versi
+bahasa Inggris (opsional)** pada formulir menu yang sama. Bila dikosongkan,
+pengunjung yang memilih EN tetap melihat teks bahasa Indonesia.
 
 ## 3. Bahan baku dan harganya
 

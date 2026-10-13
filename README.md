@@ -115,7 +115,7 @@ src/
 │  ├─ KeranjangLaci.tsx     Keranjang berupa laci samping
 │  ├─ akun/                 Formulir auth, peta alamat (Leaflet)
 │  └─ pesanan/              Daftar & detail pesanan pelanggan
-├─ data/                    Data contoh: menu, bahan, pesanan, profil
+├─ data/                    Data contoh: menu, bahan, pesanan, profil (+ profil-en.ts)
 ├─ lib/
 │  ├─ types.ts              Tipe data domain
 │  ├─ format.ts             Format rupiah, tanggal, persen
@@ -128,10 +128,12 @@ src/
 │  ├─ api-klien.ts          Pemanggil /api/* dengan token sesi
 │  ├─ status.ts             Alur, label, dan warna status
 │  ├─ db.ts                 Baca/tulis tabel Supabase
+│  ├─ teks.ts               Teks menu, status, dan tanggal per bahasa
 │  ├─ gemini.ts             Pemanggil Gemini (server saja)
 │  ├─ ai-tipe.ts            Bentuk data yang boleh dikirim ke Gemini
 │  ├─ ai-sanitasi.ts        Penyaring data sebelum dikirim keluar
 │  └─ ai-klien.ts           Jembatan halaman admin ke /api/ai/*
+├─ store/BahasaProvider.tsx Pilihan bahasa ID/EN situs pelanggan
 ├─ store/AuthProvider.tsx   Sesi, profil, dan status admin (Supabase Auth)
 ├─ store/DataProvider.tsx   Sumber data tunggal + keranjang
 supabase/
@@ -143,6 +145,7 @@ supabase/
 ├─ 07-foto-menu.sql         Bucket Storage untuk foto menu
 ├─ 08-contoh-pesanan-lunas.sql  5 pesanan lunas untuk menguji laporan, opsional
 ├─ 09-qris.sql              QRIS toko, nominal unik, log notifikasi
+├─ 10-menu-bahasa-inggris.sql  Kolom & isi menu versi bahasa Inggris
 └─ 06-akun-pembayaran.sql   Akun pelanggan, pembayaran, RLS produksi
 scripts/
 ├─ muat-data.mjs                 Memuat src/data/*.ts untuk kedua skrip di bawah
@@ -313,6 +316,12 @@ npm start
   `tailwind.config.ts`).
 - Responsif mulai lebar 360 px. Tabel panel admin dapat digeser mendatar di
   layar kecil.
+- Situs pelanggan tersedia dalam **Bahasa Indonesia dan Inggris**. Tombol
+  **ID | EN** ada di samping keranjang (di HP: satu tombol yang menampilkan
+  bahasa tujuan). Pilihan disimpan di peramban (`asri.bahasa`). Teks antarmuka
+  ditulis berpasangan lewat `t("…", "…")` dari `useBahasa()`; isi menu memakai
+  kolom `*_en` dan jatuh ke bahasa Indonesia bila kosong. Panel admin, pesan
+  galat dari server, dan metadata SEO tetap berbahasa Indonesia.
 
 ---
 

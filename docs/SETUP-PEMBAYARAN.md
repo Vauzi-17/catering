@@ -33,6 +33,7 @@ Setelah bagian ini selesai:
 | 3 | **`06-akun-pembayaran.sql`** | Akun pelanggan, pembayaran, RLS produksi |
 | 4 | **`07-foto-menu.sql`** | Bucket Storage `menu` untuk unggah foto dari panel admin |
 | 5 | **`09-qris.sql`** | QRIS toko, nominal unik, log notifikasi, tagihan kedaluwarsa |
+| 6 | **`10-menu-bahasa-inggris.sql`** | Nama, deskripsi, dan isi paket versi bahasa Inggris untuk tombol EN |
 | opsional | `08-contoh-pesanan-lunas.sql` | 5 pesanan lunas (kode `ASR-UJI-`) untuk menguji laporan, margin, dan catatan AI |
 | opsional | `05-contoh-pesanan.sql` | 23 pesanan contoh versi lama (kode `ASR-DEMO-`) |
 
