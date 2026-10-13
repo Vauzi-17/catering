@@ -21,7 +21,7 @@ export default function HalamanTentang() {
       <HeroHalaman
         remah={[{ label: "Beranda", href: "/" }, { label: "Tentang" }]}
         judul="Tentang Asri Catering"
-        deskripsi={`Dari dapur rumah Ibu Asri sejak ${profil.berdiri}, kini melayani kantor, sekolah, dan acara keluarga di Bandung.`}
+        deskripsi={`Dari dapur rumah Ibu Asri sejak ${profil.berdiri}, kini melayani kantor, sekolah, dan acara keluarga di Cilacap.`}
         foto={fotoDekorasi.slice(1)}
       />
 

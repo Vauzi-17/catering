@@ -4,7 +4,7 @@ export const profil = {
   pemilik: "Ibu Asri Wulandari",
   berdiri: 2016,
   deskripsiSingkat:
-    "Asri Catering melayani nasi kotak, bento, prasmanan, tumpeng, dan snack box untuk acara kantor, sekolah, pengajian, dan keluarga. Semua masakan diolah pada hari pengantaran di dapur sendiri.",
+    "Asri Catering melayani nasi kotak, bento, tumpeng, dan snack box untuk acara kantor, sekolah, pengajian, dan keluarga. Semua masakan diolah pada hari pengantaran di dapur sendiri.",
   sejarah: [
     {
       tahun: "2016",
@@ -27,10 +27,10 @@ export const profil = {
       isi: "Pencatatan pesanan yang semula ditulis di buku tulis dipindahkan ke sistem digital, lengkap dengan perhitungan harga pokok produksi dan laporan pendapatan harian.",
     },
   ],
-  alamat: "Jl. Melati Raya No. 27, Kelurahan Sukamaju, Kota Bandung, Jawa Barat 40285",
-  alamatSingkat: "Jl. Melati Raya No. 27, Sukamaju, Bandung",
-  telepon: "0812-2345-6789",
-  teleponRaw: "6281223456789",
+  alamat: "Jl. Nata Bangsa RT 01 RW 10, Desa Jambusari, Kecamatan Jeruklegi, Kabupaten Cilacap, Jawa Tengah",
+  alamatSingkat: "Jl. Nata Bangsa, Jambusari, Jeruklegi, Cilacap",
+  telepon: "0851-3375-0156",
+  teleponRaw: "6285133750156",
   email: "halo@asricatering.id",
   instagram: "@asricatering.id",
   jamOperasional: [
@@ -40,10 +40,9 @@ export const profil = {
     { hari: "Hari Besar", jam: "Dengan perjanjian" },
   ],
   areaLayanan: [
-    "Kota Bandung",
-    "Kabupaten Bandung",
-    "Cimahi",
-    "Bandung Barat (min. 50 porsi)",
+    "Jeruklegi dan sekitarnya",
+    "Kota Cilacap",
+    "Kabupaten Cilacap",
   ],
   statistik: [
     { angka: "9", label: "Tahun melayani" },
@@ -112,12 +111,12 @@ export const profil = {
     {
       tanya: "Berapa minimal pemesanan?",
       jawab:
-        "Minimal pemesanan berbeda tiap paket. Nasi box mulai 10 box, snack box mulai 20 box, prasmanan mulai 50 porsi, sedangkan tumpeng bisa dipesan satuan.",
+        "Minimal pemesanan berbeda tiap paket. Nasi box mulai 10 box, snack box mulai 20 box, sedangkan tumpeng bisa dipesan satuan.",
     },
     {
       tanya: "Berapa hari sebelumnya pesanan harus dibuat?",
       jawab:
-        "Untuk pesanan di bawah 100 porsi kami menerima pesanan H-1. Untuk pesanan di atas 100 porsi atau paket prasmanan, sebaiknya dipesan minimal tiga hari sebelum acara.",
+        "Untuk pesanan di bawah 100 porsi kami menerima pesanan H-1. Untuk pesanan di atas 100 porsi, sebaiknya dipesan minimal tiga hari sebelum acara.",
     },
     {
       tanya: "Apakah ada biaya antar?",
@@ -132,7 +131,7 @@ export const profil = {
     {
       tanya: "Apakah menu bisa disesuaikan?",
       jawab:
-        "Bisa. Isi lauk pada paket prasmanan dan tumpeng dapat diganti sesuai permintaan. Silakan tuliskan permintaan Anda pada kolom catatan saat memesan.",
+        "Bisa. Isi lauk pada paket nasi kotak dan tumpeng dapat diganti sesuai permintaan. Silakan tuliskan permintaan Anda pada kolom catatan saat memesan.",
     },
   ],
 };

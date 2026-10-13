@@ -49,7 +49,7 @@ export default function Beranda() {
               Nasi Kotak &amp; Bento untuk Setiap Acara
             </h1>
             <p className="mt-5 max-w-md text-[16px] leading-relaxed text-white/85 sm:text-[17px]">
-              Dimasak pagi di hari pengantaran, dari dapur Ibu Asri di Bandung.
+              Dimasak pagi di hari pengantaran, dari dapur Ibu Asri di Jeruklegi, Cilacap.
             </p>
 
             <div className="mt-8">

@@ -20,18 +20,18 @@ const display = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL("https://asricatering.id"),
   title: {
-    default: "Asri Catering — Katering Nasi Kotak, Bento & Prasmanan di Bandung",
+    default: "Asri Catering — Katering Nasi Kotak, Bento & Tumpeng di Cilacap",
     template: "%s · Asri Catering",
   },
   description:
-    "Asri Catering melayani nasi kotak, bento, prasmanan, tumpeng, dan snack box untuk acara kantor, sekolah, dan keluarga di Bandung. Harga jelas, pesan online, pesanan tercatat rapi.",
+    "Asri Catering melayani nasi kotak, bento, tumpeng, dan snack box untuk acara kantor, sekolah, dan keluarga di Cilacap. Harga jelas, pesan online, pesanan tercatat rapi.",
   keywords: [
-    "catering bandung",
-    "nasi kotak bandung",
+    "catering cilacap",
+    "nasi kotak cilacap",
     "bento catering",
-    "nasi box bandung",
-    "catering prasmanan",
-    "tumpeng bandung",
+    "nasi box cilacap",
+    "catering jeruklegi",
+    "tumpeng cilacap",
     "snack box",
   ],
   openGraph: {
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     siteName: "Asri Catering",
     title: "Asri Catering — Katering nasi kotak & bento untuk setiap acara",
     description:
-      "Nasi kotak, bento, prasmanan, tumpeng, dan snack box untuk acara di Bandung. Pesan online, harga tercantum jelas.",
+      "Nasi kotak, bento, tumpeng, dan snack box untuk acara di Cilacap. Pesan online, harga tercantum jelas.",
   },
   robots: { index: true, follow: true },
   // Terjemahan otomatis peramban mengganti teks halaman diam-diam dan membuat

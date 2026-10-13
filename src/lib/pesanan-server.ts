@@ -55,8 +55,8 @@ export async function infoPengantaran(): Promise<{ lat: number; lng: number; rad
     .maybeSingle();
   if (error) throw error;
   return {
-    lat: Number(data?.dapur_lat ?? -6.917464),
-    lng: Number(data?.dapur_lng ?? 107.619123),
+    lat: Number(data?.dapur_lat ?? -7.560572),
+    lng: Number(data?.dapur_lng ?? 109.01547),
     radiusKm: Number(data?.radius_km ?? 25),
   };
 }
