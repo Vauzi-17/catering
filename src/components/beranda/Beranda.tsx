@@ -4,7 +4,9 @@ import Link from "next/link";
 import {
   ArrowRight,
   ClipboardList,
+  Flame,
   ShoppingBag,
+  Sparkles,
   Ticket,
   Truck,
   UtensilsCrossed,
@@ -13,7 +15,7 @@ import { DaftarTestimoni } from "@/components/DaftarTestimoni";
 import { HitungCepat } from "@/components/beranda/HitungCepat";
 import { MenuLaris } from "@/components/beranda/MenuLaris";
 import { PilihAcara } from "@/components/beranda/PilihAcara";
-import { KartuFavorit, RingkasMenu } from "@/components/beranda/SorotanHero";
+import { KartuFavorit, RingkasMenu, StikerHarga } from "@/components/beranda/SorotanHero";
 import { IconWhatsapp } from "@/components/Icons";
 import { FotoMenu } from "@/components/Placeholder";
 import { SectionHeading } from "@/components/Ui";
@@ -49,7 +51,7 @@ export function Beranda() {
     <>
       {/* Hero */}
       <section className="relative overflow-hidden rounded-b-[50%_56px] bg-gradient-to-br from-jingga-700 via-jingga-600 to-jingga-400 text-white sm:rounded-b-[50%_88px]">
-        <div className="container-page grid items-center gap-14 pb-24 pt-12 sm:pb-28 lg:grid-cols-[1.1fr_1fr] lg:gap-10 lg:pb-32 lg:pt-16">
+        <div className="container-page grid items-center gap-16 pb-24 pt-12 sm:pb-28 lg:grid-cols-[1fr_1.1fr] lg:gap-8 lg:pb-32 lg:pt-16">
           <div>
             <h1 className="text-[42px] font-medium leading-[1.03] sm:text-[58px] lg:text-[66px]">
               {t("Nasi Kotak & Bento untuk Setiap Acara", "Rice Boxes & Bento for Every Occasion")}
@@ -79,31 +81,82 @@ export function Beranda() {
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[300px] sm:max-w-[370px] lg:mr-6">
-            <div className="rounded-full bg-jingga-200/35 p-3 sm:p-4">
-              <FotoMenu
-                src={fotoUtama}
-                nama="Paket Nasi Kuning Bento Royal"
-                rasio="aspect-square"
-                className="rounded-full"
-              />
+          <div className="relative mx-auto mt-4 w-full max-w-[320px] sm:max-w-[440px] lg:mt-0 lg:max-w-[520px]">
+            {/* Cahaya hangat di belakang piring */}
+            <span
+              className="hero-denyut pointer-events-none absolute -inset-10 rounded-full bg-[radial-gradient(circle,rgba(255,236,200,0.75)_0%,rgba(255,214,150,0.35)_40%,transparent_70%)] blur-2xl"
+              aria-hidden="true"
+            />
+            {/* Cincin putus-putus yang berputar pelan */}
+            <span
+              className="hero-putar pointer-events-none absolute -inset-3 rounded-full border-2 border-dashed border-white/45 sm:-inset-5"
+              aria-hidden="true"
+            />
+
+            {/* Piring utama */}
+            <div className="hero-muncul group relative rounded-full bg-white/25 p-3 shadow-[0_45px_90px_-30px_rgba(80,30,0,0.75)] ring-1 ring-white/40 backdrop-blur-sm sm:p-4">
+              <div className="overflow-hidden rounded-full ring-4 ring-white/70">
+                {fotoUtama ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={fotoUtama}
+                    alt={t("Paket Nasi Kuning Bento Royal", "Royal Yellow Rice Bento")}
+                    className="aspect-square w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                ) : (
+                  <FotoMenu src={fotoUtama} nama="Paket Nasi Kuning Bento Royal" rasio="aspect-square" className="rounded-full" />
+                )}
+              </div>
             </div>
 
-            {/* Foto kecil yang mengorbit piring utama */}
+            {/* Kilau kecil */}
+            <Sparkles
+              className="hero-kerlip absolute -left-2 top-[18%] h-6 w-6 text-jingga-100 sm:h-7 sm:w-7"
+              aria-hidden="true"
+            />
+            <Sparkles
+              className="hero-kerlip absolute right-[8%] top-[46%] h-5 w-5 text-white [animation-delay:1.1s]"
+              aria-hidden="true"
+            />
+            <Sparkles
+              className="hero-kerlip absolute bottom-[22%] left-[30%] h-4 w-4 text-jingga-100 [animation-delay:2s]"
+              aria-hidden="true"
+            />
+
+            {/* Stiker harga */}
+            <div className="hero-muncul absolute -left-3 -top-3 [animation-delay:0.25s] sm:-left-6 sm:-top-2">
+              <StikerHarga />
+            </div>
+
+            {/* Foto kecil yang mengapung di sekitar piring */}
             {fotoOrbit[0] && (
-              <span className="absolute -right-3 top-2 h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-lg sm:-right-8 sm:h-28 sm:w-28">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={fotoOrbit[0]} alt="" className="h-full w-full object-cover" />
+              <span className="hero-muncul absolute -right-2 top-0 [animation-delay:0.35s] sm:-right-8 sm:top-2">
+                <span className="hero-apung block h-24 w-24 overflow-hidden rounded-full border-4 border-white shadow-[0_18px_36px_-14px_rgba(80,30,0,0.7)] sm:h-32 sm:w-32">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={fotoOrbit[0]} alt="" className="h-full w-full object-cover" />
+                </span>
               </span>
             )}
             {fotoOrbit[1] && (
-              <span className="absolute -left-4 top-[38%] hidden h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-lg sm:-left-12 sm:block sm:h-24 sm:w-24">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={fotoOrbit[1]} alt="" className="h-full w-full object-cover" />
+              <span className="hero-muncul absolute -right-1 bottom-[18%] [animation-delay:0.5s] sm:-right-10">
+                <span className="hero-apung block h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-[0_18px_36px_-14px_rgba(80,30,0,0.7)] [animation-delay:1.5s] sm:h-28 sm:w-28">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={fotoOrbit[1]} alt="" className="h-full w-full object-cover" />
+                </span>
               </span>
             )}
 
-            <div className="absolute -bottom-5 left-0 max-w-[calc(100%-1rem)] sm:-left-8">
+            {/* Label segar */}
+            <span className="hero-muncul absolute -left-8 top-[52%] hidden [animation-delay:0.6s] sm:block">
+              <span className="hero-apung flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-[13px] font-semibold text-ink shadow-[0_14px_30px_-14px_rgba(80,30,0,0.6)] [animation-delay:0.8s]">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-jingga-100 text-jingga-600">
+                  <Flame size={14} strokeWidth={2.2} />
+                </span>
+                {t("Dimasak pagi ini", "Cooked this morning")}
+              </span>
+            </span>
+
+            <div className="hero-muncul absolute -bottom-6 left-1 max-w-[calc(100%-1rem)] [animation-delay:0.7s] sm:-left-6">
               <KartuFavorit />
             </div>
           </div>

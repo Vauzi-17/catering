@@ -193,3 +193,96 @@
     animation: none;
   }
 }
+
+/* Efek foto hero beranda: piring muncul, cincin berputar, foto kecil
+   mengambang, stiker bergoyang, dan kilau berkedip. */
+@keyframes hero-muncul {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hero-putar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hero-apung {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes hero-denyut {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes hero-goyang {
+  0%,
+  100% {
+    transform: rotate(-12deg);
+  }
+  50% {
+    transform: rotate(-4deg);
+  }
+}
+
+@keyframes hero-kerlip {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.6) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(25deg);
+  }
+}
+
+.hero-muncul {
+  animation: hero-muncul 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.hero-putar {
+  animation: hero-putar 50s linear infinite;
+}
+.hero-apung {
+  animation: hero-apung 6s ease-in-out infinite;
+}
+.hero-denyut {
+  animation: hero-denyut 7s ease-in-out infinite;
+}
+.hero-goyang {
+  animation: hero-goyang 4s ease-in-out infinite;
+}
+.hero-kerlip {
+  animation: hero-kerlip 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-muncul,
+  .hero-putar,
+  .hero-apung,
+  .hero-denyut,
+  .hero-goyang,
+  .hero-kerlip {
+    animation: none;
+  }
+}
