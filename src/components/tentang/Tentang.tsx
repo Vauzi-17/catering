@@ -5,7 +5,6 @@ import { ArrowRight, ChevronDown, Clock, ExternalLink, Mail, MapPin, Phone } fro
 import { DaftarKeunggulan } from "@/components/DaftarKeunggulan";
 import { HeroHalaman } from "@/components/HeroHalaman";
 import { IconInstagram, IconWhatsapp } from "@/components/Icons";
-import { GambarPlaceholder } from "@/components/Placeholder";
 import { SectionHeading } from "@/components/Ui";
 import { useProfil } from "@/lib/useProfil";
 import { useBahasa } from "@/store/BahasaProvider";
@@ -58,10 +57,14 @@ export function Tentang() {
 
           <div className="lg:col-span-5">
             <div className="kartu p-3">
-              <GambarPlaceholder
-                label={t("Foto Asri di dapur — 1200 × 900 px", "Photo of Asri in the kitchen — 1200 × 900 px")}
-                className="rounded-xl border-0"
-              />
+              <div className="aspect-[4/3] w-full overflow-hidden rounded-xl bg-abu">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/ibu-asri.jpeg"
+                  alt={t("Foto Asri di dapur", "Photo of Asri in the kitchen")}
+                  className="h-full w-full object-cover"
+                />
+              </div>
               <div className="px-3 pb-3 pt-5">
                 <p className="text-[13px] text-ink-muted">{t("Pemilik usaha", "Owner")}</p>
                 <h3 className="mt-0.5 text-[24px] font-semibold">{profil.pemilik}</h3>
